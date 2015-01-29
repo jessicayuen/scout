@@ -1,8 +1,5 @@
-CMPUT 401: Requirements Technical Reviews and Repairs (4%)
-Jim Wen, Shen Wei Liao, Justin Hoy, Thomas Fung, Jessica Yuen
-Due: Jan. 30, 2015
 
-##Iteration Plan                             Planned/Estimated                                          Actual
+####-----------------------Iteration Plan---------------------------Planned/Estimated-------------Actual------
 
 | Milestone  | Activity  | Start  | End | Effort | Start | End | Effort |
 |:-----------|:----------|:-------|:----|:------:|-------|-----|--------|
