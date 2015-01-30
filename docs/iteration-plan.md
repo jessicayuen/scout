@@ -1,3 +1,11 @@
+Sprint End Dates
+----------------
+* Sprint 0: Jan 30, 2015
+* Sprint 1: Feb 13, 2015
+* Sprint 2: Feb 27, 2015
+* Sprint 3: Mar 13, 2015
+* Sprint 4: Mar 27, 2015
+* Sprint 5: Apr 10, 2015
 
 ####-----------------------Iteration Plan---------------------------Planned/Estimated-------------Actual------
 
