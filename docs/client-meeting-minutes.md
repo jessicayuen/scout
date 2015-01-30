@@ -61,3 +61,47 @@ Jan. 26, 2015 Client Meeting (Irregular)
 * UI, user usability is of little importance. Focus on getting the technology (i.e. triangulation, background services) to work, and the ability to track customer data.
 * Kyle will place an order on 3 Estimote Beacons.
 
+Jan. 30, 2015 Client Meeting
+-----------------------------
+* Went over user requirement plan with kylem specifically user stories.
+   * Agreed upon which of the user stories were right to cut out and which one to keep. Cutting out condition being whether or not it was feasible or related to what kyle wanted in the first place, since many new points were brought up during our previous irregular meeting.
+	* Extensive points system had its priority lowered in the backlog as it was more of a niche than a necessity, if time arises in the end implementations can be looked into.
+
+* Noted that the user story regarding to approximate location of user within a beacon was one of the main features Kyle would have liked in the working prototype.
+
+* The type of data collected and shown as well as method of collection were discussed extensively in the meeting.
+   * whether or not the application is running in the foreground of background when collecting data
+	* amount of time spent in the store
+	* distance based (approximity - meaning data is collected whenever user comes in range of a BLE beacon)
+	* ability to identify specific beacon as well as signal strength to said beacon (this will individualize each stores as users are probably going to be visiting more than one Scout associated merchant
+	* association of the data collected with specific user (ability to identify each individual user - male or female, age, name, etc) (ethicality should be considered with this idea)
+
+* Items to be displayed on the dashboard specifically to the merchants were also reviewed in the meeting
+	* number of new customers
+	* list of registered user who have visited the store
+	* ability to display user location data within the store(relativity to a beacon within the store) (this data can also be used to map out the location attracting most users)
+	* user heat map (displaying user location concentration within the areas of the store) with respect to time derived from point above
+	* beacon specific information (e.g. stores names, location, etc)
+	* Average time a user spent in the store
+	* number of points given (either per user or average)
+	* set rewards for users to claim (ability for merchants to alter the prizes customers can redeem with points)
+	* rewards redeemed by the user (data on what the users are redeeming with their points)
+
+* Another topic we went over was the items to be displayed on the android appliation, these are user specific
+	* Number of points accumulated
+	* Type of rewards that can be redeemed
+
+#####With all the discussion points noted above the following user stories were either added or modified:
+   * As a business owner, I’d like to be able to utilize BLE sensors to track customer interaction with my store
+   * As a business owner, I want to be able to sign in into an online dashboard
+   * As a business owner, I’d like to be able to track a customer’s approximate location within a certain radius of the beacon
+   * As a business owner, I’d like to utilize the hardware’s ability to trilaterate the user’s approximate movement within the store
+   * As a customer, I’d like to be rewarded points for visiting a business once a day
+   * As a business owner, I’d like to be able to see the movement of the customer on my dashboard in the shape of a heat map
+   * As a business owner, I want the app to run in the 
+background to collect the data
+   * As a business owner, I want the average time a customer was in the store to be visible on my dashboard
+   * As a customer, I would like to be able to sign in to the mobile application
+   * As a customer, I want to be able to redeem my points for rewards
+   * As a business owner, I want to know the number of points I have given customers visible on my dashboard
+
