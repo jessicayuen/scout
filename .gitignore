@@ -25,3 +25,6 @@ ScoutMobile/proguard/
 
 # Log Files
 ScoutMobile/*.log
+
+# Misc
+.DS_Store
