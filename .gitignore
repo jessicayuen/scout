@@ -28,3 +28,14 @@ ScoutMobile/*.log
 
 # Misc
 .DS_Store
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Rope
+.ropeproject
+
+# Django stuff
+*.log
+*.pot
