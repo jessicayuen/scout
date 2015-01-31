@@ -11,17 +11,18 @@ class Customer(models.Model):
     points = models.IntegerField()
 
 
+class BLE(models.Model):
+    customer = models.OneToOneField(Customer)
+    time = models.DateTimeField()
+
+
 class Business(models.Model):
     user = models.OneToOneField(User)
     customers = models.ManyToManyField(Customer)
+    ble = models.ForeignKey(BLE)
 
 
 class Rewards(models.Model):
     business = models.ForeignKey(Business)
     points = models.IntegerField()
     reward = models.TextField()
-
-
-class BLE(models.Model):
-    customer = models.ForeignKey(Customer)
-    time = models.DateTimeField()
