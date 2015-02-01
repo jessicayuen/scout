@@ -21,6 +21,10 @@
             android:name=".RewardsActivity"
             android:label="@string/title_activity_rewards" >
         </activity>
+        <activity
+            android:name=".PlacesActivity"
+            android:label="@string/title_activity_places" >
+        </activity>
     </application>
 
 </manifest>
