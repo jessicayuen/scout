@@ -1,0 +1,89 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="scout.scoutmobile.activities.RegisterActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/signUpForm"
+        android:layout_centerInParent="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15dp"
+                android:src="@drawable/ic_launcher"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            <EditText
+                android:id="@+id/register_name_first_edittext"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_name_first"/>
+
+            <EditText
+                android:id="@+id/register_name_last_edittext"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_name_last"/>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/register_email_edittext"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_email" />
+
+            <EditText
+                android:id="@+id/register_password_edittext"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_password" />
+
+            <EditText
+                android:id="@+id/register_password_again_edittext"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_password_again" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+                <Button android:id="@+id/register_cancel_btn" style="@style/CustomStyleButton"
+                    android:text="@string/action_cancel"/>
+
+                <Button android:id="@+id/register_accept_btn" style="@style/CustomStyleButton"
+                    android:text="@string/action_accept"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+     </ScrollView>
+
+</RelativeLayout>

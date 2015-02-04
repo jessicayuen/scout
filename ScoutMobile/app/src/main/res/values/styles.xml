@@ -5,4 +5,15 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="CustomStyleButton" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#DEDFDC</item>
+        <item name="android:gravity">center</item>
+        <item  name="android:background">@drawable/custom_button</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
 </resources>

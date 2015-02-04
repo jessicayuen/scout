@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Strings related to register -->
+    <string name="title_activity_register">Register</string>
+
+    <string name="action_cancel">Cancel</string>
+    <string name="action_accept">Register</string>
+
+    <string name="hint_name_first">First Name</string>
+    <string name="hint_name_last">Last Name</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_password_again">Confirm password</string>
+    <string name="hint_email">Email</string>
+
+    <string name="password_not_match">Verify password does not match the password entered</string>
+    <string name="missing_field">Field is not filled</string>
+    <string name="invalid_email">Email entered is not valid</string>
+    <string name="invalid_password">Password entered is too short</string>
+
+    <string name="spinner_register">Registering, please wait....</string>
+
+</resources>
