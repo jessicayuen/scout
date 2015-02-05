@@ -9,7 +9,7 @@ public final class Consts {
     public static final String GENDER = "gender";
 
     //For registering and logging in
-    public static final String EMAIL_VALIDATING_REGEX = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$";
+    public static final String EMAIL_VALIDATING_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
 
 
     private Consts() {
