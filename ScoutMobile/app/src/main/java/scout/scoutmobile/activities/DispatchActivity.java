@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import com.parse.ParseUser;
 
-import scout.scoutmobile.PlacesActivity;
 import scout.scoutmobile.models.User;
 
 public class DispatchActivity extends Activity {

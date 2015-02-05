@@ -15,7 +15,6 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-import scout.scoutmobile.PlacesActivity;
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.models.User;

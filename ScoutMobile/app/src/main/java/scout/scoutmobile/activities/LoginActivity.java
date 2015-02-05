@@ -28,7 +28,6 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
-import scout.scoutmobile.PlacesActivity;
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.models.User;

@@ -33,6 +33,10 @@
             android:label="@string/title_activity_register"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
+
+        <activity android:name=".activities.PlacesActivity"
+            android:label=""></activity>
+        <activity android:name=".activities.RewardsActivity"></activity>
     </application>
 
 </manifest>
