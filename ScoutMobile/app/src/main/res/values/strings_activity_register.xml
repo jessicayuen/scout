@@ -17,6 +17,7 @@
     <string name="missing_field">Field is not filled</string>
     <string name="invalid_email">Email entered is not valid</string>
     <string name="invalid_password">Password entered is too short</string>
+    <string name="error_email_exists">Email entered already exists</string>
 
     <string name="spinner_register">Registering, please wait....</string>
 

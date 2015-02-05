@@ -3,7 +3,6 @@ package scout.scoutmobile.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,33 +11,46 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 import scout.scoutmobile.PlacesActivity;
 import scout.scoutmobile.R;
+import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.models.User;
 
 
 public class RegisterActivity extends Activity {
 
-    private static final String EMAIL_VALIDATING_REGEX = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$";
-
     private static final int MIN_USER_PASSWORD_LENGTH = 6;
 
-    private EditText mEmail;
-    private EditText mPassword;
-    private EditText mRetypedPassword;
+    private EditText mEmailEditText;
+    private EditText mPasswordEditText;
+    private EditText mRetypedPasswordEditText;
+    private EditText mFirstNameEditText;
+    private EditText mLastNameEditText;
+
+    private ProgressDialog mRegisterLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        mRegisterLoader = new ProgressDialog(RegisterActivity.this);
+        mRegisterLoader.setMessage(getString(R.string.spinner_register));
+
+        //setup submit button
         Button submitBtn = (Button) findViewById(R.id.register_accept_btn);
         submitBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                createAccount();
             }
         });
 
+        //setup cancel button
         Button cancelBtn = (Button) findViewById(R.id.register_cancel_btn);
         cancelBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -47,9 +59,11 @@ public class RegisterActivity extends Activity {
             }
         });
 
-        mEmail = (EditText) findViewById(R.id.register_email_edittext);
-        mPassword = (EditText) findViewById(R.id.register_password_edittext);
-        mRetypedPassword = (EditText) findViewById(R.id.register_password_again_edittext);
+        mEmailEditText = (EditText) findViewById(R.id.register_email_edittext);
+        mPasswordEditText = (EditText) findViewById(R.id.register_password_edittext);
+        mRetypedPasswordEditText = (EditText) findViewById(R.id.register_password_again_edittext);
+        mFirstNameEditText = (EditText) findViewById(R.id.register_name_first_edittext);
+        mLastNameEditText = (EditText) findViewById(R.id.register_name_last_edittext);
     }
 
 
@@ -75,81 +89,91 @@ public class RegisterActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void showLoader(boolean show) {
+        if (show) {
+            mRegisterLoader.show();
+        } else {
+            mRegisterLoader.dismiss();
+        }
+    }
+
+    /**
+     * Checks whether or not the email is valid syntax wise, it however does not validate the email
+     * given with any external source
+     * @param email the email provided by user
+     * @return true if valid, false other wise
+     */
     private boolean isEmailValid(String email) {
-        return email.matches(EMAIL_VALIDATING_REGEX);
+        return !email.isEmpty() && email.matches(Consts.EMAIL_VALIDATING_REGEX);
     }
 
     private boolean isPasswordValid(String password) {
         return password.length() >= MIN_USER_PASSWORD_LENGTH; //TODO change this
     }
 
-    private boolean createAccount() {
+    /**
+     * Attempt to create an account in parse database. Before the server query, valid string checks
+     * are made on email, password and verify password field.
+     */
+    private void createAccount() {
 
-        String email = mEmail.getText().toString().trim();
-        String password = mPassword.getText().toString();
-        String verifyPass = mRetypedPassword.getText().toString();
+        String email = mEmailEditText.getText().toString().trim();
+        String password = mPasswordEditText.getText().toString();
+        String verifyPass = mRetypedPasswordEditText.getText().toString();
 
         View focusView = null;
         boolean hasError = false;
 
-        if (email.isEmpty()) {
-            focusView = mEmail;
+        if (!isEmailValid(email)) {
+            focusView = mEmailEditText;
             hasError = true;
-            mEmail.setError(getString(R.string.invalid_email));
-        } else if (password.isEmpty() || isPasswordValid(password)) {
-            focusView = mPassword;
+            mEmailEditText.setError(getString(R.string.invalid_email));
+        } else if (!isPasswordValid(password)) {
+            focusView = mPasswordEditText;
             hasError = true;
-            mPassword.setError(getString(R.string.invalid_password));
+            mPasswordEditText.setError(getString(R.string.invalid_password));
         } else if (verifyPass.isEmpty()) {
-            focusView = mRetypedPassword;
+            focusView = mRetypedPasswordEditText;
             hasError = true;
-            mRetypedPassword.setError(getString(R.string.missing_field));
+            mRetypedPasswordEditText.setError(getString(R.string.missing_field));
         } else if (verifyPass.compareTo(password) != 0) {
-            focusView = mRetypedPassword;
+            focusView = mRetypedPasswordEditText;
             hasError = true;
-            mRetypedPassword.setError(getString(R.string.password_not_match));
+            mRetypedPasswordEditText.setError(getString(R.string.password_not_match));
         }
 
-        boolean creation = true;
-        if (creation == true) {
-            Intent mainActivity = new Intent(this, PlacesActivity.class);
-            mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(mainActivity);
-            finish();
+        if (hasError) {
+            focusView.requestFocus();
+        } else {
+            showLoader(true);
+
+            //populate the user to register
+            //TODO should locations be added here when registering?
+            //TODO could cause problems with final
+            final ParseUser user = new ParseUser();
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setUsername(email);
+            user.put(Consts.FIRST_NAME, mFirstNameEditText.getText().toString());
+            user.put(Consts.LAST_NAME, mLastNameEditText.getText().toString());
+
+            user.signUpInBackground(new SignUpCallback() {
+                @Override
+                public void done(ParseException e) {
+                    showLoader(false);
+                    if (e != null) {
+                        mEmailEditText.setError(getString(R.string.error_email_exists));
+                        mEmailEditText.requestFocus();
+                    } else {
+                        User.getInstance().setCurrentUser(user);
+                        Intent mainActivity = new Intent(RegisterActivity.this, PlacesActivity.class);
+                        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(mainActivity);
+                        finish();
+                    }
+                }
+            });
         }
 
-        return false;
-    }
-
-    public void showCreationFailed() {
-
-    }
-
-    private class UserRegisterTask extends AsyncTask<Void, Void, Void> {
-
-        public UserRegisterTask() {
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
     }
 }

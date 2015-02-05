@@ -1,15 +1,15 @@
 package scout.scoutmobile.models;
 
 
+import com.parse.ParseUser;
+
+import scout.scoutmobile.constants.Consts;
+
 public class User {
 
     private static User currentUser = null;
 
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String passWord;
-    private int points;
+    private ParseUser loggedInUser; // Current user logged in
 
     public static User getInstance() {
         if (currentUser == null) {
@@ -19,49 +19,45 @@ public class User {
     }
 
     public int getPoints() {
-        return points;
+        return loggedInUser.getInt(Consts.POINTS);
     }
 
     public void setPoints(int points) {
-        this.points = points;
+        loggedInUser.put(Consts.POINTS, points);
     }
 
     public String getEmail() {
 
-        return email;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        return loggedInUser.getEmail();
     }
 
     public String getFirstName() {
-        return firstName;
+        return loggedInUser.getString(Consts.FIRST_NAME);
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        loggedInUser.put(Consts.FIRST_NAME, firstName);
     }
 
     public String getLastName() {
-        return lastName;
+        return loggedInUser.getString(Consts.LAST_NAME);
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        loggedInUser.put(Consts.LAST_NAME, lastName);
+    }
+
+    public void logOut() {
+        loggedInUser.logOut();
+        resetUser();
     }
 
     public void resetUser() {
-        this.email = this.firstName = this.lastName = this.passWord = "";
-        this.points = -1;
+        loggedInUser = null;
+    }
+
+    public void setCurrentUser(ParseUser user) {
+        loggedInUser = user;
     }
 
     private User() {
