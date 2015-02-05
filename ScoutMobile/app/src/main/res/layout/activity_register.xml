@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="15dp"
-                android:src="@drawable/scout_home_page"/>
+                android:src="@drawable/scout_home_logo"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
