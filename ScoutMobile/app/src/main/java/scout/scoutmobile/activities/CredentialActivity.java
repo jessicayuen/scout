@@ -1,3 +1,8 @@
+/**
+ * Superclass for user credential related activities. These include but not limited to logging in
+ * and registering.
+ */
+
 package scout.scoutmobile.activities;
 
 import android.app.Activity;
@@ -6,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
-import com.parse.Parse;
 import com.parse.ParseException;
 
 import scout.scoutmobile.R;
@@ -31,10 +35,20 @@ public class CredentialActivity extends Activity {
         return email.matches(Consts.EMAIL_VALIDATING_REGEX);
     }
 
+    /**
+     * checks for the validity of the password, currently only checks if a password is of a certain
+     * length
+     * @param password password string to check
+     * @return true if value false otherwise
+     */
     protected boolean isPasswordValid(String password) {
         return password.length() >= MIN_USER_PASSWORD_LENGTH ;
     }
 
+    /**
+     * Checks for if a network is available to transfer data either wifi or mobile data
+     * @return true if a source is available false other wise
+     */
     protected boolean isNetworkingAvailable() {
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connManager.getActiveNetworkInfo();
@@ -45,10 +59,17 @@ public class CredentialActivity extends Activity {
         return false;
     }
 
+    /**
+     * Toasts no network available when called
+     */
     protected void toastNoNetwork() {
         showToast(getString(R.string.toast_network_unavailable));
     }
 
+    /**
+     * Displays a toast with the given message
+     * @param message message to be displayed
+     */
     protected void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
@@ -64,17 +85,23 @@ public class CredentialActivity extends Activity {
         }
     }
 
+    /**
+     * Displays the error string with the given error code.
+     * for more information visit https://parse.com/docs/android/api/com/parse/ParseException.html
+     * @param errorCode the ParseException error code
+     * @return a human readable string corresponding to the error code
+     */
     protected String getErrorString(int errorCode) {
         String resStr = "";
         switch (errorCode) {
             case ParseException.ACCOUNT_ALREADY_LINKED:
-                resStr = "Account already logged in";
+                resStr = getString(R.string.exception_account_linked);
                 break;
             case ParseException.EMAIL_TAKEN:
-                resStr = "Account already exists with that email";
+                resStr = getString(R.string.exception_email_exits);
                 break;
             case ParseException.CONNECTION_FAILED:
-                resStr = "Error Connecting to the server";
+                resStr = getString(R.string.exception_server_connection);
                 break;
             default:
                 return resStr = "";

@@ -22,8 +22,6 @@ import scout.scoutmobile.utils.Logger;
 
 public class RegisterActivity extends CredentialActivity {
 
-    private static final int MIN_USER_PASSWORD_LENGTH = 6;
-
     private EditText mEmailEditText;
     private EditText mPasswordEditText;
     private EditText mRetypedPasswordEditText;
@@ -98,6 +96,10 @@ public class RegisterActivity extends CredentialActivity {
      */
     private void createAccount() {
 
+        mEmailEditText.setError(null);
+        mPasswordEditText.setError(null);
+        mRetypedPasswordEditText.setError(null);
+
         String email = mEmailEditText.getText().toString().trim();
         String password = mPasswordEditText.getText().toString();
         String verifyPass = mRetypedPasswordEditText.getText().toString();
@@ -129,8 +131,6 @@ public class RegisterActivity extends CredentialActivity {
             showProgress(true);
 
             //populate the user to register
-            //TODO should locations be added here when registering?
-            //TODO could cause problems with final
             final ParseUser user = new ParseUser();
             user.setEmail(email);
             user.setPassword(password);

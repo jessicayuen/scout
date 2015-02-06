@@ -7,4 +7,9 @@
 
     <!--Network related strings-->
     <string name="toast_network_unavailable">No network connection exists to perform that action</string>
+
+    <!--Parse Exception Strings-->
+    <string name="exception_account_linked">Account already logged in</string>
+    <string name="exception_email_exits">Account already exists with that email</string>
+    <string name="exception_server_connection">Error Connecting to the server</string>
 </resources>

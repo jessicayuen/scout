@@ -12,5 +12,5 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
-    <string name="spinner_login">Loggin in, please wait...</string>
+    <string name="spinner_login">Logging in, please wait...</string>
 </resources>

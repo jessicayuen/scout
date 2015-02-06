@@ -1,3 +1,8 @@
+/**
+ * The sole purpose of this activity is to dispatch the application to the correct activity.
+ * Since parse user once logged in has a local instance stored, we can bypass the need to go to
+ * the login screen whenever the application is reopened.
+ */
 package scout.scoutmobile.activities;
 
 import android.app.Activity;

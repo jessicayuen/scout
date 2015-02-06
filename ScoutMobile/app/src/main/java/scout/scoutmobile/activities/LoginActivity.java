@@ -137,8 +137,8 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // Show a loading spinner, and kick off a background task to
+            // perform the user login attempt via parse.
             showProgress(true);
             ParseUser.logInInBackground(email, password, new LogInCallback() {
                 @Override
