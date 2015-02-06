@@ -1,6 +1,5 @@
 package scout.scoutmobile.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +17,10 @@ import com.parse.SignUpCallback;
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.models.User;
+import scout.scoutmobile.utils.Logger;
 
 
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends CredentialActivity {
 
     private static final int MIN_USER_PASSWORD_LENGTH = 6;
 
@@ -30,22 +30,26 @@ public class RegisterActivity extends Activity {
     private EditText mFirstNameEditText;
     private EditText mLastNameEditText;
 
-    private ProgressDialog mRegisterLoader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mRegisterLoader = new ProgressDialog(RegisterActivity.this);
-        mRegisterLoader.setMessage(getString(R.string.spinner_register));
+        mLogger = new Logger("RegisterActivity");
+
+        mLoadingDialog = new ProgressDialog(RegisterActivity.this);
+        mLoadingDialog.setMessage(getString(R.string.spinner_register));
 
         //setup submit button
         Button submitBtn = (Button) findViewById(R.id.register_accept_btn);
         submitBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                createAccount();
+                if (isNetworkingAvailable()) {
+                    createAccount();
+                } else {
+                    toastNoNetwork();
+                }
             }
         });
 
@@ -88,28 +92,6 @@ public class RegisterActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showLoader(boolean show) {
-        if (show) {
-            mRegisterLoader.show();
-        } else {
-            mRegisterLoader.dismiss();
-        }
-    }
-
-    /**
-     * Checks whether or not the email is valid syntax wise, it however does not validate the email
-     * given with any external source
-     * @param email the email provided by user
-     * @return true if valid, false other wise
-     */
-    private boolean isEmailValid(String email) {
-        return !email.isEmpty() && email.matches(Consts.EMAIL_VALIDATING_REGEX);
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() >= MIN_USER_PASSWORD_LENGTH; //TODO change this
-    }
-
     /**
      * Attempt to create an account in parse database. Before the server query, valid string checks
      * are made on email, password and verify password field.
@@ -144,7 +126,7 @@ public class RegisterActivity extends Activity {
         if (hasError) {
             focusView.requestFocus();
         } else {
-            showLoader(true);
+            showProgress(true);
 
             //populate the user to register
             //TODO should locations be added here when registering?
@@ -156,14 +138,21 @@ public class RegisterActivity extends Activity {
             user.put(Consts.FIRST_NAME, mFirstNameEditText.getText().toString());
             user.put(Consts.LAST_NAME, mLastNameEditText.getText().toString());
 
+            mLogger.log("Registering user...");
             user.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
-                    showLoader(false);
+                    showProgress(false);
                     if (e != null) {
-                        mEmailEditText.setError(getString(R.string.error_email_exists));
-                        mEmailEditText.requestFocus();
+                        int code = e.getCode();
+                        if (code == ParseException.EMAIL_TAKEN) {
+                            mEmailEditText.setError(getString(R.string.error_email_exists));
+                            mEmailEditText.requestFocus();
+                        } else {
+                            showToast(getErrorString(code));
+                        }
                     } else {
+                        mLogger.log("Successfully registered user");
                         User.getInstance().setCurrentUser(user);
                         Intent mainActivity = new Intent(RegisterActivity.this, PlacesActivity.class);
                         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

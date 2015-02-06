@@ -1,6 +1,5 @@
 package scout.scoutmobile.activities;
 
-import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.CursorLoader;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import scout.scoutmobile.R;
-import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.models.User;
 import scout.scoutmobile.utils.Logger;
 
@@ -37,28 +35,19 @@ import scout.scoutmobile.utils.Logger;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
-
-    private static final int USER_SAVED_DATE_DATA_INDEX = 0;
-    private static final int USER_EMAIL_DATA_INDEX = 1;
-    private static final int USER_PASSWORD_DATA_INDEX = 2;
-
-    private static final int MIN_USER_PASSWORD_LENGTH = 6;
-
-    private Logger mLogger;
+public class LoginActivity extends CredentialActivity implements LoaderCallbacks<Cursor> {
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private ProgressDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loadingDialog = new ProgressDialog(LoginActivity.this);
-        loadingDialog.setMessage(getString(R.string.spinner_login));
+        mLoadingDialog = new ProgressDialog(LoginActivity.this);
+        mLoadingDialog.setMessage(getString(R.string.spinner_login));
 
         mLogger = new Logger("LoginActivity");
 
@@ -71,8 +60,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+                    if (isNetworkingAvailable()) {
+                        attemptLogin();
+                        return true;
+                    } else {
+                        toastNoNetwork();
+                    }
                 }
                 return false;
             }
@@ -82,27 +75,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                if (isNetworkingAvailable()) {
+                    attemptLogin();
+                } else {
+                    toastNoNetwork();
+                }
             }
         });
         Button mEmailRegisterButton = (Button) findViewById(R.id.email_register_button);
         mEmailRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class); //todo call register activity
+                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(registerIntent);
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        ParseUser user = ParseUser.getCurrentUser();
-        if (user != null) {
-            startMainActivity(user);
-        }
     }
 
     private void populateAutoComplete() {
@@ -158,33 +145,19 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 public void done(ParseUser parseUser, ParseException e) {
                     showProgress(false);
                     if (e != null) {
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
+                        int code = e.getCode();
+                        if (code == ParseException.VALIDATION_ERROR) {
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+                        } else {
+                            showToast(getErrorString(code));
+                        }
                     } else {
                         startMainActivity(parseUser);
                     }
                 }
 
             });
-        }
-    }
-
-    private boolean isEmailValid(String email) {
-        return email.matches(Consts.EMAIL_VALIDATING_REGEX);
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() >= MIN_USER_PASSWORD_LENGTH ;
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    public void showProgress(final boolean show) {
-        if (show) {
-            loadingDialog.show();
-        } else {
-            loadingDialog.dismiss();
         }
     }
 
@@ -219,7 +192,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
     }
 
     private interface ProfileQuery {
@@ -243,6 +215,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     private void startMainActivity(ParseUser parseUser) {
+        mLogger.log("Starting main activity");
         User.getInstance().setCurrentUser(parseUser);
         Intent mainActivity = new Intent(LoginActivity.this, PlacesActivity.class);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
