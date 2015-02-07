@@ -34,9 +34,14 @@
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
 
-        <activity android:name=".activities.PlacesActivity"
-            android:label=""></activity>
-        <activity android:name=".activities.RewardsActivity"></activity>
+        <activity
+            android:name=".activities.PlacesActivity"
+            android:label="Places" >
+        </activity>
+        <activity
+            android:name=".activities.RewardsActivity"
+            android:label="Rewards" >
+        </activity>
     </application>
 
 </manifest>

@@ -2,7 +2,7 @@ package scout.scoutmobile.constants;
 
 public final class Consts {
 
-    //Contants to access properties in parse user object
+    //Constants to access properties in parse user object
     public static final String FIRST_NAME = "firstname";
     public static final String LAST_NAME = "lastname";
     public static final String POINTS = "points";
