@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -142,8 +143,8 @@ public class RegisterActivity extends CredentialActivity {
             user.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
-                    showProgress(false);
                     if (e != null) {
+                        showProgress(false);
                         int code = e.getCode();
                         if (code == ParseException.EMAIL_TAKEN) {
                             mEmailEditText.setError(getString(R.string.error_email_exists));
@@ -152,6 +153,12 @@ public class RegisterActivity extends CredentialActivity {
                             showToast(getErrorString(code));
                         }
                     } else {
+                        //create the relation that this user is a customer in parse
+                        ParseObject customer = new ParseObject(Consts.TABLE_CUSTOMER);
+                        customer.put(Consts.CUSTOMER_USER_COL, user);
+                        customer.saveInBackground();
+
+                        showProgress(false);
                         mLogger.log("Successfully registered user");
                         User.getInstance().setCurrentUser(user);
                         Intent mainActivity = new Intent(RegisterActivity.this, PlacesActivity.class);

@@ -2,7 +2,15 @@ package scout.scoutmobile.constants;
 
 public final class Consts {
 
-    //Constants to access properties in parse user object
+    //Parse table class names
+    public static final String TABLE_CUSTOMER = "Customer";
+    public static final String CUSTOMER_USER_COL = "user";
+
+    /**
+     * for every table and tables col names add them in a readable format with a space separation
+     */
+
+    //Contants to access properties in parse user object
     public static final String FIRST_NAME = "firstname";
     public static final String LAST_NAME = "lastname";
     public static final String POINTS = "points";
