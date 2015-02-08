@@ -4,8 +4,8 @@ The Scout web application is utilized by business owners in which is used to mod
 
 Required Modules
 -----------------------
-node.js
-npm
+* node.js
+* npm
 
 Running the application
 -----------------------
