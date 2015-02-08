@@ -70,7 +70,7 @@ public class PlacesActivity extends ActionBarActivity {
 
             // Set the Place list item values
             titleView.setText(place.getTitle());
-            pointsView.setText(place.getPoints());
+            pointsView.setText(place.getPoints().toString());
             //image.setImageResource(mPlaces.get(position).getImageURL());
 
             return view;
@@ -131,13 +131,24 @@ public class PlacesActivity extends ActionBarActivity {
                             if (e == null) {
                                 for (ParseObject businessPoints : parseObjects) {
                                     // We're expecting the entries to be unique
-                                    Integer points = businessPoints.getInt(Consts.COL_POINTS_POINTS);
-                                    ParseObject business = businessPoints.getParseObject(Consts.COL_POINTS_BUSINESS);
-                                    String title = business.getString(Consts.COL_PLACE_NAME);
-                                    String thumbnailUrl = business.getString(Consts.COL_PLACE_THUMBNAIL_URL);
-                                    String id = business.getObjectId();
+                                    Integer points = businessPoints.
+                                            getInt(Consts.COL_POINTS_POINTS);
+                                    ParseObject business = businessPoints.
+                                            getParseObject(Consts.COL_POINTS_BUSINESS);
+                                    // have to retrieve the business object from parse, because
+                                    // parse is dumb in that returned parseobjects relations
+                                    // don't have data!
+                                    try {
+                                        String title = business.fetchIfNeeded().
+                                                getString(Consts.COL_PLACE_NAME);
+                                        String thumbnailUrl = business.fetchIfNeeded().
+                                                getString(Consts.COL_PLACE_THUMBNAIL_URL);
+                                        String id = business.getObjectId();
 
-                                    places.add(new Place(title, thumbnailUrl, points, id));
+                                        places.add(new Place(title, thumbnailUrl, points, id));
+                                    } catch (ParseException e1) {
+                                        mLogger.logError(e1);
+                                    }
                                 }
                                 // Finally, we can update the list view with this info
                                 updateListView(places);
