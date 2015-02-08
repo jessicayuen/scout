@@ -160,8 +160,7 @@ public class RegisterActivity extends CredentialActivity {
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
-                        startMainActivity(RegisterActivity.this, PlacesActivity.class,
-                                customer.getObjectId());
+                        startMainActivity(RegisterActivity.this, PlacesActivity.class);
                     }
                 }
             });

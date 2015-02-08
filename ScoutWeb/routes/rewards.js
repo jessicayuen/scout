@@ -3,7 +3,11 @@ var router = express.Router();
 var Parse = require('parse').Parse;
 
 router.get('/', function(req, res, next) {
-  res.render('rewards', { title: 'Scout' , jumbotron: 'Rewards' });
+  if (Parse.User.current()) {
+    res.render('rewards', { title: 'Scout' , jumbotron: 'Rewards' });
+  } else {
+    res.redirect('/');
+  }
 });
 
 router.get('/getrewards', function(req, res, next) {
@@ -23,19 +27,19 @@ router.post('/removereward', function (req, res) {
   var RewardObj = Parse.Object.extend("Reward");
   var query = new Parse.Query(RewardObj);
 
-  console.log("id: "+ rewardObjectId);
-
   query.get(rewardObjectId, {
     success: function (reward) {
       reward.destroy();
       console.log('Reward has been successfully deleted.');
+
+      res.redirect('/rewards');
     },
     error: function (object, error) {
       console.log('ERROR: Cannot delete reward.');
+
+      res.redirect('/rewards');
     }
   });
-
-  res.redirect('/rewards');
 });
 
 module.exports = router;

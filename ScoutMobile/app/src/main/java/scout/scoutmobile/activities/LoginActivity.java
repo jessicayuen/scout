@@ -160,8 +160,7 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                         query.getFirstInBackground(new GetCallback<ParseObject>() {
                             public void done(ParseObject object, ParseException e) {
                                 if (object != null) {
-                                    startMainActivity(LoginActivity.this, PlacesActivity.class,
-                                            object.getObjectId());
+                                    startMainActivity(LoginActivity.this, PlacesActivity.class);
                                 } else {
                                     showPasswordError();
                                 }
