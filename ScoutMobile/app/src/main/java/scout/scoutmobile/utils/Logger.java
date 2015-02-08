@@ -1,5 +1,7 @@
 package scout.scoutmobile.utils;
 
+import android.util.Log;
+
 public class Logger {
 
     private String callerClass;
@@ -9,6 +11,10 @@ public class Logger {
     }
 
     public void log(String output) {
-        System.out.println(callerClass + ": " + output);
+        Log.w(callerClass, output);
+    }
+
+    public void logError(Throwable e) {
+        Log.wtf(callerClass, e);
     }
 }
