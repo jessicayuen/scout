@@ -10,14 +10,13 @@ router.post('/', function (req, res) {
   var email = req.body['email'];
   var password = req.body['password'];
 
-
   Parse.User.logIn(email, password, {
     success: function(user) {
-      res.redirect('dashboard')
+      res.redirect('/dashboard');
     },
     error: function(user, error) {
-      // need to do more
-      res.send('Incorrect Login');
+      // put up error message
+      res.redirect('/');
     }
   });
 });
