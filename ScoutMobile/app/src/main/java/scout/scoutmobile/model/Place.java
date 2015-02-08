@@ -10,11 +10,13 @@ public class Place {
     String mTitle;
     String mThumbnailUrl;
     Integer mPoints;
+    String mId;
 
-    public Place(String title, String thumbnailUrl, Integer points) {
+    public Place(String title, String thumbnailUrl, Integer points, String id) {
         this.mTitle = title;
         this.mThumbnailUrl = thumbnailUrl;
         this.mPoints = points;
+        this.mId = id;
     }
 
     public String getTitle() {
@@ -39,5 +41,13 @@ public class Place {
 
     public void setPoints(Integer points) {
         this.mPoints = points;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        this.mId = id;
     }
 }
