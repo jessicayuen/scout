@@ -20,14 +20,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import scout.scoutmobile.R;
+import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -146,13 +150,22 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                     if (e != null) {
                         int code = e.getCode();
                         if (code == ParseException.VALIDATION_ERROR) {
-                            mPasswordView.setError(getString(R.string.error_incorrect_password));
-                            mPasswordView.requestFocus();
+                           showPasswordError();
                         } else {
                             showToast(getErrorString(code));
                         }
                     } else {
-                        startMainActivity(parseUser);
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
+                        query.whereEqualTo(Consts.CUSTOMER_USER_COL, parseUser);
+                        query.getFirstInBackground(new GetCallback<ParseObject>() {
+                            public void done(ParseObject object, ParseException e) {
+                                if (object != null) {
+                                    startMainActivity(LoginActivity.this, PlacesActivity.class);
+                                } else {
+                                    showPasswordError();
+                                }
+                            }
+                        });
                     }
                 }
 
@@ -213,13 +226,9 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
         mEmailView.setAdapter(adapter);
     }
 
-    private void startMainActivity(ParseUser parseUser) {
-        mLogger.log("Starting main activity");
-        Intent mainActivity = new Intent(LoginActivity.this, PlacesActivity.class);
-        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(mainActivity);
-        finish();
+    private void showPasswordError() {
+        mPasswordView.setError(getString(R.string.error_incorrect_password));
+        mPasswordView.requestFocus();
     }
 }
 

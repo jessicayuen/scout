@@ -158,11 +158,9 @@ public class RegisterActivity extends CredentialActivity {
                         customer.saveInBackground();
 
                         showProgress(false);
+
                         mLogger.log("Successfully registered user");
-                        Intent mainActivity = new Intent(RegisterActivity.this, PlacesActivity.class);
-                        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(mainActivity);
-                        finish();
+                        startMainActivity(RegisterActivity.this, PlacesActivity.class);
                     }
                 }
             });
