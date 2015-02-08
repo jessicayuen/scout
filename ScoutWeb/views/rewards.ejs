@@ -1,9 +1,53 @@
 <html>
     <head>
         <% include template/header %>
+        <style>
+            #reward-description {
+                margin-top: 10px;
+            }
+        </style>
     </head>
     <body>
         <% include template/navbar %>
+        <% include template/jumbotron %>
+        
+        <div class="container">
+            <div id="rewards-list" class="row">
+            </div>
+        </div>
+
         <% include template/footer %>
     </body>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                async: true,
+                url: '/rewards/rewardslist',
+                success: function (data) {
+                    if (data.length > 0) {
+                        data.forEach(function (reward) {
+                            var rewardDiv = 
+                                '<div class="container">'+
+                                    '<div class="col-md-2 col-md-offset-1">'+
+                                        '<a href="#" class="thumbnail">'+
+                                          '<img src="img/'+ (reward['image'] ? reward['image'] : 'noimage')+'.jpg" alt="'+(reward['image'] ? reward['image'] : 'noimage')+'">'+
+                                        '</a>'+
+                                    '</div>'+
+                                    '<div class="col-md-8 col-md-offset-1">'+
+                                        '<p id="reward-description">'+reward['description']+'</p>'+
+                                    '</div>'+
+                                '</div>';
+                            
+                            $("#rewards-list").append(rewardDiv);
+                        });
+                    } else {
+                        var noRewardDiv = 
+                            '<div class="container"><div class="col-md-2 col-md-offset-1"><p>No rewards available</p></div></div>';
+
+                        $("#rewards-list").append(noRewardDiv);
+                    }
+                }
+            });
+        });
+    </script>
 </html>
