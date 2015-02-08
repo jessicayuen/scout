@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import scout.scoutmobile.R;
-import scout.scoutmobile.models.User;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -216,7 +215,6 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
 
     private void startMainActivity(ParseUser parseUser) {
         mLogger.log("Starting main activity");
-        User.getInstance().setCurrentUser(parseUser);
         Intent mainActivity = new Intent(LoginActivity.this, PlacesActivity.class);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_NEW_TASK);

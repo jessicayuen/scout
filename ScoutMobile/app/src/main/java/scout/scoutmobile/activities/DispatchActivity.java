@@ -11,8 +11,6 @@ import android.os.Bundle;
 
 import com.parse.ParseUser;
 
-import scout.scoutmobile.models.User;
-
 public class DispatchActivity extends Activity {
 
     @Override
@@ -22,7 +20,6 @@ public class DispatchActivity extends Activity {
         ParseUser loggedInUser = ParseUser.getCurrentUser();
         Intent invokedActivity;
         if (loggedInUser != null) {
-            User.getInstance().setCurrentUser(loggedInUser);
             invokedActivity = new Intent(this, PlacesActivity.class);
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);
