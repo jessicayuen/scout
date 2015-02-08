@@ -7,11 +7,14 @@ package scout.scoutmobile.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
@@ -107,5 +110,14 @@ public class CredentialActivity extends Activity {
                 return resStr = "";
         }
         return resStr;
+    }
+
+    protected void startMainActivity(Context context, Class<?> mainClass) {
+        mLogger.log("Starting main activity");
+        Intent mainActivity = new Intent(context, mainClass);
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(mainActivity);
+        finish();
     }
 }
