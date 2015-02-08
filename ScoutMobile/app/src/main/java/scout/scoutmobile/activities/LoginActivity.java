@@ -156,11 +156,12 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                         }
                     } else {
                         ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
-                        query.whereEqualTo(Consts.CUSTOMER_USER_COL, parseUser);
+                        query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
                         query.getFirstInBackground(new GetCallback<ParseObject>() {
                             public void done(ParseObject object, ParseException e) {
                                 if (object != null) {
-                                    startMainActivity(LoginActivity.this, PlacesActivity.class);
+                                    startMainActivity(LoginActivity.this, PlacesActivity.class,
+                                            object.getObjectId());
                                 } else {
                                     showPasswordError();
                                 }

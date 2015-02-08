@@ -12,4 +12,5 @@
     <string name="exception_account_linked">Account already logged in</string>
     <string name="exception_email_exits">Account already exists with that email</string>
     <string name="exception_server_connection">Error Connecting to the server</string>
+    <string name="exception_general">Account does not exist</string>
 </resources>

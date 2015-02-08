@@ -107,16 +107,17 @@ public class CredentialActivity extends Activity {
                 resStr = getString(R.string.exception_server_connection);
                 break;
             default:
-                return resStr = "";
+                return resStr = getString(R.string.exception_general);
         }
         return resStr;
     }
 
-    protected void startMainActivity(Context context, Class<?> mainClass) {
+    protected void startMainActivity(Context context, Class<?> mainClass, String customerId) {
         mLogger.log("Starting main activity");
         Intent mainActivity = new Intent(context, mainClass);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
+        mainActivity.putExtra(Consts.CUSTOMER_ID, customerId);
         startActivity(mainActivity);
         finish();
     }

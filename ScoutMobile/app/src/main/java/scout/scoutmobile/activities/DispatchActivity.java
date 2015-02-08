@@ -9,7 +9,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import scout.scoutmobile.constants.Consts;
 
 public class DispatchActivity extends Activity {
 
@@ -18,14 +24,34 @@ public class DispatchActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         ParseUser loggedInUser = ParseUser.getCurrentUser();
-        Intent invokedActivity;
         if (loggedInUser != null) {
-            invokedActivity = new Intent(this, PlacesActivity.class);
+            ParseQuery customer = new ParseQuery(Consts.TABLE_CUSTOMER);
+            customer.whereEqualTo(Consts.COL_CUSTOMER_USER, loggedInUser);
+            customer.getFirstInBackground(new GetCallback() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    if (parseObject != null) {
+                        Intent invokedActivity = new Intent(DispatchActivity.this, PlacesActivity.class);
+                        invokedActivity.putExtra(Consts.CUSTOMER_ID, parseObject.getObjectId());
+                        invokeActivity(invokedActivity);
+                    } else {
+                        invokeLoginActivity();
+                    }
+                }
+            });
         } else {
-            invokedActivity = new Intent(this, LoginActivity.class);
+            invokeLoginActivity();
         }
-        invokedActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(invokedActivity);
+    }
+
+    private void invokeActivity(Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
+    }
+
+    private void invokeLoginActivity() {
+        Intent login = new Intent(this, LoginActivity.class);
+        invokeActivity(login);
     }
 }

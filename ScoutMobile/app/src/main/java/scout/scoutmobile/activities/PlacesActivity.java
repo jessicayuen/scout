@@ -82,6 +82,11 @@ public class PlacesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places);
 
+        String customerId = getIntent().getStringExtra(Consts.CUSTOMER_ID);
+        if (!customerId.isEmpty() && customerId != null) {
+            //do your things here
+        }
+
         // Populate the list of places
         this.getAllPlaces(new ArrayList<Place>());
     }

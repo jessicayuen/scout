@@ -4,10 +4,12 @@ public final class Consts {
 
     //Parse table class names
     public static final String TABLE_CUSTOMER = "Customer";
-    public static final String CUSTOMER_USER_COL = "user";
     public static final String TABLE_PLACE = "Business";
     public static final String TABLE_POINTS = "Points";
     public static final String TABLE_REWARDS = "Rewards";
+
+    //Parse Customer object properties
+    public static final String COL_CUSTOMER_USER = "user";
 
     //Parse user object properties
     public static final String FIRST_NAME = "firstname";
@@ -43,6 +45,7 @@ public final class Consts {
     public static final String PLACE_NAME = "place name";
     public static final String PLACE_ID = "place id";
     public static final String PLACE_POINTS = "place points";
+    public static final String CUSTOMER_ID = "customer id";
 
     private Consts() {
         //preventing the class being created

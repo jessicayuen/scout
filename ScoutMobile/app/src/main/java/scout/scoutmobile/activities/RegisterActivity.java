@@ -154,13 +154,14 @@ public class RegisterActivity extends CredentialActivity {
                     } else {
                         //create the relation that this user is a customer in parse
                         ParseObject customer = new ParseObject(Consts.TABLE_CUSTOMER);
-                        customer.put(Consts.CUSTOMER_USER_COL, user);
+                        customer.put(Consts.COL_CUSTOMER_USER, user);
                         customer.saveInBackground();
 
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
-                        startMainActivity(RegisterActivity.this, PlacesActivity.class);
+                        startMainActivity(RegisterActivity.this, PlacesActivity.class,
+                                customer.getObjectId());
                     }
                 }
             });
