@@ -3,7 +3,11 @@ var router = express.Router();
 var Parse = require('parse').Parse;
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Scout' });
+  if (Parse.User.current() == null) {
+    res.render('index', { title: 'Scout' });
+  } else {
+    res.redirect('/dashboard');
+  }
 });
 
 router.post('/', function (req, res) {
