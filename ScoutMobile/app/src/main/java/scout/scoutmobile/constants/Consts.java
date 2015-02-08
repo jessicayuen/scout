@@ -31,6 +31,11 @@ public final class Consts {
     public static final String PROGRESS_WAIT = "Please Wait";
     public static final String PROGRESS_BUSINESS_ALL_QUERY = "Retrieving business directories ... ";
 
+    //For intent extra passing
+    public static final String PLACE_NAME = "place name";
+    public static final String PLACE_ID = "place id";
+    public static final String PLACE_POINTS = "place points";
+
     private Consts() {
         //preventing the class being created
         throw new AssertionError();

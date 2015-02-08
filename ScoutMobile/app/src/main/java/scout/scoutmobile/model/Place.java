@@ -7,10 +7,10 @@ package scout.scoutmobile.model;
  */
 public class Place {
 
-    String mTitle;
-    String mThumbnailUrl;
-    Integer mPoints;
-    String mId;
+    private String mTitle;
+    private String mThumbnailUrl;
+    private Integer mPoints;
+    private String mId;
 
     public Place(String title, String thumbnailUrl, Integer points, String id) {
         this.mTitle = title;

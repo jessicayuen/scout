@@ -1,6 +1,7 @@
 package scout.scoutmobile.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -190,9 +191,15 @@ public class PlacesActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                TextView name = (TextView) view.findViewById(R.id.placeTitle);
-                // Transition to rewards activity for this business.
 
+                // Transition to rewards activity for this business.
+                Intent rewardsActivity = new Intent(
+                        PlacesActivity.this, RewardsActivity.class);
+                Place selected = places.get(position);
+                rewardsActivity.putExtra(Consts.PLACE_ID, selected.getId());
+                rewardsActivity.putExtra(Consts.PLACE_NAME, selected.getTitle());
+                rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());
+                startActivity(rewardsActivity);
             }
         });
     }
