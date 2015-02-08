@@ -82,11 +82,6 @@ public class PlacesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places);
 
-        String customerId = getIntent().getStringExtra(Consts.CUSTOMER_ID);
-        if (!customerId.isEmpty() && customerId != null) {
-            //do your things here
-        }
-
         // Populate the list of places
         this.getAllPlaces(new ArrayList<Place>());
     }
@@ -164,22 +159,39 @@ public class PlacesActivity extends ActionBarActivity {
      * @param callback The callback object to handle the results
      * @throws ParseException If an exception was thrown during the query
      */
-    private void queryPoints(List<ParseObject> businesses,
-                             FindCallback<ParseObject> callback) {
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+    private void queryPoints(final List<ParseObject> businesses,
+                             final FindCallback<ParseObject> callback) {
+        final List<ParseQuery<ParseObject>> queries = new ArrayList<>();
 
-        for (ParseObject business : businesses) {
-            // Let's create these queries with parse - would be easier with a join
-            // but I don't know a way in parse yet.
-            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS).
-                    whereEqualTo(Consts.COL_POINTS_CUSTOMER, ParseUser.getCurrentUser())
-                    .whereEqualTo(Consts.COL_POINTS_BUSINESS, business);
-            queries.add(query);
-        }
+        // Get the current customer.
+        ParseQuery<ParseObject> customerQuery = ParseQuery.getQuery(Consts.TABLE_CUSTOMER)
+                .whereEqualTo(Consts.COL_CUSTOMER_USER, ParseUser.getCurrentUser());
+        customerQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                // We're only expecting one match
+                if (parseObjects.size() > 0 && e == null) {
+                    ParseObject customer = parseObjects.get(0);
 
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+                    for (ParseObject business : businesses) {
+                        // Let's create these queries with parse - would be easier with a join
+                        // but I don't know a way in parse yet.
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS).
+                                whereEqualTo(Consts.COL_POINTS_CUSTOMER, customer)
+                                .whereEqualTo(Consts.COL_POINTS_BUSINESS, business);
+                        queries.add(query);
+                    }
 
-        mainQuery.findInBackground(callback);
+                    ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+
+                    mainQuery.findInBackground(callback);
+
+                } else {
+                    mLogger.logError(e != null ? e :
+                            new RuntimeException("Customer does not exists."));
+                }
+            }
+        });
     }
 
     /**
