@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var Parse = require('parse').Parse;
 
 var index = require('./routes/index');
+var register = require('./routes/register');
 var dashboard = require('./routes/dashboard');
 
 var app = express();
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // url routing
 app.use('/', index);
+app.use('/register', register);
 app.use('/dashboard', dashboard);
 
 
