@@ -19,6 +19,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import scout.scoutmobile.R;
@@ -53,7 +55,7 @@ public class RewardsActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = getLayoutInflater().inflate(
-                    R.layout.place_list_item,
+                    R.layout.rewards_list_item,
                     null
             );
 
@@ -64,7 +66,7 @@ public class RewardsActivity extends ActionBarActivity {
 
             // Set the Reward list item values
             descView.setText(reward.getDescription());
-            pointsView.setText(reward.getPoints());
+            pointsView.setText(reward.getPoints().toString());
 
             return view;
         }
@@ -82,8 +84,8 @@ public class RewardsActivity extends ActionBarActivity {
         TextView pointsView = (TextView) findViewById(R.id.points);
         TextView placeView = (TextView) findViewById(R.id.business);
 
-        pointsView.setText(placeName);
-        placeView.setText(placePoints);
+        pointsView.setText(placePoints.toString());
+        placeView.setText(placeName);
 
         // Set the rewards list items
         this.setRewardsListItems(placeId);
@@ -133,16 +135,27 @@ public class RewardsActivity extends ActionBarActivity {
                     rewardsQuery.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> rewardObjects, ParseException e) {
-                            List<Reward> rewards = new ArrayList<>();
-                            for (ParseObject r : rewardObjects) {
-                                Integer points = r.getInt(Consts.COL_REWARDS_POINTS);
-                                String desc = r.getString(Consts.COL_REWARDS_DESC);
-                                String qrCode = r.getString(Consts.COL_REWARDS_QR);
+                            if (e == null) {
+                                List<Reward> rewards = new ArrayList<>();
+                                for (ParseObject r : rewardObjects) {
+                                    Integer points = r.getInt(Consts.COL_REWARDS_POINTS);
+                                    String desc = r.getString(Consts.COL_REWARDS_DESC);
+                                    String qrCode = r.getString(Consts.COL_REWARDS_QR);
 
-                                rewards.add(new Reward(points, desc, qrCode));
-
+                                    rewards.add(new Reward(points, desc, qrCode));
+                                }
+                                // Sort the rewards by points
+                                Collections.sort(rewards, new Comparator<Reward>() {
+                                    @Override
+                                    public int compare(Reward lhs, Reward rhs) {
+                                        return lhs.getPoints() - rhs.getPoints();
+                                    }
+                                });
                                 // Finally, update the list view
                                 updateListView(rewards);
+                                progress.dismiss();
+                            } else {
+                                mLogger.logError(e);
                             }
                         }
                     });

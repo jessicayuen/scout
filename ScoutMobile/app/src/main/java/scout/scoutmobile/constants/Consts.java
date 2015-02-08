@@ -6,7 +6,7 @@ public final class Consts {
     public static final String TABLE_CUSTOMER = "Customer";
     public static final String TABLE_PLACE = "Business";
     public static final String TABLE_POINTS = "Points";
-    public static final String TABLE_REWARDS = "Rewards";
+    public static final String TABLE_REWARDS = "Reward";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";
