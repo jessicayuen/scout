@@ -27,7 +27,7 @@ router.post('/', function (req, res) {
 
   user.signUp(null, {
     success: function(user) {
-      var businessObj = Parse.Object.extend("Business");
+      var businessObj = Parse.Object.extend('Business');
       var businessRec = new businessObj();
 
       businessRec.set("name", businessName);
@@ -37,15 +37,18 @@ router.post('/', function (req, res) {
         success: function(business) {
           res.redirect('/dashboard');
         },
-        error: function(business, error) {
+        error: function(error) {
           // could be handled better
           console.log("ERROR: cannot save business record");
           res.redirect('/register');
         }
       });
     },
-    error: function(user, error) {
+    error: function(error) {
       // Show the error message somewhere and let the user try again.
+      console.log('ERROR: Unable to signup user '+ email);
+      console.log(error.message);
+
       res.redirect('/register');
     }
   });

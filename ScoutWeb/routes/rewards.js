@@ -11,20 +11,39 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/getrewards', function(req, res, next) {
-  var RewardObj = Parse.Object.extend("Reward");
-  var query = new Parse.Query(RewardObj);
+  var BusinessObj = Parse.Object.extend('Business');
+  var businessQuery = new Parse.Query(BusinessObj);
 
-  query.find({
-    success: function(list) {
-      res.json(list);
+  businessQuery.equalTo('owner', Parse.User.current());
+  businessQuery.first({
+    success: function (business) {
+      var RewardObj = Parse.Object.extend('Reward');
+      var rewardQuery = new Parse.Query(RewardObj);
+
+      rewardQuery.equalTo('business', business);
+
+      rewardQuery.find({
+        success: function (rewardList) {
+          console.log(rewardList);
+          res.json(rewardList);
+        },
+        error: function (error) {
+          console.log('ERROR: cannot query rewards for business '+business['id']);
+          console.log(error.message);
+        }
+      });
+    },
+    error: function (error) {
+      console.log('ERROR: Unable to query business for owner'+Parse.User.current());
+      console.log(error.message);
     }
-  });
+  })
 });
 
 router.post('/removereward', function (req, res) {
   var rewardObjectId = req.body['objectid'];
 
-  var RewardObj = Parse.Object.extend("Reward");
+  var RewardObj = Parse.Object.extend('Reward');
   var query = new Parse.Query(RewardObj);
 
   query.get(rewardObjectId, {
@@ -34,8 +53,9 @@ router.post('/removereward', function (req, res) {
 
       res.redirect('/rewards');
     },
-    error: function (object, error) {
+    error: function (error) {
       console.log('ERROR: Cannot delete reward.');
+      console.log(error.message);
 
       res.redirect('/rewards');
     }

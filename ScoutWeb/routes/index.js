@@ -18,8 +18,10 @@ router.post('/', function (req, res) {
     success: function(user) {
       res.redirect('/dashboard');
     },
-    error: function(user, error) {
-      // put up error message
+    error: function(error) {
+      console.log('ERROR: Unable to log in user '+email);
+      console.log(error.message);
+
       res.redirect('/');
     }
   });
