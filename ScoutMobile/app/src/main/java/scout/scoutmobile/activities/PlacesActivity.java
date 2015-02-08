@@ -21,7 +21,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
@@ -82,8 +84,7 @@ public class PlacesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places);
 
-        // Populate the list of places
-        this.getAllPlaces(new ArrayList<Place>());
+        this.getAllPlaces();
     }
 
     @Override
@@ -109,11 +110,10 @@ public class PlacesActivity extends ActionBarActivity {
     }
 
     /**
-     * Populates a list of a businesses. The reason we can't just return a list is because
-     * the list may be returned before the callback is finished.
+     * Retrieves the list of all places.
      * @throws RuntimeException If an exception was thrown during the query
      */
-    private void getAllPlaces(final List<Place> places) {
+    private void getAllPlaces() {
         final ProgressDialog progress = ProgressDialog.show(this,
                 Consts.PROGRESS_WAIT,Consts.PROGRESS_BUSINESS_ALL_QUERY);
 
@@ -122,36 +122,29 @@ public class PlacesActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
+                    final Map<String, Place> placesMap = new HashMap<>();
                     // Get the points that the logged in user has for each business
-                    queryPoints(objects, new FindCallback<ParseObject>() {
+                    queryPoints(objects, placesMap, new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> parseObjects, ParseException e) {
-                            List<ParseObject> obj = parseObjects;
-
                             if (e == null) {
                                 for (ParseObject businessPoints : parseObjects) {
-                                    // We're expecting the entries to be unique
-                                    Integer points = businessPoints.
-                                            getInt(Consts.COL_POINTS_POINTS);
-                                    ParseObject business = businessPoints.
-                                            getParseObject(Consts.COL_POINTS_BUSINESS);
-                                    // have to retrieve the business object from parse, because
-                                    // parse is dumb in that returned parseobjects relations
-                                    // don't have data!
-                                    try {
-                                        String title = business.fetchIfNeeded().
-                                                getString(Consts.COL_PLACE_NAME);
-                                        String thumbnailUrl = business.fetchIfNeeded().
-                                                getString(Consts.COL_PLACE_THUMBNAIL_URL);
-                                        String id = business.getObjectId();
+                                    String businessId = businessPoints.
+                                            getParseObject(Consts.COL_POINTS_BUSINESS).
+                                            getObjectId();
 
-                                        places.add(new Place(title, thumbnailUrl, points, id));
-                                    } catch (ParseException e1) {
-                                        mLogger.logError(e1);
+                                    // Look in the map for the business id and update the points
+                                    if (placesMap.containsKey(businessId)) {
+                                        // We're expecting the entries to be unique
+                                        Integer points = businessPoints.
+                                                getInt(Consts.COL_POINTS_POINTS);
+
+                                        Place place = placesMap.get(businessId);
+                                        place.setPoints(points);
                                     }
                                 }
                                 // Finally, we can update the list view with this info
-                                updateListView(places);
+                                updateListView(new ArrayList<>(placesMap.values()));
                                 progress.dismiss();
                             } else {
                                 mLogger.logError(e);
@@ -171,6 +164,7 @@ public class PlacesActivity extends ActionBarActivity {
      * @throws ParseException If an exception was thrown during the query
      */
     private void queryPoints(final List<ParseObject> businesses,
+                             final Map<String, Place> placeMap,
                              final FindCallback<ParseObject> callback) {
         final List<ParseQuery<ParseObject>> queries = new ArrayList<>();
 
@@ -185,6 +179,14 @@ public class PlacesActivity extends ActionBarActivity {
                     ParseObject customer = parseObjects.get(0);
 
                     for (ParseObject business : businesses) {
+                        // While we're here, lets also add in the places for optimization
+                        placeMap.put(business.getObjectId(), new Place(
+                                        business.getString(Consts.COL_PLACE_NAME),
+                                        business.getString(Consts.COL_PLACE_THUMBNAIL_URL),
+                                        0,
+                                        business.getObjectId())
+                                    );
+
                         // Let's create these queries with parse - would be easier with a join
                         // but I don't know a way in parse yet.
                         ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS).
