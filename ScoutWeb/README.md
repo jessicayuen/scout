@@ -9,5 +9,5 @@ Required Modules
 
 Running the application
 -----------------------
-To run the application, got the Scout Webapp root directory and run: `node app.js`
+To run the application, go to the Scout Webapp root directory and run: `node app.js`
 
