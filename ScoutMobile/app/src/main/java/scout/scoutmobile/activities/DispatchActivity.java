@@ -23,35 +23,16 @@ public class DispatchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent invokedActivity;
         ParseUser loggedInUser = ParseUser.getCurrentUser();
         if (loggedInUser != null) {
-            ParseQuery customer = new ParseQuery(Consts.TABLE_CUSTOMER);
-            customer.whereEqualTo(Consts.COL_CUSTOMER_USER, loggedInUser);
-            customer.getFirstInBackground(new GetCallback() {
-                @Override
-                public void done(ParseObject parseObject, ParseException e) {
-                    if (parseObject != null) {
-                        Intent invokedActivity = new Intent(DispatchActivity.this, PlacesActivity.class);
-                        invokedActivity.putExtra(Consts.CUSTOMER_ID, parseObject.getObjectId());
-                        invokeActivity(invokedActivity);
-                    } else {
-                        invokeLoginActivity();
-                    }
-                }
-            });
+            invokedActivity = new Intent(this, PlacesActivity.class);
         } else {
-            invokeLoginActivity();
+            invokedActivity = new Intent(this, LoginActivity.class);
         }
-    }
-
-    private void invokeActivity(Intent intent) {
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        invokedActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(invokedActivity);
         finish();
     }
 
-    private void invokeLoginActivity() {
-        Intent login = new Intent(this, LoginActivity.class);
-        invokeActivity(login);
-    }
 }
