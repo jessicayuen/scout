@@ -83,8 +83,6 @@ public class PlacesActivity extends ActionBarActivity {
 
         // Populate the list of places
         this.getAllPlaces(new ArrayList<Place>());
-
-        mLogger.log("tSETSTSTSGS #@#@##@#");
     }
 
     @Override
@@ -123,35 +121,30 @@ public class PlacesActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
-                    for (final ParseObject place : objects) {
-                        // Get the points the logged in user has for each business
-                        queryPoints(place, new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> parseObjects, ParseException e) {
-                                if (e == null) {
-                                    String name = place.getString(Consts.COL_PLACE_NAME);
-                                    String thumbnailUrl = place.getString(
-                                            Consts.COL_PLACE_THUMBNAIL_URL);
-                                    int points = 0;
+                    // Get the points that the logged in user has for each business
+                    queryPoints(objects, new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> parseObjects, ParseException e) {
+                            List<ParseObject> obj = parseObjects;
 
-                                    // We're only expecting one entry, or none at all
-                                    if (parseObjects.size() > 0) {
-                                        points = parseObjects.get(0).
-                                                getInt(Consts.COL_POINTS_POINTS);
-                                    }
+                            if (e == null) {
+                                for (ParseObject businessPoints : parseObjects) {
+                                    // We're expecting the entries to be unique
+                                    Integer points = businessPoints.getInt(Consts.COL_POINTS_POINTS);
+                                    ParseObject business = businessPoints.getParseObject(Consts.COL_POINTS_BUSINESS);
+                                    String title = business.getString(Consts.COL_PLACE_NAME);
+                                    String thumbnailUrl = business.getString(Consts.COL_PLACE_THUMBNAIL_URL);
 
-                                    // Finally, lets create the Place object
-                                    places.add(new Place(name, thumbnailUrl, points));
-                                } else {
-                                    mLogger.logError(e);
+                                    places.add(new Place(title, thumbnailUrl, points));
                                 }
+                                // Finally, we can update the list view with this info
+                                updateListView(places);
+                                progress.dismiss();
+                            } else {
+                                mLogger.logError(e);
                             }
-                        });
-                    }
-
-                    // Finally, we can update the list view with this info
-                    updateListView(places);
-                    progress.dismiss();
+                        }
+                    });
                 } else {
                     mLogger.logError(e);
                 }
@@ -160,17 +153,26 @@ public class PlacesActivity extends ActionBarActivity {
     }
 
     /**
-     * @param business The business ParseObject
+     * @param businesses The list of business ParseObjects
      * @param callback The callback object to handle the results
      * @throws ParseException If an exception was thrown during the query
      */
-    private void queryPoints(ParseObject business,
-                                    FindCallback<ParseObject> callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS).
-                whereEqualTo(Consts.COL_POINTS_CUSTOMER, ParseUser.getCurrentUser())
-                .whereEqualTo(Consts.COL_POINTS_BUSINESS, ParseUser.getCurrentUser());
+    private void queryPoints(List<ParseObject> businesses,
+                             FindCallback<ParseObject> callback) {
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
 
-        query.findInBackground(callback);
+        for (ParseObject business : businesses) {
+            // Let's create these queries with parse - would be easier with a join
+            // but I don't know a way in parse yet.
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS).
+                    whereEqualTo(Consts.COL_POINTS_CUSTOMER, ParseUser.getCurrentUser())
+                    .whereEqualTo(Consts.COL_POINTS_BUSINESS, business);
+            queries.add(query);
+        }
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+
+        mainQuery.findInBackground(callback);
     }
 
     /**

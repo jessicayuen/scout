@@ -28,4 +28,16 @@ public class Place {
     public Integer getPoints() {
         return mPoints;
     }
+
+    public void setTitle(String title) {
+        this.mTitle = title;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.mThumbnailUrl = thumbnailUrl;
+    }
+
+    public void setPoints(Integer points) {
+        this.mPoints = points;
+    }
 }
