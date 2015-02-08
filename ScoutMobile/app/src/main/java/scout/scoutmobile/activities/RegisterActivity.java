@@ -17,7 +17,6 @@ import com.parse.SignUpCallback;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
-import scout.scoutmobile.models.User;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -160,7 +159,6 @@ public class RegisterActivity extends CredentialActivity {
 
                         showProgress(false);
                         mLogger.log("Successfully registered user");
-                        User.getInstance().setCurrentUser(user);
                         Intent mainActivity = new Intent(RegisterActivity.this, PlacesActivity.class);
                         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(mainActivity);
