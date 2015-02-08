@@ -6,25 +6,36 @@ router.get('/', function(req, res, next) {
   res.render('rewards', { title: 'Scout' , jumbotron: 'Rewards' });
 });
 
-router.get('/rewardslist', function(req, res, next) {
+router.get('/getrewards', function(req, res, next) {
   var RewardObj = Parse.Object.extend("Reward");
   var query = new Parse.Query(RewardObj);
 
   query.find({
     success: function(list) {
-      var rewards = [];
-      /*
-      list.forEach(function (reward) {
-        console.log('\n DUMP:\n %j\n', reward);
-      });
-      */
       res.json(list);
     }
   });
 });
 
-router.post('/', function (req, res) {
+router.post('/removereward', function (req, res) {
+  var rewardObjectId = req.body['objectid'];
 
+  var RewardObj = Parse.Object.extend("Reward");
+  var query = new Parse.Query(RewardObj);
+
+  console.log("id: "+ rewardObjectId);
+
+  query.get(rewardObjectId, {
+    success: function (reward) {
+      reward.destroy();
+      console.log('Reward has been successfully deleted.');
+    },
+    error: function (object, error) {
+      console.log('ERROR: Cannot delete reward.');
+    }
+  });
+
+  res.redirect('/rewards');
 });
 
 module.exports = router;
