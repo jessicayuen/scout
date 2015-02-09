@@ -29,12 +29,14 @@ router.get('/getrewards', function(req, res, next) {
         error: function (error) {
           console.log('ERROR: cannot query rewards for business '+business['id']);
           console.log(error.message);
+          res.end();
         }
       });
     },
     error: function (error) {
       console.log('ERROR: Unable to query business for owner'+Parse.User.current());
       console.log(error.message);
+      res.end();
     }
   })
 });
@@ -49,14 +51,11 @@ router.post('/removereward', function (req, res) {
     success: function (reward) {
       reward.destroy();
       console.log('Reward has been successfully deleted.');
-
-      res.redirect('/rewards');
+      res.end();
     },
     error: function (error) {
-      console.log('ERROR: Cannot delete reward.');
-      console.log(error.message);
-
-      res.redirect('/rewards');
+      console.log('ERROR: Cannot delete reward or is already deleted.');
+      res.end();
     }
   });
 });

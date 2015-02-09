@@ -42,10 +42,7 @@
                         '<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
                         '<td class="points-col">'+points+'</td>'+
                         '<td class="descrip-col">'+description+'</td>'+
-                        // probably a cleaner way to do this without form using jquery
-                        '<td class="edit-remove-col"><form method="post" action="/rewards/removereward"><input type="hidden" name="objectid" value="'+objectid+'"><button type="submit" class="btn btn-danger">Remove</button></form></td>'+
-                        '<td class="edit-remove-col"><button type="submit" class="btn btn-danger test" id="'+objectid+'">Remove</button></td>'+
-                        '</tr>';
+                        '<td class="edit-remove-col"><button type="submit" class="btn btn-danger test" id="'+objectid+'">Remove</button></td></tr>';
                 });
 
                 $("#rewards-table").append(table);
