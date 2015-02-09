@@ -30,7 +30,8 @@
     <script>
         var populateRewardsTable = function (data) {
             if (data.length > 0) {
-                var table = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
+                var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
+                $("#rewards-table").append(heading);
 
                 data.forEach(function (reward) {
                     var objectid = reward['objectId'];
@@ -38,14 +39,16 @@
                     var points = reward['points'];
                     var description = reward['description'];
 
-                    table += 
-                        '<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
+                    var row = 
+                        $('<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
                         '<td class="points-col">'+points+'</td>'+
                         '<td class="descrip-col">'+description+'</td>'+
-                        '<td class="edit-remove-col"><button type="submit" class="btn btn-danger test" id="'+objectid+'">Remove</button></td></tr>';
-                });
+                        '<td class="edit-remove-col"><button type="submit" class="btn btn-danger test" id="'+objectid+'">Remove</button></td></tr>');
+                    row.hide();
 
-                $("#rewards-table").append(table);
+                    $('#rewards-table tr:last-child').after(row);
+                    row.fadeIn(1000);
+                });
             } else {
                 $("#rewards-table").append('<td><h3>No available rewards.</h3></td>');
             }
