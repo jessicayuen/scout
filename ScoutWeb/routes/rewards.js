@@ -24,7 +24,6 @@ router.get('/getrewards', function(req, res, next) {
 
       rewardQuery.find({
         success: function (rewardList) {
-          console.log(rewardList);
           res.json(rewardList);
         },
         error: function (error) {

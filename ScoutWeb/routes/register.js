@@ -38,8 +38,10 @@ router.post('/', function (req, res) {
           res.redirect('/dashboard');
         },
         error: function(error) {
-          // could be handled better
-          console.log("ERROR: cannot save business record");
+          // This should never happen
+          console.log('ERROR: cannot save business '+businessName);
+          console.log(error.message);
+
           res.redirect('/register');
         }
       });

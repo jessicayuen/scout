@@ -28,34 +28,40 @@
         <% include template/footer %>
     </body>
     <script>
-        $(document).ready(function() {
-            $.ajax({
-                async: true,
-                url: '/rewards/getrewards',
-                success: function (data) {
-                    if (data.length > 0) {
-                        var table = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
+        var populateRewardsTable = function (data) {
+            if (data.length > 0) {
+                var table = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
 
-                        data.forEach(function (reward) {
-                            var objectid = reward['objectId'];
-                            var imageUrl = reward['image'] ? reward['image'] : 'noimage.jpg';
-                            var points = reward['points'];
-                            var description = reward['description'];
+                data.forEach(function (reward) {
+                    var objectid = reward['objectId'];
+                    var imageUrl = reward['image'] ? reward['image'] : 'noimage.jpg';
+                    var points = reward['points'];
+                    var description = reward['description'];
 
-                            table += 
-                                '<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
-                                '<td class="points-col">'+points+'</td>'+
-                                '<td class="descrip-col">'+description+'</td>'+
-                                // probably a cleaner way to do this without form using jquery
-                                '<td class="edit-remove-col"><form method="post" action="/rewards/removereward"><input type="hidden" name="objectid" value="'+objectid+'"><button type="submit" class="btn btn-danger">Remove</button></form></td></tr>';
-                        });
+                    table += 
+                        '<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
+                        '<td class="points-col">'+points+'</td>'+
+                        '<td class="descrip-col">'+description+'</td>'+
+                        // probably a cleaner way to do this without form using jquery
+                        '<td class="edit-remove-col"><form method="post" action="/rewards/removereward"><input type="hidden" name="objectid" value="'+objectid+'"><button type="submit" class="btn btn-danger">Remove</button></form></td>'+
+                        '<td class="edit-remove-col"><button type="submit" class="btn btn-danger test" id="'+objectid+'">Remove</button></td>'+
+                        '</tr>';
+                });
 
-                        $("#rewards-table").append(table);
-                    } else {
-                        $("#rewards-table").append('<td><h3>No available rewards.</h3></td>');
-                    }
+                $("#rewards-table").append(table);
+            } else {
+                $("#rewards-table").append('<td><h3>No available rewards.</h3></td>');
+            }
+        }
 
-                }
+        $('#rewards-table').ready(function() {
+            $.get('/rewards/getrewards', populateRewardsTable);
+        });
+
+        $('.container').on('click', '.test', function() {
+            $.post('/rewards/removereward', { objectid: this.id }).done(function() {
+                $('#rewards-table').empty();
+                $.get('/rewards/getrewards', populateRewardsTable);
             });
         });
     </script>
