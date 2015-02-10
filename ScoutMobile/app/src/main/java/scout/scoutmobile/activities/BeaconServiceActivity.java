@@ -1,16 +1,13 @@
 package scout.scoutmobile.activities;
 
         import android.app.Activity;
-        import android.app.Notification;
         import android.app.NotificationManager;
-        import android.app.PendingIntent;
         import android.bluetooth.BluetoothAdapter;
         import android.content.Context;
         import android.content.Intent;
         import android.os.Bundle;
         import android.os.RemoteException;
         import android.util.Log;
-        import scout.scoutmobile.R;
         import android.widget.Toast;
 
         import com.estimote.sdk.Beacon;
@@ -21,20 +18,21 @@ package scout.scoutmobile.activities;
         import java.util.List;
         import java.util.concurrent.TimeUnit;
 
+        import scout.scoutmobile.ScoutAndroidApplication;
         import scout.scoutmobile.utils.Logger;
 
 public class BeaconServiceActivity extends Activity {
 
     private static final String TAG = BeaconServiceActivity.class.getSimpleName();
-    private static final int NOTIFICATION_ID = 123;
     private static final int REQUEST_ENABLE_BT = 1234;
     private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
 
-    private BeaconManager beaconManager;
+    ScoutAndroidApplication scoutApp;
     private NotificationManager notificationManager;
+    private BeaconManager beaconManager;
     private Region region;
     protected Logger mLogger;
-    String notification;
+    private String notification;
     //private LeDeviceListAdapter adapter;
 
     @Override
@@ -42,12 +40,18 @@ public class BeaconServiceActivity extends Activity {
         super.onCreate(savedInstanceState);
         mLogger = new Logger("BeaconServiceActivity");
 
+        scoutApp = (ScoutAndroidApplication) getApplicationContext();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Configure verbose debug logging.
         L.enableDebugLogging(true);
+
         // Configure BeaconManager.
-        beaconManager = new BeaconManager(this);
+        beaconManager = scoutApp.getBeaconManager();
+        if(beaconManager == null) {
+            beaconManager = new BeaconManager(scoutApp.getApplicationContext());
+            scoutApp.setBeaconManager(beaconManager);
+        }
         // Default values are 5s of scanning and 25s of waiting time to save CPU cycles.
         // In order for this demo to be more responsive and immediate we lower down those values.
         beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(1), 0);
@@ -63,9 +67,9 @@ public class BeaconServiceActivity extends Activity {
                             notification = "Entered beacon:";
                             for (Beacon beacon : foundBeacons) {
                                 notification = notification + " " + beacon.getMacAddress();
-                                //TODO: send data here
+                                //TODO: send data to server here
                             }
-                            postNotification(notification);
+                            scoutApp.postNotification(notification);
                         }
                     }
                 });
@@ -81,32 +85,30 @@ public class BeaconServiceActivity extends Activity {
         // Check if device supports Bluetooth Low Energy.
         if (!beaconManager.hasBluetooth()) {
             Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
-            return;
         }
-
-        // If Bluetooth is not enabled, let user enable it.
-        if (!beaconManager.isBluetoothEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            connectToService();
+        else {
+            // If Bluetooth is not enabled, let user enable it.
+            if (!beaconManager.isBluetoothEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                connectToService();
+            }
         }
+        startMainActivity(BeaconServiceActivity.this, PlacesActivity.class);
     }
 
-    @Override
-    protected void onDestroy() {
+/*    protected void onDestroy() {
         try {
             beaconManager.stopRanging(ALL_ESTIMOTE_BEACONS_REGION);
         } catch (RemoteException e) {
             Log.d(TAG, "Error while stopping ranging", e);
         }
 
-        super.onStop();
-
         notificationManager.cancel(NOTIFICATION_ID);
         beaconManager.disconnect();
         super.onDestroy();
-    }
+    }*/
 
     private void connectToService() {
         getActionBar().setSubtitle("Scanning...");
@@ -115,13 +117,10 @@ public class BeaconServiceActivity extends Activity {
             public void onServiceReady() {
                 try {
                     beaconManager.startRanging(ALL_ESTIMOTE_BEACONS_REGION);
-                    startMainActivity(BeaconServiceActivity.this, PlacesActivity.class);
                 } catch (RemoteException e) {
                     Toast.makeText(BeaconServiceActivity.this, "Cannot start ranging, an error occurred",
                             Toast.LENGTH_LONG).show();
                     Log.e(TAG, "Cannot start ranging", e);
-                    Intent loginActivity = new Intent(BeaconServiceActivity.this, LoginActivity.class);
-                    startActivity(loginActivity);
                 }
             }
         });
@@ -134,25 +133,5 @@ public class BeaconServiceActivity extends Activity {
                 Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(mainActivity);
         finish();
-    }
-
-    private void postNotification(String msg) {
-        Intent notifyIntent = new Intent(BeaconServiceActivity.this, BeaconServiceActivity.class);
-        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivities(
-                BeaconServiceActivity.this,
-                0,
-                new Intent[]{notifyIntent},
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new Notification.Builder(BeaconServiceActivity.this)
-                .setSmallIcon(R.drawable.beacon_gray)
-                .setContentTitle("Notify Demo")
-                .setContentText(msg)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        notification.defaults |= Notification.DEFAULT_LIGHTS;
-        notificationManager.notify(NOTIFICATION_ID, notification);
     }
 }
