@@ -2,12 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="scout.scoutmobile" >
 
+    <uses-sdk
+        android:minSdkVersion="18"
+        android:targetSdkVersion="18"/>
+
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Needed permissions in order to scan for beacons. -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <!-- Declaration that this app is usable on phones with Bluetooth Low Energy. -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <application
         android:name=".ScoutAndroidApplication"
@@ -33,7 +43,10 @@
             android:label="@string/title_activity_register"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
-
+        <activity
+            android:name=".activities.BeaconServiceActivity"
+            android:label="BeaconService" >
+        </activity>
         <activity
             android:name=".activities.PlacesActivity"
             android:label="Places" >
@@ -42,6 +55,12 @@
             android:name=".activities.RewardsActivity"
             android:label="Rewards" >
         </activity>
+
+        <!-- Estimote service responsible for scanning beacons. -->
+        <service android:name="com.estimote.sdk.service.BeaconService"
+            android:exported="false" >
+        </service>
+
     </application>
 
 </manifest>

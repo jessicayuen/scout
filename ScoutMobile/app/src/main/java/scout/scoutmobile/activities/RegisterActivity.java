@@ -160,7 +160,8 @@ public class RegisterActivity extends CredentialActivity {
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
-                        startMainActivity(RegisterActivity.this, PlacesActivity.class);
+                        Intent beaconServiceActivity = new Intent(RegisterActivity.this, BeaconServiceActivity.class);
+                        startActivity(beaconServiceActivity);
                     }
                 }
             });
