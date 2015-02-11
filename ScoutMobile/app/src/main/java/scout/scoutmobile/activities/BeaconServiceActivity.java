@@ -25,7 +25,10 @@ package scout.scoutmobile.activities;
         import java.util.concurrent.TimeUnit;
 
         import scout.scoutmobile.ScoutAndroidApplication;
+<<<<<<< HEAD
         import scout.scoutmobile.constants.Consts;
+=======
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
         import scout.scoutmobile.utils.Logger;
 
 public class BeaconServiceActivity extends Activity {
@@ -56,7 +59,11 @@ public class BeaconServiceActivity extends Activity {
         // Configure BeaconManager.
         beaconManager = scoutApp.getBeaconManager();
         if(beaconManager == null) {
+<<<<<<< HEAD
             beaconManager = new BeaconManager(scoutApp.getContext());
+=======
+            beaconManager = new BeaconManager(scoutApp.getApplicationContext());
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
             scoutApp.setBeaconManager(beaconManager);
         }
         // Default values are 5s of scanning and 25s of waiting time to save CPU cycles.
@@ -74,7 +81,10 @@ public class BeaconServiceActivity extends Activity {
                             notification = "Entered beacon:";
                             for (Beacon beacon : foundBeacons) {
                                 notification = notification + " " + beacon.getMacAddress();
+<<<<<<< HEAD
                                 Log.d(TAG, notification);
+=======
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
                                 //TODO: send data to server here
                             }
                             scoutApp.postNotification(notification);
@@ -94,8 +104,8 @@ public class BeaconServiceActivity extends Activity {
         // Check if device supports Bluetooth Low Energy.
         if (!beaconManager.hasBluetooth()) {
             Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
-            return;
         }
+<<<<<<< HEAD
         // If Bluetooth is not enabled, let user enable it.
         if (!beaconManager.isBluetoothEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -104,6 +114,17 @@ public class BeaconServiceActivity extends Activity {
             connectToService();
         }
 
+=======
+        else {
+            // If Bluetooth is not enabled, let user enable it.
+            if (!beaconManager.isBluetoothEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                connectToService();
+            }
+        }
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
         startMainActivity(BeaconServiceActivity.this, PlacesActivity.class);
     }
 
@@ -126,9 +147,18 @@ public class BeaconServiceActivity extends Activity {
                 try {
                     beaconManager.startRanging(ALL_ESTIMOTE_BEACONS_REGION);
                 } catch (RemoteException e) {
+<<<<<<< HEAD
         Toast.makeText(BeaconServiceActivity.this, "Cannot start ranging, an error occurred",
                 Toast.LENGTH_LONG).show();
         Log.d(TAG, "Cannot start ranging", e);
+=======
+                    Toast.makeText(BeaconServiceActivity.this, "Cannot start ranging, an error occurred",
+                            Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Cannot start ranging", e);
+                }
+            }
+        });
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
     }
 }
 });

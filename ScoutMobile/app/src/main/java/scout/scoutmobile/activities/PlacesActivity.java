@@ -246,7 +246,11 @@ public class PlacesActivity extends ActionBarActivity {
         });
     }
 
+<<<<<<< HEAD
     /*@Override
+=======
+    @Override
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
     protected void onDestroy() {
         beaconManager = scoutApp.getBeaconManager();
         notificationManager = scoutApp.getNotificationManager();
@@ -264,5 +268,9 @@ public class PlacesActivity extends ActionBarActivity {
             beaconManager.disconnect();
         }
         super.onDestroy();
+<<<<<<< HEAD
     }*/
+=======
+    }
+>>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
 }
