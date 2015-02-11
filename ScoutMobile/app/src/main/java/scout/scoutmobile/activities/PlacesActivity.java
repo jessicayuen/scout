@@ -187,7 +187,7 @@ public class PlacesActivity extends ActionBarActivity {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 // We're only expecting one match
-                if (parseObjects.size() > 0 && e == null) {
+                if ((!parseObjects.isEmpty()) && e == null) {
                     ParseObject customer = parseObjects.get(0);
 
                     for (ParseObject business : businesses) {
@@ -246,11 +246,7 @@ public class PlacesActivity extends ActionBarActivity {
         });
     }
 
-<<<<<<< HEAD
-    /*@Override
-=======
-    @Override
->>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
+/*    @Override
     protected void onDestroy() {
         beaconManager = scoutApp.getBeaconManager();
         notificationManager = scoutApp.getNotificationManager();
@@ -268,9 +264,5 @@ public class PlacesActivity extends ActionBarActivity {
             beaconManager.disconnect();
         }
         super.onDestroy();
-<<<<<<< HEAD
     }*/
-=======
-    }
->>>>>>> 01d7dc27e6673c962b2ec7a4aaec8966c2af4dd9
 }

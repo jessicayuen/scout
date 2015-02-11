@@ -18,7 +18,6 @@ import com.estimote.sdk.utils.L;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -26,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.dao.BeaconDao;
+import scout.scoutmobile.dao.CustomerDao;
 import scout.scoutmobile.utils.Logger;
 
 public class BeaconServiceActivity extends Activity {
@@ -70,13 +71,43 @@ public class BeaconServiceActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(foundBeacons.size() > 0) {
+                        if(!foundBeacons.isEmpty()) {
+                            boolean customerFound = false;
                             notification = "Entered beacon:";
-                            for (Beacon beacon : foundBeacons) {
-                                notification = notification + " " + beacon.getMacAddress();
-                                Log.d(TAG, notification);
-                                //TODO: send data to server here
-                            }
+
+                            CustomerDao customerDao = new CustomerDao();
+                            customerDao.getCustomerByParseUser(ParseUser.getCurrentUser(), new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> customerResults, ParseException e) {
+                                    // We're only expecting one customer match
+                                    if ((customerResults.isEmpty()) && e == null) {
+                                        ParseObject customer = customerResults.get(0);
+
+                                        for (Beacon beacon : foundBeacons) {
+                                            notification = notification + " " + beacon.getMacAddress();
+
+                                            BeaconDao beaconDao = new BeaconDao();
+                                            beaconDao.getBeaconByMacAddress(beacon.getMacAddress(), new FindCallback<ParseObject>() {
+                                                public void done(List<ParseObject> beaconResults, ParseException e) {
+                                                    // We're only expecting one beacon match
+                                                    if ((beaconResults.isEmpty()) && e == null) {
+                                                        ParseObject beacon = beaconResults.get(0);
+                                                        //TODO: send beacon data to server here
+                                                        storeBeaconData(beacon);
+                                                    } else {
+                                                        mLogger.logError(e != null ? e :
+                                                                new RuntimeException("Beacon does not exists."));
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                    } else {
+                                        mLogger.logError(e != null ? e :
+                                                new RuntimeException("Customer does not exists."));
+                                    }
+                                }
+                            });
                             scoutApp.postNotification(notification);
                         }
                     }
@@ -85,6 +116,15 @@ public class BeaconServiceActivity extends Activity {
         });
         scoutApp.setBeaconManager(beaconManager);
 
+    }
+
+    private void storeBeaconData(ParseObject beacon) {
+        ParseObject beaconData = new ParseObject(Consts.TABLE_BEACONDATA);
+
+        beaconData.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());
+        beaconData.put(Consts.COL_BEACONDATA_BEACON, ParseObject.createWithoutData("Beacon", beacon.getObjectId()));
+        //beaconData.put(Consts.COL_BEACONDATA_MACADDRESS, beacon.getString(Consts.COL_BEACONS_MACADDRESS));
+        beaconData.saveInBackground();
     }
 
     @Override
