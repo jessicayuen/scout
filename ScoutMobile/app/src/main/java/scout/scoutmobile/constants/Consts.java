@@ -7,6 +7,8 @@ public final class Consts {
     public static final String TABLE_PLACE = "Business";
     public static final String TABLE_POINTS = "Points";
     public static final String TABLE_REWARDS = "Reward";
+    public static final String TABLE_BEACON = "Beacon";
+    public static final String TABLE_BEACON_DATA = "Beacondata";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";
@@ -32,6 +34,15 @@ public final class Consts {
     public static final String COL_REWARDS_DESC = "description";
     public static final String COL_REWARDS_BUSINESS = "business";
     public static final String COL_REWARDS_QR = "QRCode";
+
+    //Parse beacon object properties
+    public static final String COL_BEACONS_MAC_ADDRESS = "macAddress";
+    public static final String COL_BEACONS_BUSINESS = "business";
+
+    //Parse beacon data object properties
+    public static final String COL_BEACONDATA_BEACON = "beacon";
+    public static final String COL_BEACONDATA_BUSINESS = "business";
+    public static final String COL_BEACONDATA_CUSTOMER = "customer";
 
     //For registering and logging in
     public static final String EMAIL_VALIDATING_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
