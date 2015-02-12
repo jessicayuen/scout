@@ -22,12 +22,15 @@
         
         <div class="container">
             <table id="rewards-table" class="table">
+            <button class="btn btn-default" id="addbutton">Add a reward</button>
+            <div id="addform">
             </table>
         </div>
 
         <% include template/footer %>
     </body>
     <script>
+               
         var populateRewardsTable = function (data) {
             if (data.length > 0) {
                 var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
@@ -64,5 +67,31 @@
                 $.get('/rewards/getrewards', populateRewardsTable);
             });
         });
+
+        $('#addbutton').click(function() {
+            var addform = 
+            $('<form id="addForm">' +
+                '<input type="text" id="name" placeholder="Name">' +
+                '<input type="text" id="description" placeholder="Description">' +
+                '<input type="number" id="points" placeholder="Points">' +
+                '<input type="submit" value="Submit!"></form>');
+            $("#addform").append(addform);
+        });
+
+        $("#addform").submit(function(event) {
+            event.preventDefault();
+            var data = 
+                {
+                    name: $("#name").val(), 
+                    description: $("#description").val(), 
+                    points: $("#points").val()
+                };
+            //console.log(data);
+            $.post('/rewards/addreward', data);
+            $('#rewards-table').empty();
+            $.get('/rewards/getrewards', populateRewardsTable);
+        });
+        
+
     </script>
 </html>

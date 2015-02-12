@@ -41,6 +41,36 @@ router.get('/getrewards', function(req, res, next) {
   })
 });
 
+router.post('/addreward', function (req, res) {
+  var RewardObj = Parse.Object.extend('Reward');
+  var BusinessObj = Parse.Object.extend('Business');
+
+  var description = req.body['description'];
+  var points = parseInt(req.body['points']);
+
+  var businessQuery = new Parse.Query(BusinessObj);
+  businessQuery.equalTo('owner', Parse.User.current());
+  businessQuery.first().then( function(business) {
+  
+    var reward = new RewardObj();
+    reward.set("description", description);
+    reward.set("points", points);
+    reward.set("business", business);
+
+    reward.save(null, {
+      success: function(reward) {
+        console.log('Reward has been successfully saved.');
+      },
+      error: function(reward, error) {
+        console.log('Reward has not been successfully saved.');
+      }
+    });
+  }, function() {
+    console.log("Could not find current business");
+  });
+});
+
+
 router.post('/removereward', function (req, res) {
   var rewardObjectId = req.body['objectid'];
 
