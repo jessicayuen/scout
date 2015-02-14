@@ -143,9 +143,14 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
             // Show a loading spinner, and kick off a background task to
             // perform the user login attempt via parse.
             showProgress(true);
+            try {
+                Thread.sleep(5000); //need in case another instance of the user is trying to log in as well
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             ParseUser.logInInBackground(email, password, new LogInCallback() {
                 @Override
-                public void done(ParseUser parseUser, ParseException e) {
+                public void done(final ParseUser parseUser, ParseException e) {
                     showProgress(false);
                     if (e != null) {
                         int code = e.getCode();
@@ -155,18 +160,23 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                             showToast(getErrorString(code));
                         }
                     } else {
-                        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
-                        query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
-                        query.getFirstInBackground(new GetCallback<ParseObject>() {
-                            public void done(ParseObject object, ParseException e) {
-                                if (object != null) {
-                                    Intent beaconServiceActivity = new Intent(LoginActivity.this, BeaconServiceActivity.class);
-                                    startActivity(beaconServiceActivity);
-                                } else {
-                                    showPasswordError();
+                        if (!parseUser.has(Consts.COL_USER_LOGGEDIN)) {
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
+                            query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
+                            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (object != null) {
+                                        parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
+                                        parseUser.saveInBackground();
+                                        startMainActivity(LoginActivity.this, BeaconServiceActivity.class);
+                                    } else {
+                                        showPasswordError();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            showToast(getString(R.string.exception_account_already_logged_in));
+                        }
                     }
                 }
 
