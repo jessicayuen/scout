@@ -9,7 +9,8 @@ import scout.scoutmobile.constants.Consts;
 public class GeneralUtils {
 
 
-    public static void logUserOut(final ParseUser user) {
+    public static void logUserOut() {
+        final ParseUser user = ParseUser.getCurrentUser();
         user.remove(Consts.COL_USER_LOGGEDIN);
         user.saveInBackground(new SaveCallback() {
             @Override
