@@ -59,6 +59,10 @@ public final class Consts {
     public static final String PLACE_POINTS = "place points";
     public static final String CUSTOMER_ID = "customer id";
 
+    //User login related
+    public static final String COL_USER_LOGGEDIN = "loggedin";
+    public static final String USER_LOGGED = "logged";
+
     private Consts() {
         //preventing the class being created
         throw new AssertionError();
