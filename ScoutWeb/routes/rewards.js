@@ -60,13 +60,16 @@ router.post('/addreward', function (req, res) {
     reward.save(null, {
       success: function(reward) {
         console.log('Reward has been successfully saved.');
+        res.end();
       },
       error: function(reward, error) {
         console.log('Reward has not been successfully saved.');
+        res.end();
       }
     });
   }, function() {
     console.log("Could not find current business");
+    res.end();
   });
 });
 
@@ -89,5 +92,38 @@ router.post('/removereward', function (req, res) {
     }
   });
 });
+
+router.put('/editreward', function (req, res) {
+  var rewardId = req.body['objectId'];
+  var rewardDescription = req.body['description'];
+  var rewardPoints = req.body['points'];
+
+  var RewardObj = Parse.Object.extend('Reward');
+  var query = new Parse.Query(RewardObj);
+
+  query.get(rewardId, {
+    success: function (reward) {
+      reward.set('description', rewardDescription);
+      reward.set('points', parseInt(rewardPoints));
+
+      reward.save(null , {
+        success: function (reward) {
+          console.log('Reward has been successfully updated.');
+          res.end();
+        },
+        error: function(reward, error) {
+          console.log(error);
+          console.log('ERROR: Cannot update reward '+rewardId);
+          res.end();
+        }
+      });
+    },
+    error: function (error) {
+      console.log('ERROR: Cannot query reward '+rewardId);
+      res.end();
+    }
+  });
+});
+
 
 module.exports = router;

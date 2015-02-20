@@ -157,11 +157,13 @@ public class RegisterActivity extends CredentialActivity {
                         customer.put(Consts.COL_CUSTOMER_USER, user);
                         customer.saveInBackground();
 
+                        user.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
+                        user.saveInBackground();
+
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
-                        Intent beaconServiceActivity = new Intent(RegisterActivity.this, BeaconServiceActivity.class);
-                        startActivity(beaconServiceActivity);
+                        startMainActivity(RegisterActivity.this, BeaconServiceActivity.class);
                     }
                 }
             });

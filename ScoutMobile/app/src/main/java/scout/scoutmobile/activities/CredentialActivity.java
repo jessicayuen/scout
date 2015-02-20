@@ -97,9 +97,6 @@ public class CredentialActivity extends Activity {
     protected String getErrorString(int errorCode) {
         String resStr = "";
         switch (errorCode) {
-            case ParseException.ACCOUNT_ALREADY_LINKED:
-                resStr = getString(R.string.exception_account_linked);
-                break;
             case ParseException.EMAIL_TAKEN:
                 resStr = getString(R.string.exception_email_exits);
                 break;
@@ -120,4 +117,5 @@ public class CredentialActivity extends Activity {
         startActivity(mainActivity);
         finish();
     }
+
 }
