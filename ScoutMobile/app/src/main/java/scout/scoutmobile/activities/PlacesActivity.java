@@ -111,14 +111,21 @@ public class PlacesActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_toggle_tracking:
+                toggleTracking();
+                return true;
+            case R.id.action_log_out:
+                //logOut(); TODO
+                return true;
+            case R.id.action_settings:
+                //openSettings(); TODO
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -187,7 +194,7 @@ public class PlacesActivity extends ActionBarActivity {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 // We're only expecting one match
-                if ((!parseObjects.isEmpty()) && e == null) {
+                if ((!parseObjects.isEmpty()) && (e == null)) {
                     ParseObject customer = parseObjects.get(0);
 
                     for (ParseObject business : businesses) {
@@ -246,8 +253,8 @@ public class PlacesActivity extends ActionBarActivity {
         });
     }
 
-/*    @Override
-    protected void onDestroy() {
+    protected void toggleTracking() {
+        scoutApp = (ScoutAndroidApplication) getApplicationContext();
         beaconManager = scoutApp.getBeaconManager();
         notificationManager = scoutApp.getNotificationManager();
 
@@ -263,6 +270,5 @@ public class PlacesActivity extends ActionBarActivity {
         if(beaconManager != null) {
             beaconManager.disconnect();
         }
-        super.onDestroy();
-    }*/
+    }
 }

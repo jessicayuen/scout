@@ -26,7 +26,7 @@ public class DispatchActivity extends Activity {
         Intent invokedActivity;
         ParseUser loggedInUser = ParseUser.getCurrentUser();
         if (loggedInUser != null) {
-            invokedActivity = new Intent(this, PlacesActivity.class);
+            invokedActivity = new Intent(this, BeaconServiceActivity.class);
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);
         }

@@ -18,6 +18,7 @@ import com.estimote.sdk.utils.L;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -25,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.constants.Consts;
-import scout.scoutmobile.dao.BeaconDao;
-import scout.scoutmobile.dao.CustomerDao;
 import scout.scoutmobile.utils.Logger;
 
 public class BeaconServiceActivity extends Activity {
@@ -34,13 +33,10 @@ public class BeaconServiceActivity extends Activity {
     private static final String TAG = BeaconServiceActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1234;
     private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
-
+    protected Logger mLogger;
     ScoutAndroidApplication scoutApp;
     private NotificationManager notificationManager;
     private BeaconManager beaconManager;
-    private Region region;
-    protected Logger mLogger;
-    private String notification;
     //private LeDeviceListAdapter adapter;
 
     @Override
@@ -51,7 +47,7 @@ public class BeaconServiceActivity extends Activity {
         scoutApp = (ScoutAndroidApplication) getApplicationContext();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Configure verbose debug logging.
+        // Configure verbose debug logging.;
         L.enableDebugLogging(true);
 
         // Configure BeaconManager.
@@ -71,59 +67,65 @@ public class BeaconServiceActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(!foundBeacons.isEmpty()) {
-                            boolean customerFound = false;
-                            notification = "Entered beacon:";
+                        if(!foundBeacons.isEmpty()){
+                            String notification = "Entered beacon(s):";
+                            for (Beacon beacon : foundBeacons) {
+                                notification = notification + "\n" + " " + beacon.getMacAddress();
+                                storeBeacon(beacon); //TODO: remove when beacons aren't stored in app
+                                ParseQuery<ParseObject> beaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
+                                        .whereEqualTo(Consts.COL_BEACON_MACADDRESS, beacon.getMacAddress());
 
-                            CustomerDao customerDao = new CustomerDao();
-                            customerDao.getCustomerByParseUser(ParseUser.getCurrentUser(), new FindCallback<ParseObject>() {
-                                @Override
-                                public void done(List<ParseObject> customerResults, ParseException e) {
-                                    // We're only expecting one customer match
-                                    if ((customerResults.isEmpty()) && e == null) {
-                                        ParseObject customer = customerResults.get(0);
-
-                                        for (Beacon beacon : foundBeacons) {
-                                            notification = notification + " " + beacon.getMacAddress();
-
-                                            BeaconDao beaconDao = new BeaconDao();
-                                            beaconDao.getBeaconByMacAddress(beacon.getMacAddress(), new FindCallback<ParseObject>() {
-                                                public void done(List<ParseObject> beaconResults, ParseException e) {
-                                                    // We're only expecting one beacon match
-                                                    if ((beaconResults.isEmpty()) && e == null) {
-                                                        ParseObject beacon = beaconResults.get(0);
-                                                        //TODO: send beacon data to server here
-                                                        storeBeaconData(beacon);
-                                                    } else {
-                                                        mLogger.logError(e != null ? e :
-                                                                new RuntimeException("Beacon does not exists."));
-                                                    }
-                                                }
-                                            });
+                                beaconQuery.findInBackground(new FindCallback<ParseObject>() {
+                                    public void done(List<ParseObject> beaconResults, ParseException e) {
+                                        // We're only expecting one beacon match
+                                        if ((!beaconResults.isEmpty()) && (e == null)) {
+                                            ParseObject beacon = beaconResults.get(0);
+                                            storeBeaconData(beacon);
+                                        } else {
+                                            mLogger.logError(e != null ? e :
+                                                    new RuntimeException("No beacon exists"));
                                         }
-
-                                    } else {
-                                        mLogger.logError(e != null ? e :
-                                                new RuntimeException("Customer does not exists."));
                                     }
-                                }
-                            });
-                            scoutApp.postNotification(notification);
+                                });
+                            }
                         }
                     }
                 });
             }
         });
         scoutApp.setBeaconManager(beaconManager);
+    }
 
+    private void storeBeacon(final Beacon beacon) {
+        ParseQuery<ParseObject> beaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
+            .whereEqualTo(Consts.COL_BEACON_MACADDRESS, beacon.getMacAddress());
+
+        beaconQuery.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> beaconResults, ParseException e) {
+                if (e == null) {
+                    if(beaconResults.isEmpty()) {
+                        ParseObject parseBeacon = new ParseObject(Consts.TABLE_BEACON);
+                        parseBeacon.put(Consts.COL_BEACON_MACADDRESS, beacon.getMacAddress());
+                        parseBeacon.put(Consts.COL_BEACON_NAME, "BEACON NAME");
+                        parseBeacon.put(Consts.COL_BEACON_BUSINESS, ParseObject.createWithoutData("Business", "2pp2JU8cIl")); //TODO: replace as business id
+                        parseBeacon.saveInBackground();
+                        scoutApp.postNotification(beacon.getMacAddress());
+                    }
+                    // else beacon already exists
+                } else {
+                    mLogger.logError(e != null ? e :
+                            new RuntimeException("No beacon exists"));
+                }
+            }
+        });
     }
 
     private void storeBeaconData(ParseObject beacon) {
         ParseObject beaconData = new ParseObject(Consts.TABLE_BEACONDATA);
-
-        beaconData.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());
+        scoutApp.postNotification(beacon.getObjectId());
         beaconData.put(Consts.COL_BEACONDATA_BEACON, ParseObject.createWithoutData("Beacon", beacon.getObjectId()));
-        //beaconData.put(Consts.COL_BEACONDATA_MACADDRESS, beacon.getString(Consts.COL_BEACONS_MACADDRESS));
+        beaconData.put(Consts.COL_BEACONDATA_MACADDRESS, beacon.getString(Consts.COL_BEACON_MACADDRESS));
+        //beaconData.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());  //TODO: store customer data
         beaconData.saveInBackground();
     }
 
@@ -134,16 +136,17 @@ public class BeaconServiceActivity extends Activity {
         // Check if device supports Bluetooth Low Energy.
         if (!beaconManager.hasBluetooth()) {
             Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
-            return;
         }
-        // If Bluetooth is not enabled, let user enable it.
-        if (!beaconManager.isBluetoothEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            connectToService();
+        else {
+            // If Bluetooth is not enabled, let user enable it.
+            if (!beaconManager.isBluetoothEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+            else {
+                connectToService();
+            }
         }
-
         startMainActivity(BeaconServiceActivity.this, PlacesActivity.class);
     }
 

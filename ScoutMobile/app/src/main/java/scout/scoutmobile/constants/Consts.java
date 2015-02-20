@@ -36,8 +36,9 @@ public final class Consts {
     public static final String COL_REWARDS_QR = "QRCode";
 
     //Parse beacon object properties
-    public static final String COL_BEACONS_MACADDRESS = "macAddress";
-    public static final String COL_BEACONS_BUSINESS = "business";
+    public static final String COL_BEACON_MACADDRESS = "macAddress";
+    public static final String COL_BEACON_BUSINESS = "business";
+    public static final String COL_BEACON_NAME = "name";
 
     //Parse beacon data object properties
     public static final String COL_BEACONDATA_MACADDRESS = "macAddress";
