@@ -1,5 +1,6 @@
 package scout.scoutmobile.activities;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +14,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.os.RemoteException;
+import android.util.Log;
 
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import scout.scoutmobile.R;
+import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.Place;
 import scout.scoutmobile.utils.Logger;
@@ -36,7 +42,13 @@ import scout.scoutmobile.utils.Logger;
  */
 public class PlacesActivity extends ActionBarActivity {
 
+    private static final String TAG = PlacesActivity.class.getSimpleName();
+    private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
+
     Logger mLogger = new Logger("PlacesActivity");
+    ScoutAndroidApplication scoutApp;
+    private NotificationManager notificationManager;
+    private BeaconManager beaconManager;
 
     /**
      * Used for setting custom list view items.
@@ -60,9 +72,9 @@ public class PlacesActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = getLayoutInflater().inflate(
-                            R.layout.place_list_item,
-                            null
-                        );
+                    R.layout.place_list_item,
+                    null
+            );
 
             TextView titleView = (TextView) view.findViewById(R.id.placeTitle);
             TextView pointsView = (TextView) view.findViewById(R.id.placePoints);
@@ -192,7 +204,7 @@ public class PlacesActivity extends ActionBarActivity {
                                         business.getString(Consts.COL_PLACE_THUMBNAIL_URL),
                                         0,
                                         business.getObjectId())
-                                    );
+                        );
 
                         // Let's create these queries with parse - would be easier with a join
                         // but I don't know a way in parse yet.
@@ -239,5 +251,24 @@ public class PlacesActivity extends ActionBarActivity {
                 startActivity(rewardsActivity);
             }
         });
+    }
+
+    protected void toggleTracking() {
+        scoutApp = (ScoutAndroidApplication) getApplicationContext();
+        beaconManager = scoutApp.getBeaconManager();
+        notificationManager = scoutApp.getNotificationManager();
+
+        try {
+            beaconManager.stopRanging(ALL_ESTIMOTE_BEACONS_REGION);
+        } catch (RemoteException e) {
+            Log.d(TAG, "Error while stopping ranging", e);
+        }
+
+        if(notificationManager != null) {
+            notificationManager.cancel(scoutApp.getNotificationId());
+        }
+        if(beaconManager != null) {
+            beaconManager.disconnect();
+        }
     }
 }

@@ -88,6 +88,7 @@ public class BeaconServiceActivity extends Activity {
                                     }
                                 });
                             }
+                            scoutApp.postNotification(notification);
                         }
                     }
                 });
@@ -122,7 +123,7 @@ public class BeaconServiceActivity extends Activity {
 
     private void storeBeaconData(ParseObject beacon) {
         ParseObject beaconData = new ParseObject(Consts.TABLE_BEACONDATA);
-        scoutApp.postNotification(beacon.getObjectId());
+        //scoutApp.postNotification("Stored beacon data: " + beacon.getObjectId());
         beaconData.put(Consts.COL_BEACONDATA_BEACON, ParseObject.createWithoutData("Beacon", beacon.getObjectId()));
         beaconData.put(Consts.COL_BEACONDATA_MACADDRESS, beacon.getString(Consts.COL_BEACON_MACADDRESS));
         //beaconData.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());  //TODO: store customer data
