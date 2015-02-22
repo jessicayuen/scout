@@ -7,12 +7,14 @@
     <string name="action_toggle_tracking">Toggle Tracking</string>
     <string name="action_log_out">Log Out</string>
 
-    <!--Network related strings-->
+    <!-- Network related strings -->
     <string name="toast_network_unavailable">No network connection exists to perform that action</string>
 
-    <!--Parse Exception Strings-->
+    <!-- Parse Exception Strings -->
     <string name="exception_account_already_logged_in">Account already logged in</string>
     <string name="exception_email_exits">Account already exists with that email</string>
     <string name="exception_server_connection">Error Connecting to the server</string>
     <string name="exception_general">Account does not exist</string>
+    <string name="title_activity_redeem">RedeemActivity</string>
+
 </resources>
