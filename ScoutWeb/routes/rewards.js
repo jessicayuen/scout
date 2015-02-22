@@ -4,7 +4,7 @@ var Parse = require('parse').Parse;
 
 router.get('/', function(req, res, next) {
   if (Parse.User.current()) {
-    res.render('rewards', { title: 'Scout' , jumbotron: 'Rewards' });
+    res.render('rewards', { title: 'Scout', jumbotron: 'Rewards', filename: 'rewards' });
   } else {
     res.redirect('/');
   }
