@@ -1,0 +1,9 @@
+body {
+    background-image: url('./../../img/urban.png');
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: center; 
+}
+#login-container {
+    margin-top:250px;
+}

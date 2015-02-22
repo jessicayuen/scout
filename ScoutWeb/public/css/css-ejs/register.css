@@ -1,0 +1,13 @@
+body {
+    background-image: url('./../../img/urban.png');
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: center; 
+}
+#register-container {
+    margin-top: 220px;
+}
+#register-panel {
+    opacity: 0.9;
+    margin-top:30px;
+}

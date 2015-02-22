@@ -4,7 +4,7 @@ var Parse = require('parse').Parse;
 
 router.get('/', function(req, res, next) {
   if (Parse.User.current()) {
-    res.render('rewards', { title: 'Scout' , jumbotron: 'Rewards' });
+    res.render('rewards', { title: 'Scout', jumbotron: 'Rewards', filename: 'rewards' });
   } else {
     res.redirect('/');
   }
@@ -27,16 +27,22 @@ router.get('/getrewards', function(req, res, next) {
           res.json(rewardList);
         },
         error: function (error) {
-          console.log('ERROR: cannot query rewards for business '+business['id']);
+          var msg = 'ERROR: cannot query rewards for business '+business['id'];
+
+          console.log(msg);
           console.log(error.message);
-          res.end();
+
+          res.status(400).send(msg);
         }
       });
     },
     error: function (error) {
-      console.log('ERROR: Unable to query business for owner'+Parse.User.current());
+      var msg = 'ERROR: Unable to query business for owner'+Parse.User.current();
+
+      console.log(msg);
       console.log(error.message);
-      res.end();
+
+      res.status(400).send(msg);
     }
   })
 });
@@ -60,16 +66,21 @@ router.post('/addreward', function (req, res) {
     reward.save(null, {
       success: function(reward) {
         console.log('Reward has been successfully saved.');
-        res.end();
+
+        res.status(200).send();
       },
       error: function(reward, error) {
-        console.log('Reward has not been successfully saved.');
-        res.end();
+        console.log('ERROR: Unable to save reward.');
+        console.log(error.message);
+
+        res.status(400).send('Reward could not be successfully saved.');
       }
     });
-  }, function() {
-    console.log("Could not find current business");
-    res.end();
+  }, function(error) {
+    console.log('ERROR: Could not query business');
+    console.log(error.message);
+    
+    res.status(400).send('Unable to find the current business.');
   });
 });
 
@@ -84,11 +95,14 @@ router.post('/removereward', function (req, res) {
     success: function (reward) {
       reward.destroy();
       console.log('Reward has been successfully deleted.');
-      res.end();
+
+      res.status(200).send();
     },
     error: function (error) {
       console.log('ERROR: Cannot delete reward or is already deleted.');
-      res.end();
+      console.log(error.message);
+
+      res.status(400).send('Unable to delete reward.');
     }
   });
 });
@@ -109,18 +123,21 @@ router.put('/editreward', function (req, res) {
       reward.save(null , {
         success: function (reward) {
           console.log('Reward has been successfully updated.');
-          res.end();
+          
+          res.status(200).send();
         },
         error: function(reward, error) {
-          console.log(error);
           console.log('ERROR: Cannot update reward '+rewardId);
-          res.end();
+          console.log(error.message);
+
+          res.status(400).send('Unable to update the current reward.')
         }
       });
     },
     error: function (error) {
       console.log('ERROR: Cannot query reward '+rewardId);
-      res.end();
+
+      res.status(400).send('Unable to find the current reward.');
     }
   });
 });

@@ -1,11 +1,12 @@
 <!-- http://bootsnipp.com/snippets/featured/full-page-log-in-with-background -->
-<div class="container" style="margin-top:250px;">
+<div id="register-container" class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <div class="panel panel-default" style="opacity: 0.9;margin-top:30px;">
+            <% include ../template/error %>
+            <div id="register-panel" class="panel panel-default">
                 <div class="panel-heading text-center">Registration</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="post" action="/register">
+                    <form id="register-form" class="form-horizontal" role="form" method="post" action="/register">
                         <div class="form-group">
                             <label for="inputEmail3" class="col-sm-3 control-label">Email</label>
                             <div class="col-sm-9">
