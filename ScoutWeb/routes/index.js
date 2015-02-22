@@ -16,13 +16,13 @@ router.post('/', function (req, res) {
 
   Parse.User.logIn(email, password, {
     success: function(user) {
-      res.redirect('/dashboard');
+      res.status(200).send();
     },
     error: function(error) {
       console.log('ERROR: Unable to log in user '+email);
       console.log(error.message);
 
-      res.redirect('/');
+      res.status(400).send('Unable to login user.');
     }
   });
 });
