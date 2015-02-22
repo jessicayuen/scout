@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    // Populates reward records for rewards table
     var populateRewardsTable = function (data) {
         if (data.length > 0) {
             var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
@@ -28,7 +29,8 @@ $(document).ready(function(){
         }
     }
 
-    var refreshTable = function () {
+    // Refreshes rewards table
+    var refreshTable = function (callback) {
         $.get('/rewards/getrewards')
             .success(function (data) {
                 $('#rewards-table').empty();
@@ -37,15 +39,20 @@ $(document).ready(function(){
             .error(function (xhr, textStatus, errorThrown) {
                 alert(xhr.responseText);
             });
+
+        if (callback != null) callback();
     }
 
+    // Refresh table when page is loaded
     $('#rewards-table').ready(refreshTable);
 
+    // remove reward upon clicking of remove
     $('#rewards-table').on('click', '.remove', function() {
         $.post('/rewards/removereward', { objectid: this.id })
             .done(refreshTable);
     });
 
+    // An reward editting modal is shown to user when edit is clicked
     $('#rewards-table').on('click', '.edit', function() {
         var formBody = 
           '<div class="form-group">'+
@@ -65,6 +72,8 @@ $(document).ready(function(){
         $('#modal').modal('show');
     });
 
+    // When the reward editting modal is submitted, the modal will be closed,
+    // and the rewards are refreshed
     $('#modal-form').submit(function(event) {
       event.preventDefault();
       var data = 
@@ -89,6 +98,7 @@ $(document).ready(function(){
       });
     });
 
+    // When the add rewards button is pressed, a form will be shown
     $('#addbutton').click(function() {
         var addform = 
           '<form id="addForm">' +
@@ -99,6 +109,7 @@ $(document).ready(function(){
         $("#addform").append(addform);
     });
 
+    // when the add form is submitted, the table is refreshed
     $("#addform").submit(function(event) {
         event.preventDefault();
         var data = 
@@ -108,7 +119,11 @@ $(document).ready(function(){
                 points: $("#points").val()
             };
         $.post('/rewards/addreward', data)
-            .success(refreshTable)
+            .success(refreshTable(function() {
+                $("#name").val('');
+                $("#description").val('');
+                $("#points").val('');
+            }))
             .error(function (xhr, textStatus, errorThrown) {
                 alert(xhr.responseText);
             });
