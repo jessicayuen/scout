@@ -8,10 +8,46 @@
                 background-size: auto 100%;
                 background-position: center; 
             }
+            #register-container {
+                margin-top: 220px;
+            }
         </style>
     </head>
     <body>
-        <!--% include modules/error %-->
-        <% include modules/register %>
+        <div id="register-container" class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <% include template/error %>
+                    <div class="panel panel-default" style="opacity: 0.9;margin-top:30px;">
+                        <div class="panel-heading text-center">Registration</div>
+                        <div class="panel-body">
+                            <% include modules/register %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
+    <script>
+        $("#register-form").submit(function(event) {
+            event.preventDefault();
+            var data = 
+                {
+                    email: $(this).find('input[name="email"]').val(), 
+                    password: $(this).find('input[name="password"]').val(), 
+                    confirmpassword: $(this).find('input[name="confirmpassword"]').val(),
+                    businessname: $(this).find('input[name="businessname"]').val(),
+                    firstname: $(this).find('input[name="firstname"]').val(),
+                    lastname: $(this).find('input[name="lastname"]').val()
+                };
+            $.post('/register', data)
+                .success(function (data) {
+                    window.location.href = '/dashboard';
+                })
+                .error(function (xhr, textStatus, errorThrown) {
+                    $('#error-message').text(xhr.responseText);
+                    $('#error').show();
+                });
+        });
+    </script>
 </html>

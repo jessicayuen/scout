@@ -35,14 +35,14 @@ router.post('/', function (req, res) {
 
       businessRec.save(null, {
         success: function(business) {
-          res.redirect('/dashboard');
+          res.status(200).send('Registered user.');
         },
         error: function(error) {
           // This should never happen
-          console.log('ERROR: cannot save business '+businessName);
+          console.log('ERROR: cannot save business ' + businessName);
           console.log(error.message);
 
-          res.redirect('/register');
+          res.status(400).send('Business already exists. Please contact admin for assistance.');
         }
       });
     },
@@ -51,7 +51,7 @@ router.post('/', function (req, res) {
       console.log('ERROR: Unable to signup user '+ email);
       console.log(error.message);
 
-      res.redirect('/register');
+      res.status(400).send('An account with the same email already exists!');
     }
   });
 });
