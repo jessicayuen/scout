@@ -39,7 +39,7 @@ router.post('/', function (req, res) {
         },
         error: function(error) {
           // This should never happen
-          console.log('ERROR: cannot save business ' + businessName);
+          console.log('ERROR: Cannot save business ' + businessName);
           console.log(error.message);
 
           res.status(400).send('Business already exists. Please contact admin for assistance.');
