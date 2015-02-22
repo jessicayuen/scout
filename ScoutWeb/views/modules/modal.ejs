@@ -1,0 +1,26 @@
+<!-- Use jQuery to populate 
+      - modal-title-span
+      - modal-dismiss-span
+      - modal-form
+      - modal-submit-span
+      - modal-body-div
+-->
+
+<div id="modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="modal-form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"><span id="modal-title-text"></span></h4>
+        </div>
+        <div id="modal-body-div" class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><span id="modal-dismiss-text"></span></button>
+          <button type="submit" class="btn btn-primary"><span id="modal-submit-text"></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
