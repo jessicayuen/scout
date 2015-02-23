@@ -26,6 +26,7 @@ import java.util.List;
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.Reward;
+import scout.scoutmobile.utils.GeneralUtils;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -89,6 +90,12 @@ public class RewardsActivity extends ActionBarActivity {
 
         // Set the rewards list items
         this.setRewardsListItems(placeId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GeneralUtils.verifyUserLoggedIn(this);
     }
 
     @Override

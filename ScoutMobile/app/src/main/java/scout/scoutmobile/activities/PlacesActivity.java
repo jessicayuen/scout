@@ -34,6 +34,7 @@ import scout.scoutmobile.R;
 import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.Place;
+import scout.scoutmobile.utils.GeneralUtils;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -97,6 +98,12 @@ public class PlacesActivity extends ActionBarActivity {
         setContentView(R.layout.activity_places);
 
         this.getAllPlaces();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GeneralUtils.verifyUserLoggedIn(this);
     }
 
     @Override

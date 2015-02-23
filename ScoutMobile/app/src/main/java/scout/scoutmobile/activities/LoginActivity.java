@@ -144,11 +144,6 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
             // Show a loading spinner, and kick off a background task to
             // perform the user login attempt via parse.
             showProgress(true);
-            try {
-                Thread.sleep(5000); //need in case another instance of the user is trying to log in as well
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             ParseUser.logInInBackground(email, password, new LogInCallback() {
                 @Override
                 public void done(final ParseUser parseUser, ParseException e) {
@@ -156,11 +151,13 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                     if (e != null) {
                         int code = e.getCode();
                         if (code == ParseException.VALIDATION_ERROR) {
-                           showPasswordError();
+                            showPasswordError();
                         } else {
                             showToast(getErrorString(code));
                         }
                     } else {
+                        //this checks whether of not a field exists for the particular user, if said
+                        //field exists, then the user was logged in recently.
                         ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
                         query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
                         query.getFirstInBackground(new GetCallback<ParseObject>() {

@@ -11,13 +11,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.utils.GeneralUtils;
 import scout.scoutmobile.utils.Logger;
 
 public class CredentialActivity extends Activity {
@@ -27,6 +30,7 @@ public class CredentialActivity extends Activity {
     protected ProgressDialog mLoadingDialog;
 
     protected Logger mLogger;
+
 
     /**
      * Checks whether or not the email is valid syntax wise, it however does not validate the email
@@ -103,6 +107,9 @@ public class CredentialActivity extends Activity {
             case ParseException.CONNECTION_FAILED:
                 resStr = getString(R.string.exception_server_connection);
                 break;
+            case ParseException.INVALID_EMAIL_ADDRESS:
+                resStr = getString(R.string.exception_invalid_email);
+                break;
             default:
                 return resStr = getString(R.string.exception_general);
         }
@@ -110,11 +117,7 @@ public class CredentialActivity extends Activity {
     }
 
     protected void startMainActivity(Context context, Class<?> mainClass) {
-        mLogger.log("Starting main activity");
-        Intent mainActivity = new Intent(context, mainClass);
-        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(mainActivity);
+        GeneralUtils.startMainActivity(context, mainClass);
         finish();
     }
 

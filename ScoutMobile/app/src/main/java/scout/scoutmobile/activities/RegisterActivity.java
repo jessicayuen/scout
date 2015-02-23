@@ -17,6 +17,7 @@ import com.parse.SignUpCallback;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.services.BluetoothBeaconService;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -148,7 +149,11 @@ public class RegisterActivity extends CredentialActivity {
                         if (code == ParseException.EMAIL_TAKEN) {
                             mEmailEditText.setError(getString(R.string.error_email_exists));
                             mEmailEditText.requestFocus();
+                        } else if (code == ParseException.INVALID_EMAIL_ADDRESS) {
+                            mEmailEditText.setError(getString(R.string.error_invalid_email));
+                            mEmailEditText.requestFocus();
                         } else {
+                            mLogger.log("ERROR CODE:" + code);
                             showToast(getErrorString(code));
                         }
                     } else {
@@ -163,7 +168,8 @@ public class RegisterActivity extends CredentialActivity {
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
-                        startMainActivity(RegisterActivity.this, BeaconServiceActivity.class);
+                        startService(new Intent(RegisterActivity.this, BluetoothBeaconService.class));
+                        startMainActivity(RegisterActivity.this, PlacesActivity.class);
                     }
                 }
             });

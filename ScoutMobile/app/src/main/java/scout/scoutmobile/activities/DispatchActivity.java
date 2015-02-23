@@ -11,7 +11,7 @@ import android.os.Bundle;
 
 import com.parse.ParseUser;
 
-public class DispatchActivity extends Activity {
+public class DispatchActivity extends CredentialActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

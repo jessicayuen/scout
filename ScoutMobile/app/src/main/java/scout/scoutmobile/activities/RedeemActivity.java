@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import scout.scoutmobile.R;
+import scout.scoutmobile.utils.GeneralUtils;
 
 
 public class RedeemActivity extends ActionBarActivity {
@@ -16,6 +17,11 @@ public class RedeemActivity extends ActionBarActivity {
         setContentView(R.layout.activity_redeem);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GeneralUtils.verifyUserLoggedIn(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
