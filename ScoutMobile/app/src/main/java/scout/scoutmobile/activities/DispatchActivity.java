@@ -9,13 +9,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import scout.scoutmobile.constants.Consts;
 
 public class DispatchActivity extends Activity {
 
@@ -26,7 +20,7 @@ public class DispatchActivity extends Activity {
         Intent invokedActivity;
         ParseUser loggedInUser = ParseUser.getCurrentUser();
         if (loggedInUser != null) {
-            invokedActivity = new Intent(this, BeaconServiceActivity.class);
+            invokedActivity = new Intent(this, PlacesActivity.class);
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);
         }

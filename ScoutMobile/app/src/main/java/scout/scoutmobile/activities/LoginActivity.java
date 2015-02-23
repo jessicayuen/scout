@@ -32,6 +32,7 @@ import java.util.List;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.services.BluetoothBeaconService;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -160,23 +161,20 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                             showToast(getErrorString(code));
                         }
                     } else {
-                        if (!parseUser.has(Consts.COL_USER_LOGGEDIN)) {
-                            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
-                            query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
-                            query.getFirstInBackground(new GetCallback<ParseObject>() {
-                                public void done(ParseObject object, ParseException e) {
-                                    if (object != null) {
-                                        parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
-                                        parseUser.saveInBackground();
-                                        startMainActivity(LoginActivity.this, BeaconServiceActivity.class);
-                                    } else {
-                                        showPasswordError();
-                                    }
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
+                        query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
+                        query.getFirstInBackground(new GetCallback<ParseObject>() {
+                            public void done(ParseObject object, ParseException e) {
+                                if (object != null) {
+                                    parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
+                                    parseUser.saveInBackground();
+                                    startService(new Intent(LoginActivity.this, BluetoothBeaconService.class));
+                                    startMainActivity(LoginActivity.this, PlacesActivity.class);
+                                } else {
+                                    showPasswordError();
                                 }
-                            });
-                        } else {
-                            showToast(getString(R.string.exception_account_already_logged_in));
-                        }
+                            }
+                        });
                     }
                 }
 
