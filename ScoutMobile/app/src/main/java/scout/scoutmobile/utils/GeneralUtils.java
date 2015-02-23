@@ -1,5 +1,13 @@
 package scout.scoutmobile.utils;
 
+/**
+ * Contains general utility functions used elsewhere
+ * NOTE: should consider inheriting ParseUser class and override the logout instead
+ *      of making own logout.
+ */
+
+//Current implementation check could cause problems when users uninstall app hmm.
+
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
