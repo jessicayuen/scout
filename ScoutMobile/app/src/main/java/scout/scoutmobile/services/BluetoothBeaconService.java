@@ -118,6 +118,7 @@ public class BluetoothBeaconService extends Service {
                         beaconDataObject.put("beacon", beaconObject);
                         beaconDataObject.put("measuredPower", bluetoothBeaconData.getMeasuredPower());
                         beaconDataObject.put("rssi", bluetoothBeaconData.getRSSI());
+                        beaconDataObject.put("distance", bluetoothBeaconData.getDistance());
 
                         beaconDataObject.saveInBackground();
                     } catch (ParseException parseSaveException) {

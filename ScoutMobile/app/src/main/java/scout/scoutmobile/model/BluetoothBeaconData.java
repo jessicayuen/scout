@@ -17,10 +17,15 @@ public class BluetoothBeaconData {
     // The strength of the beacon's signal as seen on the receiving device
     private Integer mRSSI;
 
+    // The estimated distance in meters from the parent bluetooth beacon
+    private Float mDistance;
+
     public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Integer measuredPower, Integer rssi) {
         this.mBluetoothBeacon = bluetoothBeacon;
         this.mMeasuredPower = measuredPower;
         this.mRSSI = rssi;
+
+        mDistance = (float)rssi/measuredPower;
     }
 
     public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Beacon beacon) {
@@ -37,5 +42,9 @@ public class BluetoothBeaconData {
 
     public Integer getRSSI() {
         return mRSSI;
+    }
+
+    public Float getDistance() {
+        return mDistance;
     }
 }
