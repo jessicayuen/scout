@@ -8,7 +8,7 @@ public final class Consts {
     public static final String TABLE_POINTS = "Points";
     public static final String TABLE_REWARDS = "Reward";
     public static final String TABLE_BEACON = "Beacon";
-    public static final String TABLE_BEACONDATA = "Beacondata";
+    public static final String TABLE_BEACONDATA = "BeaconData";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";
@@ -37,12 +37,18 @@ public final class Consts {
 
     //Parse beacon object properties
     public static final String COL_BEACON_MACADDRESS = "macAddress";
+    public static final String COL_BEACON_UUID = "uuid";
+    public static final String COL_BEACON_MAJOR = "major";
+    public static final String COL_BEACON_MINOR = "minor";
     public static final String COL_BEACON_BUSINESS = "business";
     public static final String COL_BEACON_NAME = "name";
 
     //Parse beacon data object properties
     public static final String COL_BEACONDATA_MACADDRESS = "macAddress";
     public static final String COL_BEACONDATA_BEACON = "beacon";
+    public static final String COL_BEACONDATA_MEASUREDPOWER = "measuredPower";
+    public static final String COL_BEACONDATA_RSSI = "rssi";
+    public static final String COL_BEACONDATA_DISTANCE = "distance";
     public static final String COL_BEACONDATA_BUSINESS = "business";
     public static final String COL_BEACONDATA_CUSTOMER = "customer";
 

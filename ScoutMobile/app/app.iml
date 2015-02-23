@@ -92,7 +92,6 @@
     <orderEntry type="library" exported="" name="estimote-sdk-preview" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="android-core-3.2.0-javadoc" level="project" />
-    <orderEntry type="library" exported="" name="estimote-sdk-preview-javadoc" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.1.4" level="project" />
     <orderEntry type="library" exported="" name="Parse-1.8.2" level="project" />
   </component>

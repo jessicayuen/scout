@@ -24,8 +24,7 @@ public class BluetoothBeaconData {
         this.mBluetoothBeacon = bluetoothBeacon;
         this.mMeasuredPower = measuredPower;
         this.mRSSI = rssi;
-
-        mDistance = (float)rssi/measuredPower;
+        this.mDistance = (float)rssi/measuredPower;
     }
 
     public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Beacon beacon) {

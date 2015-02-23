@@ -1,5 +1,7 @@
 package scout.scoutmobile.model;
 
+import com.estimote.sdk.Beacon;
+
 /**
  * Represents a physical beacon of a business owner.
  */
@@ -26,7 +28,7 @@ public class BluetoothBeacon {
         this.mMinor = minor;
     }
 
-    public BluetoothBeacon(com.estimote.sdk.Beacon beacon) {
+    public BluetoothBeacon(Beacon beacon) {
         this(beacon.getMacAddress(), beacon.getProximityUUID(), beacon.getMajor(),
                 beacon.getMinor());
     }

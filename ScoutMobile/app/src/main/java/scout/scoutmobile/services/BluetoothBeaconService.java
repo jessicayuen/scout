@@ -15,6 +15,7 @@ import com.parse.ParseQuery;
 
 import java.util.List;
 
+import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.BluetoothBeacon;
 import scout.scoutmobile.model.BluetoothBeaconData;
 import scout.scoutmobile.utils.Logger;
@@ -39,7 +40,6 @@ public class BluetoothBeaconService extends Service {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
                 StoreBeaconData(beacons);
-
                 mLogger.log("Ranged beacons: " + beacons);
             }
         });
@@ -88,8 +88,8 @@ public class BluetoothBeaconService extends Service {
         final BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(bluetoothBeacon, beacon);
 
         // query for unique beacon mac address
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Beacon");
-        query.whereEqualTo("macAddress", bluetoothBeacon.getMacAddress()).setLimit(1);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
+        query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, bluetoothBeacon.getMacAddress()).setLimit(1);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -101,24 +101,24 @@ public class BluetoothBeaconService extends Service {
                     try {
                         // no parseObjects mean that the Beacon is new
                         if (parseObjects.isEmpty()) {
-                            beaconObject = new ParseObject("Beacon");
+                            beaconObject = new ParseObject(Consts.TABLE_BEACON);
 
-                            beaconObject.put("macAddress", bluetoothBeacon.getMacAddress());
-                            beaconObject.put("uuid", bluetoothBeacon.getUUID());
-                            beaconObject.put("major", bluetoothBeacon.getMajor());
-                            beaconObject.put("minor", bluetoothBeacon.getMinor());
+                            beaconObject.put(Consts.COL_BEACON_MACADDRESS, bluetoothBeacon.getMacAddress());
+                            beaconObject.put(Consts.COL_BEACON_UUID, bluetoothBeacon.getUUID());
+                            beaconObject.put(Consts.COL_BEACON_MAJOR, bluetoothBeacon.getMajor());
+                            beaconObject.put(Consts.COL_BEACON_MINOR, bluetoothBeacon.getMinor());
 
                             beaconObject.save();
                         } else {
                             beaconObject = parseObjects.get(0);
                         }
 
-                        beaconDataObject = new ParseObject("BeaconData");
+                        beaconDataObject = new ParseObject(Consts.TABLE_BEACONDATA);
 
-                        beaconDataObject.put("beacon", beaconObject);
-                        beaconDataObject.put("measuredPower", bluetoothBeaconData.getMeasuredPower());
-                        beaconDataObject.put("rssi", bluetoothBeaconData.getRSSI());
-                        beaconDataObject.put("distance", bluetoothBeaconData.getDistance());
+                        beaconDataObject.put(Consts.COL_BEACONDATA_BEACON, beaconObject);
+                        beaconDataObject.put(Consts.COL_BEACONDATA_MEASUREDPOWER, bluetoothBeaconData.getMeasuredPower());
+                        beaconDataObject.put(Consts.COL_BEACONDATA_RSSI, bluetoothBeaconData.getRSSI());
+                        beaconDataObject.put(Consts.COL_BEACONDATA_DISTANCE, bluetoothBeaconData.getDistance());
 
                         beaconDataObject.saveInBackground();
                     } catch (ParseException parseSaveException) {
