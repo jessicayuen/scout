@@ -3,7 +3,7 @@ $(document).ready(function(){
     var populateRewardsTable = function (data) {
         if (data.length > 0) {
             var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
-            $("#rewards-table").append(heading);
+            $('#rewards-table').append(heading);
 
             data.forEach(function (reward) {
                 var objectid = reward['objectId'];
@@ -46,12 +46,56 @@ $(document).ready(function(){
     // Refresh table when page is loaded
     $('#rewards-table').ready(refreshTable);
 
-    // remove reward upon clicking of remove
+    // Remove reward upon clicking of remove
     $('#rewards-table').on('click', '.remove', function() {
         $.post('/rewards/removereward', { objectid: this.id })
             .done(refreshTable);
     });
 
+    // Add a reward
+    var addReward = function(event) {
+        event.preventDefault();
+        var data = 
+            {
+                name: $('#name').val(), 
+                description: $('#description').val(), 
+                points: $('#points').val()
+            };
+        $.post('/rewards/addreward', data)
+            .success(refreshTable(function() {
+                $('#modal').modal('hide');
+                $('#modal-body-div').empty();
+                refreshTable();
+            }))
+            .error(function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText);
+            });
+    };
+    // Edit a reward
+    var editReward = function(event) {
+      event.preventDefault();
+      var data = 
+      {
+        objectId: $(this).find('input[name="objectId"]').val(),
+        description: $(this).find('input[name="description"]').val(),
+        points: $(this).find('input[name="points"]').val()
+      };
+
+      console.log(data);
+      $.ajax({
+        url: '/rewards/editreward',
+        type: 'PUT',
+        data: data,
+        success: function(data) {
+          $('#modal').modal('hide');
+          $('#modal-body-div').empty();
+          refreshTable();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          alert(xhr.responseText);
+        }
+      });
+    };
     // An reward editting modal is shown to user when edit is clicked
     $('#rewards-table').on('click', '.edit', function() {
         var formBody = 
@@ -70,62 +114,31 @@ $(document).ready(function(){
         $('#modal-dismiss-text').text('Close');
         $('#modal-submit-text').text('Save Changes');
         $('#modal').modal('show');
+        $('#modal-form').submit(editReward);
     });
 
     // When the reward editting modal is submitted, the modal will be closed,
     // and the rewards are refreshed
-    $('#modal-form').submit(function(event) {
-      event.preventDefault();
-      var data = 
-        {
-            objectId: $(this).find('input[name="objectId"]').val(),
-            description: $(this).find('input[name="description"]').val(),
-            points: $(this).find('input[name="points"]').val()
-        };
-
-      $.ajax({
-        url: '/rewards/editreward',
-        type: 'PUT',
-        data: data,
-        success: function(data) {
-          $('#modal').modal('hide');
-          $('#modal-body-div').empty();
-          refreshTable();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            alert(xhr.responseText)
-        }
-      });
-    });
 
     // When the add rewards button is pressed, a form will be shown
     $('#addbutton').click(function() {
-        var addform = 
-          '<form id="addForm">' +
-            '<input type="text" id="name" placeholder="Name">' +
-            '<input type="text" id="description" placeholder="Description">' +
-            '<input type="number" id="points" placeholder="Points">' +
-            '<input type="submit" value="Submit!"></form>';
-        $("#addform").append(addform);
+        var formBody  = 
+          '<div class="form-group">'+
+            '<label for="name" class="control-label">Name:</label>'+
+            '<input type="text" id="name" class="form-control" placeholder="Name" required></div>' +
+          '<div class="form-group">'+
+            '<label for="description" class="control-label">Description:</label>'+
+            '<input type="text" id="description" class="form-control" placeholder="Description" required></div>' +
+          '<div class="form-group">'+
+            '<label for="points" class="control-label">Points:</label>'+
+            '<input type="number" id="points" class="form-control" placeholder="Points" required></div>';
+
+        $('#modal-title-text').text('Add Reward');
+        $('#modal-body-div').empty().append(formBody);
+        $('#modal-dismiss-text').text('Close');
+        $('#modal-submit-text').text('Add Reward');
+        $('#modal').modal('show');
+        $('#modal-form').submit(addReward);
     });
 
-    // when the add form is submitted, the table is refreshed
-    $("#addform").submit(function(event) {
-        event.preventDefault();
-        var data = 
-            {
-                name: $("#name").val(), 
-                description: $("#description").val(), 
-                points: $("#points").val()
-            };
-        $.post('/rewards/addreward', data)
-            .success(refreshTable(function() {
-                $("#name").val('');
-                $("#description").val('');
-                $("#points").val('');
-            }))
-            .error(function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            });
-    });
 });
