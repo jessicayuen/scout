@@ -1,6 +1,5 @@
 package scout.scoutmobile.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
