@@ -73,7 +73,7 @@ public final class Consts {
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";
     //TODO: use this when we want to use bluetooth mac to identify users -> getBtUniqueId();
-    public static final String USER_LOGGED = Integer.toString((int)Math.random());
+    public static final String USER_LOGGED = "NOT_REALLY_RANDOM";
 
     private Consts() {
         //preventing the class being created
