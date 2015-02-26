@@ -50,20 +50,24 @@ public class BluetoothBeaconService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-            @Override
-            public void onServiceReady() {
-                try {
-                    beaconManager.startRanging(ALL_ESTIMOTE_BEACONS);
+        if(beaconManager.isBluetoothEnabled() && beaconManager.hasBluetooth()) {
+            beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+                @Override
+                public void onServiceReady() {
+                    try {
+                        beaconManager.startRanging(ALL_ESTIMOTE_BEACONS);
 
-                    mLogger.log("Beacon service has started");
-                } catch (RemoteException e) {
-                    mLogger.log("Unable to start ranging: " + e.toString());
+                        mLogger.log("Beacon service has started");
+                    } catch (RemoteException e) {
+                        mLogger.log("Unable to start ranging: " + e.toString());
+                    }
                 }
-            }
-        });
+            });
 
-        return Service.START_STICKY;
+            return Service.START_STICKY;
+        } else {
+            return Service.START_NOT_STICKY;
+        }
     }
 
     @Override
