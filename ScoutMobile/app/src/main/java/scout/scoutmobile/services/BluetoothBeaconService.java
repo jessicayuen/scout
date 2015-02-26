@@ -12,6 +12,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -88,10 +89,10 @@ public class BluetoothBeaconService extends Service {
         final BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(bluetoothBeacon, beacon);
 
         // query for unique beacon mac address
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
-        query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, bluetoothBeacon.getMacAddress()).setLimit(1);
+        ParseQuery<ParseObject> queryBeacon = ParseQuery.getQuery(Consts.TABLE_BEACON);
+        queryBeacon.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, bluetoothBeacon.getMacAddress()).setLimit(1);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        queryBeacon.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 ParseObject beaconObject;
@@ -115,6 +116,7 @@ public class BluetoothBeaconService extends Service {
 
                         beaconDataObject = new ParseObject(Consts.TABLE_BEACONDATA);
 
+                        beaconDataObject.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());
                         beaconDataObject.put(Consts.COL_BEACONDATA_BEACON, beaconObject);
                         beaconDataObject.put(Consts.COL_BEACONDATA_MEASUREDPOWER, bluetoothBeaconData.getMeasuredPower());
                         beaconDataObject.put(Consts.COL_BEACONDATA_RSSI, bluetoothBeaconData.getRSSI());
