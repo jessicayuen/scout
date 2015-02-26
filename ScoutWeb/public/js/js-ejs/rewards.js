@@ -57,15 +57,14 @@ $(document).ready(function(){
         event.preventDefault();
         var data = 
             {
-                name: $('#name').val(), 
-                description: $('#description').val(), 
-                points: $('#points').val()
+                description: $(this).find('input[name="description"]').val(),
+                points: $(this).find('input[name="points"]').val()
             };
+
         $.post('/rewards/addreward', data)
             .success(refreshTable(function() {
                 $('#modal').modal('hide');
                 $('#modal-body-div').empty();
-                refreshTable();
             }))
             .error(function (xhr, textStatus, errorThrown) {
                 alert(xhr.responseText);
@@ -81,16 +80,14 @@ $(document).ready(function(){
         points: $(this).find('input[name="points"]').val()
       };
 
-      console.log(data);
       $.ajax({
         url: '/rewards/editreward',
         type: 'PUT',
         data: data,
-        success: function(data) {
+        success: refresh(function() {
           $('#modal').modal('hide');
           $('#modal-body-div').empty();
-          refreshTable();
-        },
+        }),
         error: function (xhr, textStatus, errorThrown) {
           alert(xhr.responseText);
         }
@@ -121,17 +118,14 @@ $(document).ready(function(){
     // and the rewards are refreshed
 
     // When the add rewards button is pressed, a form will be shown
-    $('#addbutton').click(function() {
+    $('#addbutton').on('click', function() {
         var formBody  = 
           '<div class="form-group">'+
-            '<label for="name" class="control-label">Name:</label>'+
-            '<input type="text" id="name" class="form-control" placeholder="Name" required></div>' +
-          '<div class="form-group">'+
             '<label for="description" class="control-label">Description:</label>'+
-            '<input type="text" id="description" class="form-control" placeholder="Description" required></div>' +
+            '<input type="text" name="description" class="form-control" placeholder="Description" required></div>' +
           '<div class="form-group">'+
             '<label for="points" class="control-label">Points:</label>'+
-            '<input type="number" id="points" class="form-control" placeholder="Points" required></div>';
+            '<input type="number" name="points" class="form-control" placeholder="Points" required></div>';
 
         $('#modal-title-text').text('Add Reward');
         $('#modal-body-div').empty().append(formBody);
