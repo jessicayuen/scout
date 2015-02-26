@@ -132,15 +132,15 @@ public class RegisterActivity extends CredentialActivity {
             showProgress(true);
 
             //populate the user to register
-            final ParseUser user = new ParseUser();
-            user.setEmail(email);
-            user.setPassword(password);
-            user.setUsername(email);
-            user.put(Consts.FIRST_NAME, mFirstNameEditText.getText().toString());
-            user.put(Consts.LAST_NAME, mLastNameEditText.getText().toString());
+            final ParseUser parseUser = new ParseUser();
+            parseUser.setEmail(email);
+            parseUser.setPassword(password);
+            parseUser.setUsername(email);
+            parseUser.put(Consts.FIRST_NAME, mFirstNameEditText.getText().toString());
+            parseUser.put(Consts.LAST_NAME, mLastNameEditText.getText().toString());
 
             mLogger.log("Registering user...");
-            user.signUpInBackground(new SignUpCallback() {
+            parseUser.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
                     if (e != null) {
@@ -159,15 +159,16 @@ public class RegisterActivity extends CredentialActivity {
                     } else {
                         //create the relation that this user is a customer in parse
                         ParseObject customer = new ParseObject(Consts.TABLE_CUSTOMER);
-                        customer.put(Consts.COL_CUSTOMER_USER, user);
+                        customer.put(Consts.COL_CUSTOMER_USER, parseUser);
                         customer.saveInBackground();
 
-                        user.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
-                        user.saveInBackground();
+                        parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
+                        parseUser.saveInBackground();
 
                         showProgress(false);
 
                         mLogger.log("Successfully registered user");
+                        setCurrentUser(parseUser, customer);
                         startService(new Intent(RegisterActivity.this, BluetoothBeaconService.class));
                         startMainActivity(RegisterActivity.this, PlacesActivity.class);
                     }
