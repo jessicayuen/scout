@@ -40,7 +40,7 @@ public class RedeemActivity extends Activity {
         ImageView qrImageView = (ImageView) findViewById(R.id.qrImage);
         QRCodeWriter qrWriter = new QRCodeWriter();
 
-        int dimension = 100;
+        int dimension = 500;
         int black = 0xFF000000;
         int white = 0xFFFFFFFF;
 
