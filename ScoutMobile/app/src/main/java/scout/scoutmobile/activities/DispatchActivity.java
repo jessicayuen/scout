@@ -9,7 +9,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.services.BluetoothBeaconService;
 
 public class DispatchActivity extends CredentialActivity {
 
@@ -18,8 +25,17 @@ public class DispatchActivity extends CredentialActivity {
         super.onCreate(savedInstanceState);
 
         Intent invokedActivity;
-        ParseUser loggedInUser = ParseUser.getCurrentUser();
-        if (loggedInUser != null) {
+        final ParseUser parseUser = ParseUser.getCurrentUser();
+        if (parseUser != null) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
+            query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (object != null) {
+                        setCurrentUser(parseUser, object);
+                    }
+                }
+            });
             invokedActivity = new Intent(this, PlacesActivity.class);
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);

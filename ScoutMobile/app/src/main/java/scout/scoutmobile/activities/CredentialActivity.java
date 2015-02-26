@@ -8,18 +8,17 @@ package scout.scoutmobile.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.model.CustomerSingleton;
 import scout.scoutmobile.utils.GeneralUtils;
 import scout.scoutmobile.utils.Logger;
 
@@ -119,6 +118,12 @@ public class CredentialActivity extends Activity {
     protected void startMainActivity(Context context, Class<?> mainClass) {
         GeneralUtils.startMainActivity(context, mainClass);
         finish();
+    }
+
+    protected void setCurrentUser(ParseUser user, ParseObject customer) {
+        CustomerSingleton customerSingleton = CustomerSingleton.getInstance();
+        customerSingleton.setCurCustomer(customer);
+        customerSingleton.setCurUser(user);
     }
 
 }

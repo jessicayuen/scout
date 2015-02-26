@@ -165,6 +165,7 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                                 if (object != null) {
                                     parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
                                     parseUser.saveInBackground();
+                                    setCurrentUser(parseUser, object);
                                     startService(new Intent(LoginActivity.this, BluetoothBeaconService.class));
                                     startMainActivity(LoginActivity.this, PlacesActivity.class);
                                 } else {

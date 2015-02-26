@@ -71,31 +71,11 @@ public final class Consts {
 
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";
-    //TODO: use this when we want to use bluetooth mac to identify users -> getBtUniqueId();
     public static final String USER_LOGGED = "NOT_REALLY_RANDOM";
 
     private Consts() {
         //preventing the class being created
         throw new AssertionError();
-    }
-
-    //TODO: test cannot be tested with one device
-    synchronized private static String getBtUniqueId() {
-        BluetoothAdapter btAdapter = null; // Local Bluetooth adapter
-        try {
-
-            btAdapter = BluetoothAdapter.getDefaultAdapter();
-
-            //}
-            // Bluetooth is not supported
-            if (btAdapter != null) {
-                return btAdapter.getAddress();
-            } else {
-                return "";
-            }
-        } catch (Exception e) {
-            return "";
-        }
     }
 
 }
