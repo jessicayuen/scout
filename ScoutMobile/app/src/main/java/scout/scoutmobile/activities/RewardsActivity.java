@@ -1,6 +1,7 @@
 package scout.scoutmobile.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,9 +149,8 @@ public class RewardsActivity extends ActionBarActivity {
                                 for (ParseObject r : rewardObjects) {
                                     Integer points = r.getInt(Consts.COL_REWARDS_POINTS);
                                     String desc = r.getString(Consts.COL_REWARDS_DESC);
-                                    String qrCode = r.getString(Consts.COL_REWARDS_QR);
 
-                                    rewards.add(new Reward(points, desc, qrCode));
+                                    rewards.add(new Reward(points, desc, r.getObjectId()));
                                 }
                                 // Sort the rewards by points
                                 Collections.sort(rewards, new Comparator<Reward>() {
@@ -187,7 +188,14 @@ public class RewardsActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                // Open up QR code view - future TODO
+                Reward selected = rewards.get(position);
+                // Open up QR code view
+                Intent redeemActivity = new Intent(
+                        RewardsActivity.this, RedeemActivity.class);
+                redeemActivity.putExtra(Consts.REWARD_ID, selected.getID());
+                redeemActivity.putExtra(Consts.CUSTOMER_ID,
+                        ParseUser.getCurrentUser().getObjectId());
+                startActivity(redeemActivity);
             }
         });
     }

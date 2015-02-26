@@ -2,8 +2,6 @@ package scout.scoutmobile.constants;
 
 import android.bluetooth.BluetoothAdapter;
 
-import com.parse.ParseUser;
-
 public final class Consts {
 
     //Parse table class names
@@ -69,6 +67,7 @@ public final class Consts {
     public static final String PLACE_ID = "place id";
     public static final String PLACE_POINTS = "place points";
     public static final String CUSTOMER_ID = "customer id";
+    public static final String REWARD_ID = "reward id";
 
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";
