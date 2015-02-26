@@ -19,6 +19,7 @@ import java.util.List;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.BluetoothBeacon;
 import scout.scoutmobile.model.BluetoothBeaconData;
+import scout.scoutmobile.model.CustomerSingleton;
 import scout.scoutmobile.utils.Logger;
 
 public class BluetoothBeaconService extends Service {
@@ -124,7 +125,7 @@ public class BluetoothBeaconService extends Service {
 
                         beaconDataObject = new ParseObject(Consts.TABLE_BEACONDATA);
 
-                        beaconDataObject.put(Consts.COL_BEACONDATA_CUSTOMER, ParseUser.getCurrentUser());
+                        beaconDataObject.put(Consts.COL_BEACONDATA_CUSTOMER, CustomerSingleton.getInstance().getCurCustomer());
                         beaconDataObject.put(Consts.COL_BEACONDATA_BEACON, beaconObject);
                         beaconDataObject.put(Consts.COL_BEACONDATA_MEASUREDPOWER, bluetoothBeaconData.getMeasuredPower());
                         beaconDataObject.put(Consts.COL_BEACONDATA_RSSI, bluetoothBeaconData.getRSSI());
