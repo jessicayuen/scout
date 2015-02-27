@@ -144,33 +144,74 @@ public class BluetoothBeaconService extends Service {
 
     private void saveCoordinateWithBeacons(List<Beacon> beacons) {
 
-        List<ParseObject> detailedBeaconList = null;
+        List<BluetoothBeaconData> detailedBeaconList = null;
+        BluetoothBeaconData beaconA, beaconB, beaconC;
+        beaconA = beaconB = beaconC = null;
 
+        // iterate through list of beacons detected and get their coordinates from the server
+        // since beacons cant really store any information on them.
         for (int i = 0; i < beacons.size(); i++) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
-            query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, beacons.get(i).getMacAddress());
+            Beacon curBeacon = beacons.get(i);
+            query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, curBeacon.getMacAddress());
 
             try {
                 ParseObject obj = query.getFirst();
                 if (obj != null) {
-//                    detailedBeaconList.add(obj);
+                    detailedBeaconList.add(new BluetoothBeaconData(new BluetoothBeacon(obj), curBeacon));
                 }
             } catch (ParseException e) {
-                e.printStackTrace();
+                mLogger.logError(e);
             }
         }
 
-        float W, Z, positionX, positionY, positionYError;
-//        W = dA*dA - dB*dB - a.x*a.x - a.y*a.y + b.x*b.x + b.y*b.y;
-//        Z = dB*dB - dC*dC - b.x*b.x - b.y*b.y + c.x*c.x + c.y*c.y;
-//
-//        positionX = (W*(c.y-b.y) - Z*(b.y-a.y)) / (2 * ((b.x-a.x)*(c.y-b.y) - (c.x-b.x)*(b.y-a.y)));
-//        positionY = (W - 2*x*(b.x-a.x)) / (2*(b.y-a.y));
-//        //y2 is a second measure of y to mitigate errors
-//        positionYError = (Z - 2*x*(c.x-b.x)) / (2*(c.y-b.y));
 
-//        positionY = (positionY + positionYError) / 2;
+        int numOfDetailedBeacons = detailedBeaconList.size();
+        if (numOfDetailedBeacons == TRILATERATION_REQ_BEACON_NUM) {
+            beaconA = detailedBeaconList.get(1);
+            beaconB = detailedBeaconList.get(2);
+            beaconC = detailedBeaconList.get(3);
+        } else if (numOfDetailedBeacons > TRILATERATION_REQ_BEACON_NUM) {
+            //TODO:add logic for more beacons
+        } else {
+            //not enough beacon exists for trilateration.
+            return;
+        }
 
+        double W, Z, positionX, positionY, positionYError, x1, y1, x2, y2, x3, y3;
 
+        double distanceA = beaconA.getDistance();
+        double distanceB = beaconB.getDistance();
+        double distanceC = beaconC.getDistance();
+
+        x1 = beaconA.getBluetoothBeacon().getCoordX();
+        y1 = beaconA.getBluetoothBeacon().getCoordY();
+        x2 = beaconB.getBluetoothBeacon().getCoordX();
+        y2 = beaconB.getBluetoothBeacon().getCoordY();
+        x3 = beaconC.getBluetoothBeacon().getCoordX();
+        y3 = beaconC.getBluetoothBeacon().getCoordY();
+
+        // algorithm based on 'Three distance known' of http://everything2.com/title/Triangulate
+        W = distanceA*distanceA - distanceB*distanceB - x1*x1 - y1*y1 + x2*x2 + y2*y2;
+        Z = distanceB*distanceB - distanceC*distanceC - x2*x2 - y2*y2 + x3*x3 + y3*y3;
+
+        positionX = (W*(y3-y2) - Z*(y2-y1)) / (2 * ((x2-x1)*(y3-y2) - (x3-x2)*(y2-y1)));
+        positionY = (W - 2*positionX*(x2-x1)) / (2*(y2-y1));
+        
+        //positionYError is a second measure of y to mitigate errors
+        //this estimate will be extremely skewed as bluetooth waves can be distorted by many different
+        //sources
+        positionYError = (Z - 2*positionX*(x3-x2)) / (2*(y3-y2));
+
+        positionY = (positionY + positionYError) / 2;
+
+        //Store the coordinate object
+        ParseObject newCoord = new ParseObject(Consts.TABLE_ESTIMATED_COORDINATE);
+        newCoord.put(Consts.COL_COORDINATE_USER, CustomerSingleton.getInstance().getCurUser());
+        newCoord.put(Consts.COL_COORDINATE_BUSINESS, "business"); //TODO: put the actual business object
+        newCoord.put(Consts.COL_COORDINATE_COORDX, positionX);
+        newCoord.put(Consts.COL_COORDINATE_COORDY, positionY);
+
+        newCoord.saveInBackground();
     }
 }

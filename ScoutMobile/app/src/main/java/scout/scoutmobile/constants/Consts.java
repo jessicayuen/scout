@@ -11,6 +11,7 @@ public final class Consts {
     public static final String TABLE_REWARDS = "Reward";
     public static final String TABLE_BEACON = "Beacon";
     public static final String TABLE_BEACONDATA = "BeaconData";
+    public static final String TABLE_ESTIMATED_COORDINATE = "EstimatedCoordinate";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";
@@ -44,6 +45,9 @@ public final class Consts {
     public static final String COL_BEACON_MINOR = "minor";
     public static final String COL_BEACON_BUSINESS = "business";
     public static final String COL_BEACON_NAME = "name";
+    public static final String COL_BEACON_COORDX = "coordX";
+    public static final String COL_BEACON_COORDY = "coordY";
+
 
     //Parse beacon data object properties
     public static final String COL_BEACONDATA_MACADDRESS = "macAddress";
@@ -53,6 +57,12 @@ public final class Consts {
     public static final String COL_BEACONDATA_DISTANCE = "distance";
     public static final String COL_BEACONDATA_BUSINESS = "business";
     public static final String COL_BEACONDATA_CUSTOMER = "customer";
+
+    //Parse data for coordinate of the user within the store roughly
+    public static final String COL_COORDINATE_USER = "user";
+    public static final String COL_COORDINATE_BUSINESS = "business";
+    public static final String COL_COORDINATE_COORDX = "coordX";
+    public static final String COL_COORDINATE_COORDY= "coordY";
 
     //For registering and logging in
     public static final String EMAIL_VALIDATING_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
