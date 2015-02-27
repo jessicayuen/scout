@@ -8,12 +8,12 @@ public class Reward {
 
     private Integer mPoints;
     private String mDescription;
-    private String mQRCode;
+    private String mID;
 
-    public Reward(Integer points, String description, String QRCode) {
+    public Reward(Integer points, String description, String id) {
         this.mPoints = points;
         this.mDescription = description;
-        this.mQRCode = QRCode;
+        this.mID = id;
     }
 
     public Integer getPoints() {
@@ -32,12 +32,12 @@ public class Reward {
         this.mDescription = description;
     }
 
-    public String getQRCode() {
-        return mQRCode;
+    public String getID() {
+        return mID;
     }
 
-    public void setQRCode(String QRCode) {
-        this.mQRCode = QRCode;
+    public void setID(String id) {
+        this.mID = id;
     }
 }
 

@@ -2,8 +2,6 @@ package scout.scoutmobile.constants;
 
 import android.bluetooth.BluetoothAdapter;
 
-import com.parse.ParseUser;
-
 public final class Consts {
 
     //Parse table class names
@@ -69,25 +67,15 @@ public final class Consts {
     public static final String PLACE_ID = "place id";
     public static final String PLACE_POINTS = "place points";
     public static final String CUSTOMER_ID = "customer id";
+    public static final String REWARD_ID = "reward id";
 
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";
-    public static final String USER_LOGGED = getBtUniqueId();
+    public static final String USER_LOGGED = "NOT_REALLY_RANDOM";
 
     private Consts() {
         //preventing the class being created
         throw new AssertionError();
-    }
-
-    //TODO: test cannot be tested with one device
-    synchronized private static String getBtUniqueId() {
-        BluetoothAdapter btAdapter = null; // Local Bluetooth adapter
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter != null) {
-            return btAdapter.getAddress();
-        } else {
-            return "";
-        }
     }
 
 }

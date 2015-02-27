@@ -52,7 +52,9 @@ router.post('/addreward', function (req, res) {
   var BusinessObj = Parse.Object.extend('Business');
 
   var description = req.body['description'];
-  var points = parseInt(req.body['points']);
+  var points = req.body['points'];
+
+  console.log('description: '+ description + ', points: '+ points);
 
   var businessQuery = new Parse.Query(BusinessObj);
   businessQuery.equalTo('owner', Parse.User.current());
@@ -60,7 +62,7 @@ router.post('/addreward', function (req, res) {
   
     var reward = new RewardObj();
     reward.set("description", description);
-    reward.set("points", points);
+    reward.set("points", parseInt(points));
     reward.set("business", business);
 
     reward.save(null, {
@@ -100,7 +102,6 @@ router.post('/removereward', function (req, res) {
     },
     error: function (error) {
       console.log('ERROR: Cannot delete reward or is already deleted.');
-      console.log(error.message);
 
       res.status(400).send('Unable to delete reward.');
     }

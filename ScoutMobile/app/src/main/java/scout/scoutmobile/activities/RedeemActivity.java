@@ -1,20 +1,33 @@
 package scout.scoutmobile.activities;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import scout.scoutmobile.R;
+import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.utils.GeneralUtils;
+import scout.scoutmobile.utils.Logger;
 
 
-public class RedeemActivity extends ActionBarActivity {
+public class RedeemActivity extends Activity {
+
+    Logger mLogger = new Logger("RedeemActivity");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redeem);
+
+        String rewardID = getIntent().getStringExtra(Consts.REWARD_ID);
+        String customerID = getIntent().getStringExtra(Consts.CUSTOMER_ID);
+
+        generateQR(rewardID, customerID);
     }
 
     @Override
@@ -23,25 +36,30 @@ public class RedeemActivity extends ActionBarActivity {
         GeneralUtils.verifyUserLoggedIn(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_redeem, menu);
-        return true;
-    }
+    private void generateQR(String rewardID, String customerID) {
+        ImageView qrImageView = (ImageView) findViewById(R.id.qrImage);
+        QRCodeWriter qrWriter = new QRCodeWriter();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        int dimension = 500;
+        int black = 0xFF000000;
+        int white = 0xFFFFFFFF;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        try {
+            BitMatrix bitMatrix = qrWriter.encode(rewardID + customerID,
+                            BarcodeFormat.QR_CODE, dimension, dimension);
+
+            int[] pixels = new int[dimension * dimension];
+            for (int y = 0; y < dimension; ++y) {
+                for (int x = 0; x < dimension; ++x) {
+                    pixels[y * dimension + x] = bitMatrix.get(x, y) ? black : white;
+                }
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(dimension, dimension, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, dimension, 0, 0, dimension, dimension);
+            qrImageView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            mLogger.logError(e);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,6 +1,5 @@
 package scout.scoutmobile.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -10,13 +9,14 @@ import com.parse.SaveCallback;
 
 import scout.scoutmobile.activities.LoginActivity;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.model.CustomerSingleton;
 
 public class GeneralUtils {
 
     private static Logger m_Logger = new Logger("GeneralUtils");
 
     public static void logUserOut(Context context) {
-        final ParseUser user = ParseUser.getCurrentUser();
+        final ParseUser user = CustomerSingleton.getInstance().getCurUser();
         user.remove(Consts.COL_USER_LOGGEDIN);
         user.saveInBackground(new SaveCallback() {
             @Override
@@ -41,7 +41,7 @@ public class GeneralUtils {
      * address as the one registered in Parse database, we log the current user out
      */
     public static void verifyUserLoggedIn(Context context) {
-        ParseUser curUser = ParseUser.getCurrentUser();
+        ParseUser curUser = CustomerSingleton.getInstance().getCurUser();
         boolean userLoggedIn = false;
         try {
             curUser.fetchIfNeeded();
