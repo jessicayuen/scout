@@ -11,14 +11,14 @@ $(document).ready(function(){
                 var points = reward['points'];
                 var description = reward['description'];
 
-                var row = 
+                var row =
                     $('<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
-                    '<td class="points-col">'+points+'</td>'+
-                    '<td class="descrip-col">'+description+'</td>'+
-                    '<td class="edit-remove-col">'+
-                      '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
-                      '<button type="submit" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
-                    '</td></tr>');
+                            '<td class="points-col">'+points+'</td>'+
+                            '<td class="descrip-col">'+description+'</td>'+
+                            '<td class="edit-remove-col">'+
+                            '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
+                            '<button type="submit" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
+                            '</td></tr>');
                 row.hide();
 
                 $('#rewards-table tr:last-child').after(row);
@@ -36,9 +36,9 @@ $(document).ready(function(){
                 $('#rewards-table').empty();
                 populateRewardsTable(data);
             })
-            .error(function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            });
+        .error(function (xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+        });
 
         if (callback != null) callback();
     }
@@ -55,56 +55,56 @@ $(document).ready(function(){
     // Add a reward
     var addReward = function(event) {
         event.preventDefault();
-        var data = 
-            {
-                description: $(this).find('input[name="description"]').val(),
-                points: $(this).find('input[name="points"]').val()
-            };
+        var data =
+        {
+            description: $(this).find('input[name="description"]').val(),
+            points: $(this).find('input[name="points"]').val()
+        };
 
         $.post('/rewards/addreward', data)
             .success(refreshTable(function() {
                 $('#modal').modal('hide');
                 $('#modal-body-div').empty();
             }))
-            .error(function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            });
+        .error(function (xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+        });
     };
     // Edit a reward
     var editReward = function(event) {
-      event.preventDefault();
-      var data = 
-      {
-        objectId: $(this).find('input[name="objectId"]').val(),
-        description: $(this).find('input[name="description"]').val(),
-        points: $(this).find('input[name="points"]').val()
-      };
+        event.preventDefault();
+        var data =
+        {
+            objectId: $(this).find('input[name="objectId"]').val(),
+            description: $(this).find('input[name="description"]').val(),
+            points: $(this).find('input[name="points"]').val()
+        };
 
-      $.ajax({
-        url: '/rewards/editreward',
-        type: 'PUT',
-        data: data,
-        success: refresh(function() {
-          $('#modal').modal('hide');
-          $('#modal-body-div').empty();
-        }),
-        error: function (xhr, textStatus, errorThrown) {
-          alert(xhr.responseText);
-        }
-      });
+        $.ajax({
+            url: '/rewards/editreward',
+            type: 'PUT',
+            data: data,
+            success: refresh(function() {
+                $('#modal').modal('hide');
+                $('#modal-body-div').empty();
+            }),
+            error: function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText);
+            }
+        });
     };
     // An reward editting modal is shown to user when edit is clicked
     $('#rewards-table').on('click', '.edit', function() {
-        var formBody = 
-          '<div class="form-group">'+
+        var formBody =
+            '<div class="form-group">'+
             '<label for="editDescription" class="control-label">Description:</label>'+
-                '<input type="text" name="description" id="editDescription" class="form-control" placeholder="Description" required>'+
-          '</div>'+
-          '<div class="form-group">'+
+            '<input type="text" name="description" id="editDescription" class="form-control" placeholder="Description" required>'+
+            '</div>'+
+            '<div class="form-group">'+
             '<label for="editPoints" class="control-label">Points:</label>'+
-                '<input type="number" name="points" id="editPoints" class="form-control" placeholder="Points" required>'+
-          '</div>'+
-          '<input type="hidden" name="objectId" value="'+this.id+'">';
+            '<input type="number" name="points" id="editPoints" class="form-control" placeholder="Points" required>'+
+            '</div>'+
+            '<input type="hidden" name="objectId" value="'+this.id+'">';
 
         $('#modal-title-text').text('Edit Reward');
         $('#modal-body-div').empty().append(formBody);
@@ -119,11 +119,11 @@ $(document).ready(function(){
 
     // When the add rewards button is pressed, a form will be shown
     $('#addbutton').on('click', function() {
-        var formBody  = 
-          '<div class="form-group">'+
+        var formBody =
+            '<div class="form-group">'+
             '<label for="description" class="control-label">Description:</label>'+
             '<input type="text" name="description" class="form-control" placeholder="Description" required></div>' +
-          '<div class="form-group">'+
+            '<div class="form-group">'+
             '<label for="points" class="control-label">Points:</label>'+
             '<input type="number" name="points" class="form-control" placeholder="Points" required></div>';
 

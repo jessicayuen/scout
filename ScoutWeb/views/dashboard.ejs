@@ -4,6 +4,60 @@
     </head>
     <body>
         <% include template/navbar %>
+
+        <div class="container">
+            <div class="row">
+                <div id="newcustomers" class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3>New Customers</h3>
+                        </div>
+                        <ul class="list-group">
+                            <a id="new-daily" class="list-group-item">
+                                Today
+                                <span class="badge"></span>
+                            </a>
+                            <a id="newcustomers-monthly" class="list-group-item">
+                                This Month
+                                <span class="badge"></span>
+                            </a>
+                        </ul>
+                    </div> 
+                </div> 
+                <div id="totcustomers" class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3>Customer Demographics</h3>
+                        </div>
+                        <ul class="list-group">
+                            <li id="demographics-duration" class="list-group-item">
+                                Average Visit Duration
+                                <span class="badge">
+                                     minutes
+                                </span>
+                            </li>
+                        </ul>
+                    </div> 
+                </div> 
+                <div id="points" class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3>Points</h3>
+                        </div>
+                        <ul class="list-group">
+                            <a id="points-earned" class="list-group-item">
+                                Points Earned
+                                <span class="badge"></span>
+                            </a>
+                            <a id="points-redeemed" class="list-group-item">
+                                Points Redeemed
+                                <span class="badge"></span>
+                            </a>
+                        </ul>
+                    </div> 
+                </div> 
+            </div>
+        </div>
         <% include template/footer %>
     </body>
 </html>
