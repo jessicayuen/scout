@@ -5,7 +5,6 @@
  */
 package scout.scoutmobile.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,7 +15,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import scout.scoutmobile.constants.Consts;
-import scout.scoutmobile.services.BluetoothBeaconService;
 
 public class DispatchActivity extends CredentialActivity {
 

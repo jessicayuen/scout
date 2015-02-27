@@ -17,7 +17,7 @@ import com.parse.SignUpCallback;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
-import scout.scoutmobile.services.BluetoothBeaconService;
+import scout.scoutmobile.services.BluetoothBeaconServiceEstimote;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -169,7 +169,7 @@ public class RegisterActivity extends CredentialActivity {
 
                         mLogger.log("Successfully registered user");
                         setCurrentUser(parseUser, customer);
-                        startService(new Intent(RegisterActivity.this, BluetoothBeaconService.class));
+                        startService(new Intent(RegisterActivity.this, BluetoothBeaconServiceEstimote.class));
                         startMainActivity(RegisterActivity.this, PlacesActivity.class);
                     }
                 }

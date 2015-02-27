@@ -77,7 +77,7 @@
         </activity>
 
         <service
-            android:name=".services.BluetoothBeaconService"
+            android:name=".services.BluetoothBeaconServiceEstimote"
             android:enabled="true"
             android:exported="true" >
         </service>
@@ -86,6 +86,12 @@
             android:name=".activities.VerificationActivity"
             android:label="@string/title_activity_verification" >
         </activity>
+
+        <service
+            android:name=".services.BluetoothBeaconService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
