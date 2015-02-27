@@ -195,9 +195,11 @@ public class BluetoothBeaconService extends Service {
         W = distanceA*distanceA - distanceB*distanceB - x1*x1 - y1*y1 + x2*x2 + y2*y2;
         Z = distanceB*distanceB - distanceC*distanceC - x2*x2 - y2*y2 + x3*x3 + y3*y3;
 
+        // NOTE: this algorithm can break when the x and y values of beacons are the same
+        // However, placing the beacons on either the same x or y will not provide valueable information
         positionX = (W*(y3-y2) - Z*(y2-y1)) / (2 * ((x2-x1)*(y3-y2) - (x3-x2)*(y2-y1)));
         positionY = (W - 2*positionX*(x2-x1)) / (2*(y2-y1));
-        
+
         //positionYError is a second measure of y to mitigate errors
         //this estimate will be extremely skewed as bluetooth waves can be distorted by many different
         //sources
