@@ -6,9 +6,9 @@ $(document).ready(function() {
             $("#new-daily>span").text(data.new.daily);
             $("#new-monthly>span").text(data.new.monthly);
             // Customer demographics
-            $("#demographics-duration").text(data.totcustomers);
+            $("#demographics-duration>span").text(data.totcustomers);
             // Points
-            $("#points-earned").text(data.points.earned);
-            $("#points-redeemed").text(data.points.redeeemed);
+            $("#points-earned>span").text(data.points.earned);
+            $("#points-redeemed>span").text(data.points.redeemed);
     });
 });
