@@ -32,7 +32,7 @@ import java.util.List;
 
 import scout.scoutmobile.R;
 import scout.scoutmobile.constants.Consts;
-import scout.scoutmobile.services.BluetoothBeaconServiceEstimote;
+import scout.scoutmobile.services.BluetoothBeaconService;
 import scout.scoutmobile.utils.Logger;
 
 
@@ -166,7 +166,7 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
                                     parseUser.put(Consts.COL_USER_LOGGEDIN, Consts.USER_LOGGED);
                                     parseUser.saveInBackground();
                                     setCurrentUser(parseUser, object);
-                                    startService(new Intent(LoginActivity.this, BluetoothBeaconServiceEstimote.class));
+                                    startService(new Intent(LoginActivity.this, BluetoothBeaconService.class));
                                     startMainActivity(LoginActivity.this, PlacesActivity.class);
                                 } else {
                                     showPasswordError();
