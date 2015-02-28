@@ -1,3 +1,5 @@
+
+
 Jan 15, 2015 Client Meeting
 ---------------------------
 * Research available on market BLE (iBeacon) vendors (TI, Qualcomm, etc)
@@ -50,6 +52,8 @@ Derived user stories from discussion:
 * As a business owner, I&rsquo;d like to drive incentive to customers that have not been in the store for a while
 * As a business owner, I&rsquo;d like to know which locations in the stores the customers visiting the most often
 
+
+
 Jan. 26, 2015 Client Meeting (Irregular)
 ----------------------------------------
 * Further research available options aside from Bluetooth, such as GPS, and maybe WiFi. Further investigate the technologies FourSquare is using to perform their services.
@@ -60,6 +64,8 @@ Jan. 26, 2015 Client Meeting (Irregular)
 * Mentioned the possibility of calibrating signal strength (since that’s how we’re approximating distance of user to Bluetooth Beacon), to help out with possible interference.
 * UI, user usability is of little importance. Focus on getting the technology (i.e. triangulation, background services) to work, and the ability to track customer data.
 * Kyle will place an order on 3 Estimote Beacons.
+
+
 
 Jan. 30, 2015 Client Meeting
 -----------------------------
@@ -105,9 +111,22 @@ background to collect the data
    * As a customer, I want to be able to redeem my points for rewards
    * As a business owner, I want to know the number of points I have given customers visible on my dashboard
 
+
+
 Feb. 13, 2015 Client Meeting
 -----------------------------
 * Demoed our dashboard and Android mobile application
 * Client was pleased with demo
 * Talked about feasibility of Trilateration due to Estimote inaccuracy
 * Told client that we are on track with our schedule
+
+
+
+Feb. 27, 2015 Client Meeting
+-----------------------------
+* Demoed dashboard, trilateration, and back end database
+* Discussed trilateration techniques and introduced possibility of 3D trilateration
+* Suggested further scalability with the heat map (ie. real time tracking)
+* Discuss bluetooth technology
+* Showed Kyle source code
+
