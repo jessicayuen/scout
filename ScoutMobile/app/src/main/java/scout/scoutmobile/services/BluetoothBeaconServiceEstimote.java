@@ -95,7 +95,7 @@ public class BluetoothBeaconServiceEstimote extends Service {
 
     private void saveBeacon (Beacon beacon) {
         final BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(beacon);
-        final BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(bluetoothBeacon, beacon);
+        final BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(bluetoothBeacon, beacon.getMeasuredPower(), beacon.getRssi(), 0.0);
 
         // query for unique beacon mac address
         ParseQuery<ParseObject> queryBeacon = ParseQuery.getQuery(Consts.TABLE_BEACON);
@@ -151,6 +151,7 @@ public class BluetoothBeaconServiceEstimote extends Service {
         // iterate through list of beacons detected and get their coordinates from the server
         // since beacons cant really store any information on them.
         for (int i = 0; i < beacons.size(); i++) {
+            BluetoothBeacon bluetoothBeacon;
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
             Beacon curBeacon = beacons.get(i);
             query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, curBeacon.getMacAddress());
@@ -158,7 +159,9 @@ public class BluetoothBeaconServiceEstimote extends Service {
             try {
                 ParseObject obj = query.getFirst();
                 if (obj != null) {
-                    detailedBeaconList.add(new BluetoothBeaconData(new BluetoothBeacon(obj), curBeacon));
+                    bluetoothBeacon = new BluetoothBeacon(obj.getString(Consts.COL_BEACON_MACADDRESS), obj.getString(Consts.COL_BEACON_UUID),
+                            obj.getInt(Consts.COL_BEACON_MAJOR), obj.getInt(Consts.COL_BEACON_MINOR));
+                    detailedBeaconList.add(new BluetoothBeaconData(bluetoothBeacon, curBeacon.getMeasuredPower(), curBeacon.getRssi(), 0.0));
                 }
             } catch (ParseException e) {
                 mLogger.logError(e);

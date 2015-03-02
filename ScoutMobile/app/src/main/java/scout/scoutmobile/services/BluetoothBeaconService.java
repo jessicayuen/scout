@@ -18,6 +18,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -70,8 +71,8 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
                 if (beacons.size() > 0) {
                     StoreBeaconData(beacons);
 
-                    if (beacons.size() > TRILATERATION_REQ_BEACON_NUM) {
-                        saveCoordinateWithBeacons(beacons);
+                    if (beacons.size() >= TRILATERATION_REQ_BEACON_NUM) {
+                        //saveCoordinateWithBeacons(beacons);
                     }
                 }
             }
@@ -91,8 +92,11 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
     }
 
     private void saveBeacon (Beacon beacon) {
-        final BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(beacon.getBluetoothAddress(), beacon.getId1().toUuidString(), beacon.getId2().toInt(), beacon.getId3().toInt());
-        final BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(bluetoothBeacon, beacon.getTxPower(), beacon.getRssi());
+        final BluetoothBeacon bluetoothBeacon =
+                new BluetoothBeacon(beacon.getBluetoothAddress(), beacon.getId1().toUuidString(),
+                                    beacon.getId2().toInt(), beacon.getId3().toInt());
+        final BluetoothBeaconData bluetoothBeaconData =
+                new BluetoothBeaconData(bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
 
         ParseQuery<ParseObject> queryBeacon = ParseQuery.getQuery(Consts.TABLE_BEACON);
         queryBeacon.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, bluetoothBeacon.getMacAddress()).setLimit(1);
@@ -140,21 +144,24 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
 
     private void saveCoordinateWithBeacons(Collection<Beacon> beacons) {
 
-        List<BluetoothBeaconData> detailedBeaconList = null;
+        List<BluetoothBeaconData> detailedBeaconList = new ArrayList<BluetoothBeaconData>();
         BluetoothBeaconData beaconA, beaconB, beaconC;
         beaconA = beaconB = beaconC = null;
 
         // iterate through list of beacons detected and get their coordinates from the server
         // since beacons cant really store any information on them.
         for (Iterator it = beacons.iterator(); it.hasNext();) {
-            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
             Beacon curBeacon = (Beacon) it.next();
+            BluetoothBeacon bluetoothBeacon;
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
             query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, curBeacon.getBluetoothAddress());
 
             try {
                 ParseObject obj = query.getFirst();
                 if (obj != null) {
-                    detailedBeaconList.add(new BluetoothBeaconData(new BluetoothBeacon(obj), curBeacon.getTxPower(), curBeacon.getRssi()));
+                    bluetoothBeacon = new BluetoothBeacon(obj.getString(Consts.COL_BEACON_MACADDRESS), obj.getString(Consts.COL_BEACON_UUID),
+                            obj.getInt(Consts.COL_BEACON_MAJOR), obj.getInt(Consts.COL_BEACON_MINOR));
+                    detailedBeaconList.add(new BluetoothBeaconData(bluetoothBeacon, curBeacon.getTxPower(), curBeacon.getRssi(), curBeacon.getDistance()));
                 }
             } catch (ParseException e) {
                 mLogger.logError(e);

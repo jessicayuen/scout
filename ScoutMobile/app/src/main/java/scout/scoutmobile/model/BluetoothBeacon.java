@@ -44,13 +44,6 @@ public class BluetoothBeacon {
                 beacon.getMinor());
     }
 
-    public BluetoothBeacon(ParseObject beacon) {
-        this(beacon.getString(Consts.COL_BEACON_MACADDRESS), beacon.getString(Consts.COL_BEACON_UUID),
-                beacon.getInt(Consts.COL_BEACON_MAJOR), beacon.getInt(Consts.COL_BEACON_MINOR));
-        this.mCoordX = beacon.getInt(Consts.COL_BEACON_COORDX);
-        this.mCoordY = beacon.getInt(Consts.COL_BEACON_COORDY);
-    }
-
     public String getMacAddress() {
         return mMacAddress;
     }

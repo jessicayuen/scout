@@ -1,7 +1,5 @@
 package scout.scoutmobile.model;
 
-import com.estimote.sdk.Beacon;
-
 /**
  * Represents the recorded data from an active beacon at that moment in time.
  */
@@ -18,17 +16,13 @@ public class BluetoothBeaconData {
     private Integer mRSSI;
 
     // The estimated distance in meters from the parent bluetooth beacon
-    private Float mDistance;
+    private Double mDistance;
 
-    public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Integer measuredPower, Integer rssi) {
+    public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Integer measuredPower, Integer rssi, Double distance) {
         this.mBluetoothBeacon = bluetoothBeacon;
         this.mMeasuredPower = measuredPower;
         this.mRSSI = rssi;
-        this.mDistance = (float)rssi/measuredPower;
-    }
-
-    public BluetoothBeaconData(BluetoothBeacon bluetoothBeacon, Beacon beacon) {
-        this(bluetoothBeacon, beacon.getMeasuredPower(), beacon.getRssi());
+        this.mDistance = distance;
     }
 
     public BluetoothBeacon getBluetoothBeacon() {
@@ -43,7 +37,7 @@ public class BluetoothBeaconData {
         return mRSSI;
     }
 
-    public Float getDistance() {
+    public Double getDistance() {
         return mDistance;
     }
 }
