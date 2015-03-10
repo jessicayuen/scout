@@ -11,7 +11,7 @@ var register = require('./routes/register');
 var dashboard = require('./routes/dashboard');
 var rewards = require('./routes/rewards');
 var logout = require('./routes/logout');
-
+var heatmap = require('./routes/heatmap');
 var app = express();
 
 
@@ -35,7 +35,7 @@ app.use('/register', register);
 app.use('/dashboard', dashboard);
 app.use('/rewards', rewards);
 app.use('/logout', logout);
-
+app.use('/heatmap', heatmap);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
