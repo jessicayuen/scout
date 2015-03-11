@@ -85,7 +85,7 @@ public class PlacesActivity extends ActionBarActivity {
 
             // Set the Place list item values
             titleView.setText(place.getTitle());
-            pointsView.setText(place.getPoints().toString());
+            pointsView.setText(place.getPoints().toString() + " points");
             //image.setImageResource(mPlaces.get(position).getImageURL());
 
             return view;

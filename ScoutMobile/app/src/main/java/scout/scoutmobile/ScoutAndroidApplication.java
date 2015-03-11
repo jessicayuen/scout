@@ -8,6 +8,9 @@ import android.widget.Toast;
 import com.estimote.sdk.BeaconManager;
 import com.parse.Parse;
 
+import scout.scoutmobile.controllers.PointsManager;
+import scout.scoutmobile.services.BluetoothBeaconService;
+
 
 public class ScoutAndroidApplication extends Application {
 
@@ -48,6 +51,8 @@ public class ScoutAndroidApplication extends Application {
         scoutApp = getApplicationContext();
         Parse.initialize(scoutApp, APP_ID, CLIENT_KEY);
         beaconManager = null;
+
+        BluetoothBeaconService.addBeaconPingObserver(PointsManager.getInstance());
     }
 
     public void postNotification(String msg) {

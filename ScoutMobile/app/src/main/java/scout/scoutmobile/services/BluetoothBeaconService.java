@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -24,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.controllers.BeaconPingObserver;
 import scout.scoutmobile.model.BluetoothBeacon;
 import scout.scoutmobile.model.BluetoothBeaconData;
 import scout.scoutmobile.model.CustomerSingleton;
@@ -32,8 +32,10 @@ import scout.scoutmobile.utils.Logger;
 public class BluetoothBeaconService extends Service implements BeaconConsumer {
 
     private static final int TRILATERATION_REQ_BEACON_NUM = 3;
+    private static List<BeaconPingObserver> mPingObservers = new ArrayList<>();
     private Logger mLogger = new Logger("BluetoothBeaconService");
     private BeaconManager beaconManager = null;
+    private long scanDuration = 5000l;
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
@@ -43,7 +45,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         super.onCreate();
 
         beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.setForegroundScanPeriod(5000l);
+        beaconManager.setForegroundScanPeriod(scanDuration);
         beaconManager.getBeaconParsers().add(
                 new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.bind(this);
@@ -74,6 +76,8 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
                     if (beacons.size() >= TRILATERATION_REQ_BEACON_NUM) {
                         //saveCoordinateWithBeacons(beacons);
                     }
+
+                    notifyBeaconPingObservers(beacons, scanDuration);
                 }
             }
         });
@@ -217,5 +221,15 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         newCoord.put(Consts.COL_COORDINATE_COORDY, positionY);
 
         newCoord.saveInBackground();
+    }
+
+    public static void addBeaconPingObserver(BeaconPingObserver observer) {
+        mPingObservers.add(observer);
+    }
+
+    private void notifyBeaconPingObservers(Collection<Beacon> beacons, long milliseconds) {
+        for (BeaconPingObserver observer : mPingObservers) {
+            observer.onBeaconPing(beacons, milliseconds / 1000);
+        }
     }
 }

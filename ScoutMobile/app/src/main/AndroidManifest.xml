@@ -53,10 +53,6 @@
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name=".activities.BeaconServiceActivity"
-            android:label="BeaconService" >
-        </activity>
-        <activity
             android:name=".activities.PlacesActivity"
             android:label="Places" >
         </activity>
