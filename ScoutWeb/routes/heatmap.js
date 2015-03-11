@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Parse = require('parse').Parse;
+var parseHandler = require('parse-handler');
 
 router.get('/', function(req, res, next) {
     if (Parse.User.current()) {
@@ -10,6 +11,29 @@ router.get('/', function(req, res, next) {
     }
 });
 
+// routing to test retrieveIntervalJSON
+router.get('/retrieveIntervalJSON', function(req, res, next) {
+    var successCb = function (interval) {
+        res.json(interval); // TODO: need to populate
+    }
+    var errorCb = function (interval, error) {
+        console.log(error);
+        res.status(400).send('ERROR: Cannot retrieve interval');
+    }
+    parseHandler.retrieveIntervalJSON(successCb, errorCb, {'user': Parse.User.current()});
+});
+
+// routing to test retrieveIntervalRecordsJSON
+router.get('/retrieveIntervalRecordsJSON', function(req, res, next) {
+    var successCb = function (intervalRecords) {
+        res.json(intervalRecords); // TODO: need to populate
+    }
+    var errorCb = function (intervalRecords, error) {
+        console.log(error);
+        res.status(400).send('ERROR: Cannot retrieve interval');
+    }
+    parseHandler.retrieveIntervalRecordsJSON(successCb, errorCb, {'user': Parse.User.current()});
+});
 
 router.get('/getheatmap', function(req, res, next) {
 
