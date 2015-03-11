@@ -14,18 +14,18 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.utils.L;
-
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.constants.Consts;
+import scout.scoutmobile.controllers.BeaconPingObserver;
 import scout.scoutmobile.utils.Logger;
 
 public class BeaconServiceActivity extends Activity {
@@ -38,6 +38,7 @@ public class BeaconServiceActivity extends Activity {
     private NotificationManager notificationManager;
     private BeaconManager beaconManager;
     //private LeDeviceListAdapter adapter;
+    private static List<BeaconPingObserver> mPingObservers = new ArrayList<BeaconPingObserver>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,9 @@ public class BeaconServiceActivity extends Activity {
                                         if ((!beaconResults.isEmpty()) && (e == null)) {
                                             ParseObject beacon = beaconResults.get(0);
                                             storeBeaconData(beacon);
+
+                                            notifyBeaconPingObservers(beacon,
+                                                    beacon.getParseObject(Consts.COL_BEACON_BUSINESS));
                                         } else {
                                             mLogger.logError(e != null ? e :
                                                     new RuntimeException("No beacon exists"));
@@ -185,5 +189,15 @@ public class BeaconServiceActivity extends Activity {
                 Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(mainActivity);
         finish();
+    }
+
+    public static void addBeaconPingObserver(BeaconPingObserver observer) {
+        mPingObservers.add(observer);
+    }
+
+    private void notifyBeaconPingObservers(ParseObject beacon, ParseObject business) {
+        for (BeaconPingObserver observer : mPingObservers) {
+            observer.onBeaconPing(beacon, business);
+        }
     }
 }
