@@ -1,7 +1,9 @@
 package scout.scoutmobile.controllers;
 
-import com.parse.ParseObject;
+import org.altbeacon.beacon.Beacon;
+
+import java.util.Collection;
 
 public interface BeaconPingObserver {
-    public void onBeaconPing(ParseObject beacon, ParseObject business);
+    public void onBeaconPing(Collection<Beacon> beacons, long seconds);
 }
