@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/getrewards', function(req, res, next) {
   var businessSuccess = function (business) {
-    
+
     var rewardSuccess = function (rewardList) {
       res.json(rewardList);
     }
@@ -41,7 +41,9 @@ router.get('/getrewards', function(req, res, next) {
       res.status(400).send(msg);
     }
 
-  parseHandler.retrieveBusiness(businessSuccess, businessFailure);
+  var businessArgs = {'user': Parse.User.current()};
+
+  parseHandler.retrieveBusiness(businessSuccess, businessFailure, businessArgs);
 });
 
 router.post('/addreward', function (req, res) {
