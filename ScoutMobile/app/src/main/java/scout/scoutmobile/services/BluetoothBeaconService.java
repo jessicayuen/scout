@@ -174,9 +174,9 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
 
         int numOfDetailedBeacons = detailedBeaconList.size();
         if (numOfDetailedBeacons == TRILATERATION_REQ_BEACON_NUM) {
-            beaconA = detailedBeaconList.get(1);
-            beaconB = detailedBeaconList.get(2);
-            beaconC = detailedBeaconList.get(3);
+            beaconA = detailedBeaconList.get(0);
+            beaconB = detailedBeaconList.get(1);
+            beaconC = detailedBeaconList.get(2);
         } else if (numOfDetailedBeacons > TRILATERATION_REQ_BEACON_NUM) {
             //TODO:add logic for more beacons
         } else {
