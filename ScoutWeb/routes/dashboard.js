@@ -34,31 +34,26 @@ router.get('/index', function(req, res, next) {
         var businessObj = Parse.Object.extend('Business');
         var pointsObj = Parse.Object.extend('Points');
 
-        var queries = [];
         var businessQuery = new Parse.Query(businessObj);
         var pointsQuery = new Parse.Query(pointsObj);
-        queries.push(pointsQuery);
 
         businessQuery.equalTo('owner', Parse.User.current());
 
         businessQuery.first().then( function(business) {
+            // get points matching current business
             pointsQuery.equalTo('business', business);
-            pointsQuery.count().then( function(count) {
-                    data.new.daily = count;
-                    res.json(data);
-                    console.log(data);
-                }, function(error) {
-                    console.log(error);
-                });
-        }, function(error) {
-            console.log('ERROR: Could not query business');
-            console.log(error.message);
-        });
+            return pointsQuery.count()
 
-        // Return json when all the queries finish
-        // this doesn't work :(
-        Parse.Promise.when(queries).then( function() {
+        }).then( function(count) {
+            // set count
+            data.new.daily = count;
             console.log(data);
+
+        }).then( function() {
+            // render
+            res.json(data);
+        }, function(error) {
+            console.log(error);
         });
 });
 
