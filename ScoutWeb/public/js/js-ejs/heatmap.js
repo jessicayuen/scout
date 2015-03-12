@@ -5,19 +5,25 @@ $(document).ready(function(){
             var src = "/img/floorplan.jpg";
             $('#heatmapContainer').prepend('<img id="floorplan" src="' + src + '" />');
 
-            //create a heatmap instance
-            var heatmap = h337.create({
-              container:  $('#heatmapContainer')[0],
-              maxOpacity: .6,
+            $("<img />")
+                .attr("src", src)
+                .load(function() {
+                    $("#heatmapContainer").height(this.height);
+                    $("#heatmapContainer").width(this.width);
+                                                                //create a heatmap instance
+                        var heatmap = h337.create({
+                          container:  $('#heatmapContainer')[0],
+                          maxOpacity: .6,
 
-              radius: 30,
-              blur: .90,
-              // backgroundColor with alpha so you can see through it
-              backgroundColor: 'rgba(100, 100, 100, 0)'
+                          radius: 30,
+                          blur: .90,
+                          // backgroundColor with alpha so you can see through it
+                          backgroundColor: 'rgba(100, 100, 100, 0)'
+                        });
+
+                        heatmap.setData(data)
+                        $('#heatmapContainer').hide().fadeIn(1000);
             });
-
-            heatmap.setData(data)
-            $('#heatmapContainer').hide().fadeIn(1000);
     }
 
     // Refreshes heatmap

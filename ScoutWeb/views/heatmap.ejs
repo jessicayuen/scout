@@ -6,12 +6,13 @@
             body { font-family:sans-serif; }
             body * { font-weight:200;}
             #heatmapContainerWrapper { width:100%; height:100%; position:absolute; }
-            #heatmapContainer { display: inline-block; }
+            #heatmapContainer {  width:100%; height:100%; display: inline-block; }
+            #heatmap { margin: 0px auto 0px auto }
         </style>
     </head>
     <body>
         <% include template/navbar %>
-        <div style="text-align: center; padding: 100px">
+        <div id="heatmap" style="text-align: center; padding: 100px">
             <div id="heatmapContainer" ></div>
             <div id="heatmapContainerWrapper"></div>
         </div>
