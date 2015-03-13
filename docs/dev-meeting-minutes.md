@@ -20,3 +20,9 @@ Feb 06, 2015 Dev Meeting
 * Jessica is working on the Android business directory and rewards this week
 * Switched from django framework to parse
 * TA’s comments: Story map could be made better for allowing easier visualization
+
+Mar 06, 2015 Dev Meeting
+----------------------------
+* TA notes that we should write acceptance tests for the next sprint in our current sprint
+   * Going for a TDD approach
+* Using our current Parse tables will be difficult to build data visualizations, thus a new a way to store data is needed.
