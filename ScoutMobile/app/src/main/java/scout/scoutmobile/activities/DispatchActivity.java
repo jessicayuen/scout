@@ -27,14 +27,19 @@ public class DispatchActivity extends CredentialActivity {
         if (parseUser != null) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_CUSTOMER);
             query.whereEqualTo(Consts.COL_CUSTOMER_USER, parseUser);
-            query.getFirstInBackground(new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
-                    if (object != null) {
-                        setCurrentUser(parseUser, object);
-                    }
+            ParseObject object = null;
+            try {
+                object = query.getFirst();
+                if (object != null) {
+                    setCurrentUser(parseUser, object);
+                    invokedActivity = new Intent(this, PlacesActivity.class);
+                } else {
+                    invokedActivity = new Intent(this, LoginActivity.class);
                 }
-            });
-            invokedActivity = new Intent(this, PlacesActivity.class);
+            } catch (ParseException e) {
+                invokedActivity = new Intent(this, LoginActivity.class);
+                e.printStackTrace();
+            }
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);
         }

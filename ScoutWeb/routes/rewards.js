@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Parse = require('parse').Parse;
+var parseHandler = require('parse-handler');
 
 router.get('/', function(req, res, next) {
   if (Parse.User.current()) {
@@ -11,32 +12,27 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/getrewards', function(req, res, next) {
-  var BusinessObj = Parse.Object.extend('Business');
-  var businessQuery = new Parse.Query(BusinessObj);
+  var businessSuccess = function (business) {
 
-  businessQuery.equalTo('owner', Parse.User.current());
-  businessQuery.first({
-    success: function (business) {
-      var RewardObj = Parse.Object.extend('Reward');
-      var rewardQuery = new Parse.Query(RewardObj);
+    var rewardSuccess = function (rewardList) {
+      res.json(rewardList);
+    }
 
-      rewardQuery.equalTo('business', business);
+    var rewardFailure = function (error) {
+      var msg = 'ERROR: cannot query rewards for business '+business['id'];
 
-      rewardQuery.find({
-        success: function (rewardList) {
-          res.json(rewardList);
-        },
-        error: function (error) {
-          var msg = 'ERROR: cannot query rewards for business '+business['id'];
+      console.log(msg);
+      console.log(error.message);
 
-          console.log(msg);
-          console.log(error.message);
+      res.status(400).send(msg);
+    }
 
-          res.status(400).send(msg);
-        }
-      });
-    },
-    error: function (error) {
+    var rewardArgs = {'business': business};
+
+    parseHandler.retrieveRewards(rewardSuccess, rewardFailure, rewardArgs);
+  }
+
+  var businessFailure = function (error) {
       var msg = 'ERROR: Unable to query business for owner'+Parse.User.current();
 
       console.log(msg);
@@ -44,7 +40,10 @@ router.get('/getrewards', function(req, res, next) {
 
       res.status(400).send(msg);
     }
-  })
+
+  var businessArgs = {'user': Parse.User.current()};
+
+  parseHandler.retrieveBusiness(businessSuccess, businessFailure, businessArgs);
 });
 
 router.post('/addreward', function (req, res) {
