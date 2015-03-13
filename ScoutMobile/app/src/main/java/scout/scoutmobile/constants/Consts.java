@@ -12,6 +12,7 @@ public final class Consts {
     public static final String TABLE_BEACON = "Beacon";
     public static final String TABLE_BEACONDATA = "BeaconData";
     public static final String TABLE_ESTIMATED_COORDINATE = "EstimatedCoordinate";
+    public static final String TABLE_NEW_INTERVAL = "NEW_Interval";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";
@@ -63,6 +64,11 @@ public final class Consts {
     public static final String COL_COORDINATE_BUSINESS = "business";
     public static final String COL_COORDINATE_COORDX = "coordX";
     public static final String COL_COORDINATE_COORDY= "coordY";
+
+    //Parse data for user duration interval
+    public static final String COL_INTERVAL_BUSINESS = "business_temp";
+    public static final String COL_INTERVAL_USER = "user_temp";
+    public static final String COL_INTERVAL_DURATION= "duration";
 
     //For registering and logging in
     public static final String EMAIL_VALIDATING_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
