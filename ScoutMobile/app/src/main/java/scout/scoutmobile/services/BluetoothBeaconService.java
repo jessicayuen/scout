@@ -2,6 +2,7 @@ package scout.scoutmobile.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -36,6 +37,9 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
     private Logger mLogger = new Logger("BluetoothBeaconService");
     private BeaconManager beaconManager = null;
     private long scanDuration = 5000l;
+    private long startTime, endTime;
+    private int minimalDuration = 30000;// timeout before sending user duration info
+    private boolean withinProximity = false; //indicates whether or not the user entered a store
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
@@ -49,6 +53,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         beaconManager.getBeaconParsers().add(
                 new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.bind(this);
+        startTime = endTime = 0;
         mLogger.log("Beacon service has been created");
     }
 
@@ -72,13 +77,27 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 int numOfBeacons = beacons.size();
                 if (numOfBeacons > 0) {
+                    if (!withinProximity) {
+                        withinProximity = true;
+                        startTime = System.currentTimeMillis();
+                    }
                     StoreBeaconData(beacons);
 
                     if (numOfBeacons >= TRILATERATION_REQ_BEACON_NUM) {
-                        saveCoordinateWithBeacons(beacons);
+//                        getCoordinateWithBeacons(beacons);
+                    } else {
+                        endTime = System.currentTimeMillis();
                     }
 
                     notifyBeaconPingObservers(beacons, scanDuration);
+                }
+
+                if (withinProximity) {
+                    long duration = endTime - startTime; //is subtraction expensive?
+                    if (duration >= minimalDuration) {
+                        sendUserStayedDuration(duration);
+                        withinProximity = false;
+                    }
                 }
             }
         });
@@ -147,7 +166,12 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         });
     }
 
-    private void saveCoordinateWithBeacons(Collection<Beacon> beacons) {
+    /**
+     * Get coordinates with a list of beacons provided
+     * @param beacons
+     * @return a Point if coordinate has been found. null other wise
+     */
+    private Point getCoordinateWithBeacons(Collection<Beacon> beacons) {
         List<BluetoothBeaconData> detailedBeaconList = new ArrayList<BluetoothBeaconData>();
         BluetoothBeaconData beaconA, beaconB, beaconC;
         beaconA = beaconB = beaconC = null;
@@ -180,7 +204,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             //TODO:add logic for more beacons
         } else {
             //not enough beacon exists for trilateration.
-            return;
+            return null;
         }
 
         double W, Z, positionX, positionY, x1, y1, x2, y2, x3, y3;
@@ -197,9 +221,9 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         y3 = beaconC.getBluetoothBeacon().getCoordY();
 
         // checking if the any of the beacons are aligned if so we cant do trilateration since
-        // having beacons on the same axis doesnt provide any valueable information
+        // having beacons on the same axis doesn't provide any valuable information
         if ((y1 - y2)*(x1 - x3) == (y1 - y3)*(x1 - x2)) {
-            return;
+            return null;
         }
 
         // algorithm based on 'Three distance known' of http://everything2.com/title/Triangulate
@@ -213,14 +237,9 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         positionY = ((Z * (x2 - x3)) - (W * (x2 - x1))) / (((y1 - y2) * (x2 - x3)) - ((y3 - y2) * (x2 - x1)));
         positionX = ((positionY * (y1 - y2)) - Z) / (x2 - x1);
 
-        //Store the coordinate object
-        ParseObject newCoord = new ParseObject(Consts.TABLE_ESTIMATED_COORDINATE);
-        newCoord.put(Consts.COL_COORDINATE_USER, CustomerSingleton.getInstance().getCurUser());
-        newCoord.put(Consts.COL_COORDINATE_BUSINESS, "business"); //TODO: put the actual business object
-        newCoord.put(Consts.COL_COORDINATE_COORDX, positionX);
-        newCoord.put(Consts.COL_COORDINATE_COORDY, positionY);
+        Point userLoc = new Point((int)Math.round(positionX), (int)Math.round(positionY));
 
-        newCoord.saveInBackground();
+        return userLoc;
     }
 
     public static void addBeaconPingObserver(BeaconPingObserver observer) {
@@ -231,5 +250,18 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         for (BeaconPingObserver observer : mPingObservers) {
             observer.onBeaconPing(beacons, milliseconds / 1000);
         }
+    }
+
+    /**
+     * store the duration of the user at a specific business
+     * NOTE: currently only when user stay at a business for more than 30 sec is the information stored
+     * @param duration
+     */
+    private void sendUserStayedDuration(long duration) {
+        ParseObject userDuration = new ParseObject(Consts.TABLE_NEW_INTERVAL);
+        userDuration.put(Consts.COL_INTERVAL_USER, CustomerSingleton.getInstance().getCurUser());
+        userDuration.put(Consts.COL_INTERVAL_BUSINESS, "business"); //TODO need to somehow get business
+        userDuration.put(Consts.COL_INTERVAL_DURATION, duration);
+        userDuration.saveInBackground();
     }
 }
