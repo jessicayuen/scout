@@ -4,17 +4,35 @@ var Parse = require('parse').Parse;
 
 
 // Mock data
-// Hopefully we get some points data in parse soon!
+// Hopefully we get more points data in parse soon!
 var data = {
     new: {
-        daily: 9999,
-        monthly: 9999
+        daily: 'N/A',
+        monthly: 'N/A'
     },
-    totcustomers: 9999,
+    totcustomers: 'N/A',
     points: {
-        earned: 9999,
-        redeemed: 9999
+        earned: 'N/A',
+        redeemed: 'N/A'
     }
+};
+
+
+// Please rename this function. I dunno how to describe. I need sleep.
+var doStuffToMuhObjectJSON = function(objName, stuff) {
+    var businessObj = Parse.Object.extend('Business');
+    var businessQuery = new Parse.Query(businessObj);
+    var query = new Parse.Query(Parse.Object.extend(objName));
+    businessQuery.equalTo('owner', Parse.User.current());
+
+    return businessQuery.first().then( function(business) {
+        // queries for this page.
+        query.equalTo('business', business);
+        return query.collection().fetch();
+    }).then( function (collection) {
+        // do stuff to muh JSON
+        stuff(collection.toJSON());
+    });
 };
 
 
@@ -29,56 +47,82 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/index', function(req, res, next) {
-
-        // fetch actual points count for a business. 
-        var businessObj = Parse.Object.extend('Business');
-        var pointsObj = Parse.Object.extend('Points');
-
-        var businessQuery = new Parse.Query(businessObj);
-        var pointsQuery = new Parse.Query(pointsObj);
-
-        businessQuery.equalTo('owner', Parse.User.current());
-
-        businessQuery.first().then( function(business) {
-            // get points matching current business
-            pointsQuery.equalTo('business', business);
-            return pointsQuery.count()
-
-        }).then( function(count) {
-            // set count
-            data.new.daily = count;
-            console.log(data);
-
-        }).then( function() {
-            // render
-            res.json(data);
-        }, function(error) {
-            console.log(error);
-        });
+    doStuffToMuhObjectJSON('Points', function(json) {
+        // new daily customers with points
+        data.new.daily = json.filter( function(point) {
+            date = new Date(point.createdAt);
+            return date.setDate(date.getDate() + 1) > new Date();
+        }).length;
+        // new monthly customers with points
+        data.new.monthly = json.filter( function(point) {
+            date = new Date(point.createdAt);
+            return date.setMonth(date.getMonth() + 1) > new Date();
+        }).length;
+        res.json(data);
+    });
 });
 
 
-router.get('/gethistoric', function(req, res, next) {
-    // this is just using mock data at the moment
-    
-    var dataList = [
-        {'date':'2013-01','value': 53 },
-        {'date':'2013-02','value': 165},
-        {'date':'2013-03','value': 269},
-        {'date':'2013-04','value': 344},
-        {'date':'2013-05','value': 376},
-        {'date':'2013-06','value': 410},
-        {'date':'2013-07','value': 421},
-        {'date':'2013-08','value': 405},
-        {'date':'2013-09','value': 376},
-        {'date':'2013-10','value': 359},
-        {'date':'2013-11','value': 392},
-        {'date':'2013-12','value': 433},
-        {'date':'2014-01','value': 455},
-        {'date':'2014-02','value': 478},
-    ];
+router.get('/points', function(req, res, next) {
+    var pointsData = [{
+        key : 'Points',
+        values : []
+    }];
+    doStuffToMuhObjectJSON('Points', function(json) {
+        // map collection into series, with js timestamps
+        var series = json.map( function (point) {
+            return {
+                x: +new Date(point.createdAt),
+                y: point.points,
+                size: 50
+            };
+        });
+        // set and display
+        pointsData[0].values = series;
+        res.json(pointsData);
+    });
+});
 
-    res.json(dataList);
+
+router.get('/customers', function(req, res, next) {
+    var customerData = [
+        {
+            key : 'Visits',
+            values : []
+        },
+        {
+            key : 'New Customers',
+            values : []
+        },
+    ];
+    doStuffToMuhObjectJSON('NEW_Interval', function(json) {
+        // get dates, and unique visits counts binned by said dates.
+        var counts =  {};
+        json.forEach( function(interval) {
+            var d = new Date(interval.from.iso);
+            d.setHours(0,0,0,0);
+            counts[+d] = 1 + (counts[+d] || 0);
+        });
+        for (key in counts)
+            customerData[0].values.push({x: parseInt(key), y: counts[key]});
+
+    }).then( function() {
+        // bin dates for points data (where unique business-customer
+        // relationships should first be instatiated... eventually)
+        var counts = {};
+        doStuffToMuhObjectJSON('Points', function(json) {
+            console.log(json);
+            json.forEach( function(point) {
+                var d = new Date(point.createdAt);
+                d.setHours(0,0,0,0);
+                counts[+d] = 1 + (counts[+d] || 0);
+            });
+            console.log(counts);
+            for (key in counts)
+                customerData[1].values.push({x: parseInt(key), y: counts[key]});
+            res.json(customerData);
+        });
+    });
 });
 
 module.exports = router;

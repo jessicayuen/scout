@@ -1,6 +1,10 @@
 <html>
     <head>
         <% include template/header %>
+        <link href="css/nv.d3.css" rel="stylesheet" type="text/css">
+
+        <script src="js/d3.min.js"></script>
+        <script src="js/nv.d3.js"></script>
     </head>
     <body>
         <% include template/navbar %>
@@ -27,8 +31,8 @@
                                 <span class="badge"></span>
                             </a>
                         </ul>
-                    </div> 
-                </div> 
+                    </div>
+                </div>
                 <div id="totcustomers" class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -42,8 +46,8 @@
                                 </span>
                             </li>
                         </ul>
-                    </div> 
-                </div> 
+                    </div>
+                </div>
                 <div id="points" class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -59,94 +63,65 @@
                                 <span class="badge"></span>
                             </a>
                         </ul>
-                    </div> 
-                </div> 
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div id="chart" class="col-md-8 col-md-offset-2">
+                    <svg/>
+                </div>
             </div>
         </div>
         <% include template/footer %>
     </body>
     <script>
 
-// this needs to be redone and refactored
+// nvd3 chart
 
-var generateGraph = function (data) {
-    var margin = {top: 20, right: 20, bottom: 70, left: 40},
-    width = 600 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+var drawPointsScatter = function() {
+    d3.selectAll("svg > *").remove();
+    d3.json('/dashboard/points', function(data) {
+        nv.addGraph( function() {
+            var width = 600, height = 400;
+            var chart = nv.models.scatterChart()
+            chart.xAxis
+                .tickFormat(function(d) {
+                    return d3.time.format('%x')(new Date(d));
+                });
+            chart.forceY(0);
+            d3.select('#chart svg')
+                .datum(data)
+                .call(chart);
 
-    // Parse the date / time
-    var parseDate = d3.time.format("%Y-%m").parse;
-
-    var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
-
-    var y = d3.scale.linear().range([height, 0]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .tickFormat(d3.time.format("%Y-%m"));
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10);
-
-    var svg = d3.select("#graph").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
-
-    data.forEach(function(d) {
-        d.date = parseDate(d.date);
-        d.value = +d.value;
+            nv.utils.windowResize(chart.update);
+            return chart;
+        });
     });
+};
 
+var drawCustomerLine = function() {
+    d3.selectAll("svg > *").remove();
+    d3.json('/dashboard/customers', function(data) {
+        nv.addGraph( function() {
+            var width = 600, height = 400;
+            var chart = nv.models.lineChart()
+            chart.xAxis.tickFormat(function(d) {
+                    return d3.time.format('%x')(new Date(d));
+                });
+            chart.forceY(0);
 
-      x.domain(data.map(function(d) { return d.date; }));
-      y.domain([0, d3.max(data, function(d) { return d.value; })]);
+            d3.select('#chart svg')
+                .datum(data)
+                .call(chart);
 
-      svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis)
-        .selectAll("text")
-          .style("text-anchor", "end")
-          .attr("dx", "-.8em")
-          .attr("dy", "-.55em")
-          .attr("transform", "rotate(-90)" );
-
-      svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-        .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Value");
-
-      svg.selectAll("bar")
-          .data(data)
-        .enter().append("rect")
-          .style("fill", "steelblue")
-          .attr("x", function(d) { return x(d.date); })
-          .attr("width", x.rangeBand())
-          .attr("y", function(d) { return y(d.value); })
-          .attr("height", function(d) { return height - y(d.value); });
-
-    //});
-}
-
-$.get('/dashboard/gethistoric')
-    .success(function (barGraphData) {
-        generateGraph(barGraphData);
-    })
-    .error(function (xhr, textStatus, errorThrown) {
-        alert(xhr.responseText);
+            nv.utils.windowResize(chart.update);
+            return chart;
+        });
     });
-
-
+};
+$("#new-daily, #new-montly").click(drawCustomerLine);
+$("#points-earned, #points-redeemed").click(drawPointsScatter);
+drawCustomerLine();
     </script>
 </html>
