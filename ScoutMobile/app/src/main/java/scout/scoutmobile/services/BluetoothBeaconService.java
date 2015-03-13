@@ -70,11 +70,13 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
+                int numOfBeacons = beacons.size();
+                mLogger.log("YO SIZE OF NUMBER " + numOfBeacons);
+                if (numOfBeacons > 0) {
                     StoreBeaconData(beacons);
 
-                    if (beacons.size() >= TRILATERATION_REQ_BEACON_NUM) {
-                        //saveCoordinateWithBeacons(beacons);
+                    if (numOfBeacons >= TRILATERATION_REQ_BEACON_NUM) {
+                        saveCoordinateWithBeacons(beacons);
                     }
 
                     notifyBeaconPingObservers(beacons, scanDuration);
@@ -147,7 +149,6 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
     }
 
     private void saveCoordinateWithBeacons(Collection<Beacon> beacons) {
-
         List<BluetoothBeaconData> detailedBeaconList = new ArrayList<BluetoothBeaconData>();
         BluetoothBeaconData beaconA, beaconB, beaconC;
         beaconA = beaconB = beaconC = null;
@@ -159,7 +160,6 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             BluetoothBeacon bluetoothBeacon;
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_BEACON);
             query.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, curBeacon.getBluetoothAddress());
-
             try {
                 ParseObject obj = query.getFirst();
                 if (obj != null) {
@@ -184,7 +184,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             return;
         }
 
-        double W, Z, positionX, positionY, positionYError, x1, y1, x2, y2, x3, y3;
+        double W, Z, positionX, positionY, x1, y1, x2, y2, x3, y3;
 
         double distanceA = beaconA.getDistance();
         double distanceB = beaconB.getDistance();
@@ -197,21 +197,22 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         x3 = beaconC.getBluetoothBeacon().getCoordX();
         y3 = beaconC.getBluetoothBeacon().getCoordY();
 
+        // checking if the any of the beacons are aligned if so we cant do trilateration since
+        // having beacons on the same axis doesnt provide any valueable information
+        if ((y1 - y2)*(x1 - x3) == (y1 - y3)*(x1 - x2)) {
+            return;
+        }
+
         // algorithm based on 'Three distance known' of http://everything2.com/title/Triangulate
-        W = distanceA*distanceA - distanceB*distanceB - x1*x1 - y1*y1 + x2*x2 + y2*y2;
-        Z = distanceB*distanceB - distanceC*distanceC - x2*x2 - y2*y2 + x3*x3 + y3*y3;
+        // use case https://www.youtube.com/watch?v=dMWEl6GBGqk
+        // results obtained after using the distances for the beacons are extremely inaccurate
+        W = (Math.pow(x3, 2.0) - Math.pow(x2, 2.0) + Math.pow(y3, 2.0) -
+                Math.pow(y2, 2.0) + Math.pow(distanceB, 2.0) - Math.pow(distanceC, 2.0)) / 2.0;
+        Z = (Math.pow(x1, 2.0) - Math.pow(x2, 2.0) + Math.pow(y1, 2.0) -
+                Math.pow(y2, 2.0) + Math.pow(distanceB, 2.0) - Math.pow(distanceA, 2.0)) / 2.0;
 
-        // NOTE: this algorithm can break when the x and y values of beacons are the same
-        // However, placing the beacons on either the same x or y will not provide valueable information
-        positionX = (W*(y3-y2) - Z*(y2-y1)) / (2 * ((x2-x1)*(y3-y2) - (x3-x2)*(y2-y1)));
-        positionY = (W - 2*positionX*(x2-x1)) / (2*(y2-y1));
-
-        //positionYError is a second measure of y to mitigate errors
-        //this estimate will be extremely skewed as bluetooth waves can be distorted by many different
-        //sources
-        positionYError = (Z - 2*positionX*(x3-x2)) / (2*(y3-y2));
-
-        positionY = (positionY + positionYError) / 2;
+        positionY = ((Z * (x2 - x3)) - (W * (x2 - x1))) / (((y1 - y2) * (x2 - x3)) - ((y3 - y2) * (x2 - x1)));
+        positionX = ((positionY * (y1 - y2)) - Z) / (x2 - x1);
 
         //Store the coordinate object
         ParseObject newCoord = new ParseObject(Consts.TABLE_ESTIMATED_COORDINATE);

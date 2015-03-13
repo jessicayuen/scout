@@ -47,6 +47,8 @@ public class CustomerSingleton {
 
 
     private CustomerSingleton() {
+
+
     }
 
 }
