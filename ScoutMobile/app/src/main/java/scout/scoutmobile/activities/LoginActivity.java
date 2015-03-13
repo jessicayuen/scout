@@ -50,6 +50,11 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        String errStr = getIntent().getStringExtra(Consts.LOGIN_ERROR_EXTRA);
+        if (errStr != null && !errStr.isEmpty()) {
+            showToast(getString(R.string.another_session_found_error));
+        }
+
         mLoadingDialog = new ProgressDialog(LoginActivity.this);
         mLoadingDialog.setMessage(getString(R.string.spinner_login));
 

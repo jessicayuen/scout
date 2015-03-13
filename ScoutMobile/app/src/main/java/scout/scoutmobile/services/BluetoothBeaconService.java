@@ -71,7 +71,6 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 int numOfBeacons = beacons.size();
-                mLogger.log("YO SIZE OF NUMBER " + numOfBeacons);
                 if (numOfBeacons > 0) {
                     StoreBeaconData(beacons);
 

@@ -68,11 +68,25 @@ public class GeneralUtils {
      * @param mainClass
      */
     public static void startMainActivity(Context context, Class<?> mainClass) {
+        startMainActivity(context, mainClass, "");
+    }
+
+    /**
+     * Overloaded class to handle sending error messages into the login screen. e.g. when user is
+     * kicked out of a session
+     * @param context
+     * @param mainClass
+     */
+    public static void startMainActivity(Context context, Class<?> mainClass, String err) {
         m_Logger.log("Starting main activity");
         Intent mainActivity = new Intent(context, mainClass);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_NEW_TASK|
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        if (err != "") {
+            mainActivity.putExtra(Consts.LOGIN_ERROR_EXTRA, err);
+        }
         context.startActivity(mainActivity);
     }
 

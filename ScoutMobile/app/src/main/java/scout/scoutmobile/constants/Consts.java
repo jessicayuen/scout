@@ -82,6 +82,7 @@ public final class Consts {
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";
     public static final String USER_LOGGED = "NOT_REALLY_RANDOM";
+    public static final String LOGIN_ERROR_EXTRA = "error";
 
     private Consts() {
         //preventing the class being created

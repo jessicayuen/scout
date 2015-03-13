@@ -13,4 +13,6 @@
     <string name="error_field_required">This field is required</string>
 
     <string name="spinner_login">Logging in, please wait...</string>
+
+    <string name="another_session_found_error">User logged in else where</string>
 </resources>
