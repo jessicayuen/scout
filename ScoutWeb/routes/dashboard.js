@@ -111,13 +111,11 @@ router.get('/customers', function(req, res, next) {
         // relationships should first be instatiated... eventually)
         var counts = {};
         doStuffToMuhObjectJSON('Points', function(json) {
-            console.log(json);
             json.forEach( function(point) {
                 var d = new Date(point.createdAt);
                 d.setHours(0,0,0,0);
                 counts[+d] = 1 + (counts[+d] || 0);
             });
-            console.log(counts);
             for (key in counts)
                 customerData[1].values.push({x: parseInt(key), y: counts[key]});
             res.json(customerData);
