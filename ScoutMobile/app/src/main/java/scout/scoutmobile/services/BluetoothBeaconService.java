@@ -125,7 +125,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         for (Beacon beacon : beacons) {
             final BluetoothBeacon bluetoothBeacon =
                     new BluetoothBeacon(beacon.getBluetoothAddress(), beacon.getId1().toUuidString(),
-                            beacon.getId2().toInt(), beacon.getId3().toInt());
+                            beacon.getId2().toInt(), beacon.getId3().toInt(), -1, -1);
             final BluetoothBeaconData bluetoothBeaconData =
                     new BluetoothBeaconData(bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
 
@@ -172,7 +172,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
     private void saveBeacon (Beacon beacon) {
         final BluetoothBeacon bluetoothBeacon =
                 new BluetoothBeacon(beacon.getBluetoothAddress(), beacon.getId1().toUuidString(),
-                                    beacon.getId2().toInt(), beacon.getId3().toInt());
+                                    beacon.getId2().toInt(), beacon.getId3().toInt(), -1, -1);
         final BluetoothBeaconData bluetoothBeaconData =
                 new BluetoothBeaconData(bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
 
@@ -240,8 +240,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             try {
                 ParseObject obj = query.getFirst();
                 if (obj != null) {
-                    bluetoothBeacon = new BluetoothBeacon(obj.getString(Consts.COL_BEACON_MACADDRESS), obj.getString(Consts.COL_BEACON_UUID),
-                            obj.getInt(Consts.COL_BEACON_MAJOR), obj.getInt(Consts.COL_BEACON_MINOR));
+                    bluetoothBeacon = new BluetoothBeacon(obj);
                     detailedBeaconList.add(new BluetoothBeaconData(bluetoothBeacon, curBeacon.getTxPower(), curBeacon.getRssi(), curBeacon.getDistance()));
                 }
             } catch (ParseException e) {

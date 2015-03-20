@@ -127,12 +127,14 @@ public class IntervalManager implements BeaconPingObserver {
             ParseObject intervalRecordObj = new ParseObject(Consts.TABLE_INTERVAL_RECORD);
             intervalRecordObj.put("interval", intervalHandler.intervalObj);
             intervalRecordObj.put("timestamp", intervalHandler.interval.getTo());
-            intervalRecordObj.put("coordX", (location != null ? location.x : 0));
-            intervalRecordObj.put("coordY", (location != null ? location.y : 0));
-            // distance is probably not necessary
             intervalRecordObj.put("distBeacon1", beaconDataList.get(0).getDistance());
             intervalRecordObj.put("distBeacon2", beaconDataList.get(1).getDistance());
             intervalRecordObj.put("distBeacon3", beaconDataList.get(2).getDistance());
+
+            if (location != null) {
+                intervalRecordObj.put("coordX", location.x);
+                intervalRecordObj.put("coordY", location.y);
+            }
 
             intervalRecordObj.saveInBackground();
         } catch (Exception e) {
@@ -145,16 +147,25 @@ public class IntervalManager implements BeaconPingObserver {
 
         if (beacons.size() == MIN_REQ_BEACON_NUM) {
             for (Iterator<Beacon> it = beacons.iterator(); it.hasNext(); ) {
-                Beacon beacon = it.next();
+                Beacon beacon = (Beacon) it.next();
 
-                BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(
-                        beacon.getBluetoothAddress(), beacon.getId1().toUuidString(),
-                        beacon.getId2().toInt(), beacon.getId3().toInt());
+                try {
+                    ParseQuery<ParseObject> bluetoothBeaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
+                        .whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, beacon.getBluetoothAddress());
 
-                BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(
-                        bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
+                    ParseObject beaconObj = bluetoothBeaconQuery.getFirst();
 
-                bluetoothBeaconDataList.add(bluetoothBeaconData);
+                    if (beaconObj != null) {
+                        BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(beaconObj);
+
+                        BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(
+                                bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
+
+                        bluetoothBeaconDataList.add(bluetoothBeaconData);
+                    }
+                } catch (ParseException e) {
+                    mLogger.logError(e);
+                }
             }
         } else if (beacons.size() > MIN_REQ_BEACON_NUM) {
             // determine the 3 best beacons to use

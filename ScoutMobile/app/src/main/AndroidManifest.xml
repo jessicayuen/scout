@@ -72,12 +72,6 @@
             android:label="Redeem Reward" >
         </activity>
 
-        <service
-            android:name=".services.BluetoothBeaconServiceEstimote"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-
         <activity
             android:name=".activities.VerificationActivity"
             android:label="@string/title_activity_verification" >
