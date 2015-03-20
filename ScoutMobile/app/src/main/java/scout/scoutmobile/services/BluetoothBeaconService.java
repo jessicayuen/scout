@@ -78,7 +78,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
                 // Beacons aren't inserted in the business side yet so if the beacon is new, insert it here
-                insertNewBeacons(beacons);
+                //insertNewBeacons(beacons);
 
                 notifyBeaconPingObservers(beacons, scanDuration);
 
@@ -150,6 +150,10 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
                                 beaconObject.put(Consts.COL_BEACON_MINOR, bluetoothBeacon.getMinor());
 
                                 beaconObject.save();
+
+                                mLogger.log("Inserted beacon: "+ bluetoothBeacon.getMacAddress()+ " " + bluetoothBeacon.getUUID());
+                            } else {
+                                mLogger.log("Detected beacon: "+ bluetoothBeacon.getMacAddress()+ " " + bluetoothBeacon.getUUID());
                             }
                         } catch (ParseException parseSaveException) {
                             mLogger.logError(parseSaveException);
