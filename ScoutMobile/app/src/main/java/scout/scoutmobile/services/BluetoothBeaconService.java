@@ -33,6 +33,7 @@ import scout.scoutmobile.utils.Logger;
 public class BluetoothBeaconService extends Service implements BeaconConsumer {
 
     private static final int TRILATERATION_REQ_BEACON_NUM = 3;
+    private static final String BEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
     private static List<BeaconPingObserver> mPingObservers = new ArrayList<>();
     private Logger mLogger = new Logger("BluetoothBeaconService");
     private BeaconManager beaconManager = null;
@@ -50,9 +51,9 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
 
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.setForegroundScanPeriod(scanDuration);
-        beaconManager.getBeaconParsers().add(
-                new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BEACON_LAYOUT));
         beaconManager.bind(this);
+
         startTime = endTime = 0;
         mLogger.log("Beacon service has been created");
     }
@@ -75,6 +76,15 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+
+                // Beacons aren't inserted in the business side yet so if the beacon is new, insert it here
+                insertNewBeacons(beacons);
+
+                notifyBeaconPingObservers(beacons, scanDuration);
+
+                // if app stable should remove the old code below
+
+               /*
                 int numOfBeacons = beacons.size();
                 if (numOfBeacons > 0) {
                     if (!withinProximity) {
@@ -92,6 +102,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
                     notifyBeaconPingObservers(beacons, scanDuration);
                 }
 
+
                 if (withinProximity) {
                     long duration = endTime - startTime; //is subtraction expensive?
                     if (duration >= minimalDuration) {
@@ -99,6 +110,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
                         withinProximity = false;
                     }
                 }
+                */
             }
         });
 
@@ -108,6 +120,48 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
             mLogger.logError(e);
         }
     }
+
+    private void insertNewBeacons (Collection<Beacon> beacons) {
+        for (Beacon beacon : beacons) {
+            final BluetoothBeacon bluetoothBeacon =
+                    new BluetoothBeacon(beacon.getBluetoothAddress(), beacon.getId1().toUuidString(),
+                            beacon.getId2().toInt(), beacon.getId3().toInt());
+            final BluetoothBeaconData bluetoothBeaconData =
+                    new BluetoothBeaconData(bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
+
+            ParseQuery<ParseObject> queryBeacon = ParseQuery.getQuery(Consts.TABLE_BEACON);
+            queryBeacon.whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, bluetoothBeacon.getMacAddress()).setLimit(1);
+
+            queryBeacon.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> parseObjects, ParseException e) {
+                    ParseObject beaconObject;
+                    ParseObject beaconDataObject;
+
+                    if (e == null) {
+                        try {
+                            // no parseObjects mean that the Beacon is new
+                            if (parseObjects.isEmpty()) {
+                                beaconObject = new ParseObject(Consts.TABLE_BEACON);
+
+                                beaconObject.put(Consts.COL_BEACON_MACADDRESS, bluetoothBeacon.getMacAddress());
+                                beaconObject.put(Consts.COL_BEACON_UUID, bluetoothBeacon.getUUID());
+                                beaconObject.put(Consts.COL_BEACON_MAJOR, bluetoothBeacon.getMajor());
+                                beaconObject.put(Consts.COL_BEACON_MINOR, bluetoothBeacon.getMinor());
+
+                                beaconObject.save();
+                            }
+                        } catch (ParseException parseSaveException) {
+                            mLogger.logError(parseSaveException);
+                        }
+                    } else {
+                        mLogger.logError(e);
+                    }
+                }
+            });
+        }
+    }
+
 
     private void StoreBeaconData (Collection<Beacon> beacons) {
         for (Beacon beacon : beacons) {
@@ -258,7 +312,7 @@ public class BluetoothBeaconService extends Service implements BeaconConsumer {
      * @param duration
      */
     private void sendUserStayedDuration(long duration) {
-        ParseObject userDuration = new ParseObject(Consts.TABLE_NEW_INTERVAL);
+        ParseObject userDuration = new ParseObject(Consts.TABLE_INTERVAL);
         userDuration.put(Consts.COL_INTERVAL_USER, CustomerSingleton.getInstance().getCurUser());
         userDuration.put(Consts.COL_INTERVAL_BUSINESS, "business"); //TODO need to somehow get business
         userDuration.put(Consts.COL_INTERVAL_DURATION, duration);

@@ -12,7 +12,8 @@ public final class Consts {
     public static final String TABLE_BEACON = "Beacon";
     public static final String TABLE_BEACONDATA = "BeaconData";
     public static final String TABLE_ESTIMATED_COORDINATE = "EstimatedCoordinate";
-    public static final String TABLE_NEW_INTERVAL = "NEW_Interval";
+    public static final String TABLE_INTERVAL = "Interval";
+    public static final String TABLE_INTERVAL_RECORD = "IntervalRecord";
 
     //Parse Customer object properties
     public static final String COL_CUSTOMER_USER = "user";

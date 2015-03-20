@@ -19,4 +19,8 @@ public class Interval {
     public Date getTo() {
         return mTo;
     }
+
+    public void setTo(Date to) {
+        this.mTo = to;
+    }
 }
