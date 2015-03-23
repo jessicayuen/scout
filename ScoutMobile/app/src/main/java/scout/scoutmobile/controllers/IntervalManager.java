@@ -1,6 +1,6 @@
 package scout.scoutmobile.controllers;
 
-import android.graphics.Point;
+import android.util.Pair;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.BluetoothBeacon;
@@ -23,8 +24,8 @@ import scout.scoutmobile.utils.Logger;
 public class IntervalManager implements BeaconPingObserver {
     private static final int MIN_REQ_BEACON_NUM = 3;
     private static IntervalManager instance = null;
-    private static Logger mLogger = new Logger("IntervalManager");
     private static IntervalHandler intervalHandler = null;
+    private static Logger mLogger = new Logger("IntervalManager");
 
     private static class IntervalHandler {
         Interval interval = null;
@@ -51,7 +52,10 @@ public class IntervalManager implements BeaconPingObserver {
 
     @Override
     public void onBeaconPing(Collection<Beacon> beacons, long seconds) {
-        if (beacons.size() < MIN_REQ_BEACON_NUM) {
+        List<BluetoothBeaconData> bluetoothBeaconDataList = null;
+
+        if (beacons.size() < MIN_REQ_BEACON_NUM ||
+                (bluetoothBeaconDataList = getBeaconDataList(beacons)) == null) {
             intervalHandler.resetInterval();
 
             return;
@@ -59,7 +63,7 @@ public class IntervalManager implements BeaconPingObserver {
 
         if (intervalHandler.interval == null) {
             // new interval
-            initIntervalHandler(beacons);
+            initIntervalHandler(bluetoothBeaconDataList);
             insertInterval();
         } else {
             // update current interval
@@ -67,24 +71,24 @@ public class IntervalManager implements BeaconPingObserver {
             updateInterval();
         }
 
-        insertIntervalRecord(beacons);
+        insertIntervalRecord(bluetoothBeaconDataList);
     }
 
-    private void initIntervalHandler(Collection<Beacon> beacons) {
-        Beacon beacon = beacons.iterator().next();
+    private void initIntervalHandler(List<BluetoothBeaconData> beaconDataList) {
+        BluetoothBeacon bluetoothBeacon = beaconDataList.get(0).getBluetoothBeacon();
 
         intervalHandler.interval = new Interval();
         intervalHandler.customerObj = getCustomer();
-        intervalHandler.businessObj = getBusiness(beacon);
+        intervalHandler.businessObj = getBusiness(bluetoothBeacon);
     }
 
     private void insertInterval() {
         try {
             ParseObject intervalObj = new ParseObject(Consts.TABLE_INTERVAL);
-            intervalObj.put("business", intervalHandler.businessObj);
-            intervalObj.put("customer", intervalHandler.customerObj);
-            intervalObj.put("from", intervalHandler.interval.getFrom());
-            intervalObj.put("to", intervalHandler.interval.getTo());
+            intervalObj.put(Consts.COL_INTERVAL_BUSINESS, intervalHandler.businessObj);
+            intervalObj.put(Consts.COL_INTERVAL_CUSTOMER, intervalHandler.customerObj);
+            intervalObj.put(Consts.COL_INTERVAL_FROM, intervalHandler.interval.getFrom());
+            intervalObj.put(Consts.COL_INTERVAL_TO, intervalHandler.interval.getTo());
             intervalObj.save();
 
             intervalHandler.intervalObj = intervalObj;
@@ -114,26 +118,24 @@ public class IntervalManager implements BeaconPingObserver {
         }
     }
 
-    private void insertIntervalRecord(Collection<Beacon> beacons) {
-        ArrayList<BluetoothBeaconData> beaconDataList = getBeaconDataArrayList(beacons);
-
+    private void insertIntervalRecord(List<BluetoothBeaconData> beaconDataList) {
         try {
             if (beaconDataList.size() < MIN_REQ_BEACON_NUM) {
                 throw new Exception("Insufficient beacons to create interval record");
             }
 
-            Point location = getCoordinateWithBeacons(beaconDataList);
+            Pair location = getCoordinateWithBeacons(beaconDataList);
 
             ParseObject intervalRecordObj = new ParseObject(Consts.TABLE_INTERVAL_RECORD);
-            intervalRecordObj.put("interval", intervalHandler.intervalObj);
-            intervalRecordObj.put("timestamp", intervalHandler.interval.getTo());
-            intervalRecordObj.put("distBeacon1", beaconDataList.get(0).getDistance());
-            intervalRecordObj.put("distBeacon2", beaconDataList.get(1).getDistance());
-            intervalRecordObj.put("distBeacon3", beaconDataList.get(2).getDistance());
+            intervalRecordObj.put(Consts.COL_INTERVALRECORD_INTERVAL, intervalHandler.intervalObj);
+            intervalRecordObj.put(Consts.COL_INTERVALRECORD_TIMESTAMP, intervalHandler.interval.getTo());
+            intervalRecordObj.put(Consts.COL_INTERVALRECORD_DISTBEACON1, beaconDataList.get(0).getDistance());
+            intervalRecordObj.put(Consts.COL_INTERVALRECORD_DISTBEACON2, beaconDataList.get(1).getDistance());
+            intervalRecordObj.put(Consts.COL_INTERVALRECORD_DISTBEACON3, beaconDataList.get(2).getDistance());
 
             if (location != null) {
-                intervalRecordObj.put("coordX", location.x);
-                intervalRecordObj.put("coordY", location.y);
+                intervalRecordObj.put(Consts.COL_INTERVALRECORD_COORDX, location.first);
+                intervalRecordObj.put(Consts.COL_INTERVALRECORD_COORDY, location.second);
             }
 
             intervalRecordObj.saveInBackground();
@@ -142,36 +144,31 @@ public class IntervalManager implements BeaconPingObserver {
         }
     }
 
-    private ArrayList<BluetoothBeaconData> getBeaconDataArrayList(Collection<Beacon> beacons) {
-        ArrayList<BluetoothBeaconData> bluetoothBeaconDataList = new ArrayList<BluetoothBeaconData>();
+    private List<BluetoothBeaconData> getBeaconDataList(Collection<Beacon> beacons) {
+        List<BluetoothBeaconData> bluetoothBeaconDataList = new ArrayList();
 
-        if (beacons.size() == MIN_REQ_BEACON_NUM) {
-            for (Iterator<Beacon> it = beacons.iterator(); it.hasNext(); ) {
-                Beacon beacon = (Beacon) it.next();
+        try {
+            // query for the first three valid beacons
+            for (Iterator<Beacon> it = beacons.iterator(); it.hasNext() && bluetoothBeaconDataList.size() < MIN_REQ_BEACON_NUM;) {
+                Beacon beacon = it.next();
 
-                try {
-                    ParseQuery<ParseObject> bluetoothBeaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
-                        .whereEqualTo(Consts.COL_BEACONDATA_MACADDRESS, beacon.getBluetoothAddress());
+                ParseQuery<ParseObject> beaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
+                        .whereEqualTo(Consts.COL_BEACON_MACADDRESS, beacon.getBluetoothAddress());
 
-                    ParseObject beaconObj = bluetoothBeaconQuery.getFirst();
+                if (beaconQuery.count() > 0) {
+                    BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(beaconQuery.getFirst());
 
-                    if (beaconObj != null) {
-                        BluetoothBeacon bluetoothBeacon = new BluetoothBeacon(beaconObj);
+                    BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(
+                            bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
 
-                        BluetoothBeaconData bluetoothBeaconData = new BluetoothBeaconData(
-                                bluetoothBeacon, beacon.getTxPower(), beacon.getRssi(), beacon.getDistance());
-
-                        bluetoothBeaconDataList.add(bluetoothBeaconData);
-                    }
-                } catch (ParseException e) {
-                    mLogger.logError(e);
+                    bluetoothBeaconDataList.add(bluetoothBeaconData);
                 }
             }
-        } else if (beacons.size() > MIN_REQ_BEACON_NUM) {
-            // determine the 3 best beacons to use
+        } catch (ParseException e) {
+            mLogger.logError(e);
         }
 
-        return bluetoothBeaconDataList;
+        return (bluetoothBeaconDataList.size() == MIN_REQ_BEACON_NUM ? bluetoothBeaconDataList : null);
     }
 
     private ParseObject getCustomer() {
@@ -191,17 +188,18 @@ public class IntervalManager implements BeaconPingObserver {
         return customerObj;
     }
 
-    private ParseObject getBusiness(Beacon beacon) {
+    private ParseObject getBusiness(BluetoothBeacon beacon) {
         ParseObject businessObj = null;
 
         try {
             ParseQuery<ParseObject> beaconQuery = ParseQuery.getQuery(Consts.TABLE_BEACON)
-                    .whereEqualTo(Consts.COL_BEACON_MACADDRESS, beacon.getBluetoothAddress());
+                    .whereEqualTo(Consts.COL_BEACON_MACADDRESS, beacon.getMacAddress());
 
             businessObj = beaconQuery.getFirst().getParseObject(Consts.COL_BEACON_BUSINESS).fetch();
         } catch (ParseException e) {
             mLogger.logError(e);
         }
+
         return businessObj;
     }
 
@@ -215,9 +213,9 @@ public class IntervalManager implements BeaconPingObserver {
     /**
      * Get coordinates with a list of beacons provided
      * @param bluetoothBeaconList
-     * @return a Point if coordinate has been found. null other wise
+     * @return a Pair if coordinate has been found. null other wise
      */
-    private Point getCoordinateWithBeacons(ArrayList<BluetoothBeaconData> bluetoothBeaconList) {
+    private Pair<Float, Float> getCoordinateWithBeacons(List<BluetoothBeaconData> bluetoothBeaconList) {
         BluetoothBeaconData beaconA = bluetoothBeaconList.get(0);
         BluetoothBeaconData beaconB = bluetoothBeaconList.get(1);
         BluetoothBeaconData beaconC = bluetoothBeaconList.get(2);
@@ -251,9 +249,7 @@ public class IntervalManager implements BeaconPingObserver {
         positionY = ((Z * (x2 - x3)) - (W * (x2 - x1))) / (((y1 - y2) * (x2 - x3)) - ((y3 - y2) * (x2 - x1)));
         positionX = ((positionY * (y1 - y2)) - Z) / (x2 - x1);
 
-        Point userLoc = new Point((int)Math.round(positionX), (int)Math.round(positionY));
-
-        return userLoc;
+        return new Pair(positionX, positionY);
     }
 
 }

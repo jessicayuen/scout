@@ -67,9 +67,19 @@ public final class Consts {
     public static final String COL_COORDINATE_COORDY= "coordY";
 
     //Parse data for user duration interval
-    public static final String COL_INTERVAL_BUSINESS = "business_temp";
-    public static final String COL_INTERVAL_USER = "user_temp";
-    public static final String COL_INTERVAL_DURATION= "duration";
+    public static final String COL_INTERVAL_BUSINESS = "business";
+    public static final String COL_INTERVAL_CUSTOMER = "customer";
+    public static final String COL_INTERVAL_FROM= "from";
+    public static final String COL_INTERVAL_TO= "to";
+
+    //Parse data for interval record
+    public static final String COL_INTERVALRECORD_INTERVAL = "interval";
+    public static final String COL_INTERVALRECORD_TIMESTAMP = "timestamp";
+    public static final String COL_INTERVALRECORD_DISTBEACON1 = "distBeacon1";
+    public static final String COL_INTERVALRECORD_DISTBEACON2 = "distBeacon2";
+    public static final String COL_INTERVALRECORD_DISTBEACON3 = "distBeacon3";
+    public static final String COL_INTERVALRECORD_COORDX = "coordX";
+    public static final String COL_INTERVALRECORD_COORDY = "coordY";
 
     //For registering and logging in
     public static final String EMAIL_VALIDATING_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
