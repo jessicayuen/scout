@@ -105,7 +105,7 @@ public class IntervalManager implements BeaconPingObserver {
 
     private void updateInterval() {
         try {
-            intervalHandler.intervalObj.put("to", intervalHandler.interval.getTo());
+            intervalHandler.intervalObj.put(Consts.COL_INTERVAL_TO, intervalHandler.interval.getTo());
             intervalHandler.intervalObj.saveInBackground();
 
             if (intervalHandler.intervalObj == null) {
@@ -178,7 +178,7 @@ public class IntervalManager implements BeaconPingObserver {
             ParseUser currentUser = ParseUser.getCurrentUser();
 
             ParseQuery<ParseObject> customerQuery = ParseQuery.getQuery(Consts.TABLE_CUSTOMER)
-                    .whereEqualTo("user", currentUser);
+                    .whereEqualTo(Consts.COL_CUSTOMER_USER, currentUser);
 
             customerObj = customerQuery.getFirst();
         } catch (ParseException e) {

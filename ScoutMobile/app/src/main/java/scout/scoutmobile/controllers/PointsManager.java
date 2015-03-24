@@ -83,16 +83,19 @@ public class PointsManager implements BeaconPingObserver {
                 @Override
                 public void done(List<ParseObject> parseObjects, ParseException e) {
                     // We're expecting one ParseObject or none at all.
+                    ParseObject points;
+
                     if (parseObjects.size() == 0) {
-                        ParseObject points = new ParseObject(Consts.TABLE_POINTS);
+                        points = new ParseObject(Consts.TABLE_POINTS);
                         points.put(Consts.COL_POINTS_CUSTOMER, CustomerSingleton.getInstance().getCurCustomer());
                         points.put(Consts.COL_POINTS_BUSINESS, business);
                         points.put(Consts.COL_POINTS_POINTS, 1);
-                        points.saveInBackground();
                     } else {
-                        ParseObject points = parseObjects.get(0);
+                        points = parseObjects.get(0);
                         points.put(Consts.COL_POINTS_POINTS, points.getInt(Consts.COL_POINTS_POINTS) + 1);
                     }
+
+                    points.saveInBackground();
                 }
             });
         }
