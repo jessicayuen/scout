@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import scout.scoutmobile.R;
-import scout.scoutmobile.ScoutAndroidApplication;
 import scout.scoutmobile.activities.util.SystemUiHider;
 
 /**
@@ -17,7 +16,7 @@ import scout.scoutmobile.activities.util.SystemUiHider;
  */
 public class SplashScreenActivity extends Activity {
 
-    private static int SPLASH_TIME_OUT = 3000;
+    private static int SPLASH_TIME_OUT = 1500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
