@@ -1,10 +1,11 @@
 package scout.scoutmobile.activities;
 
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +15,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.os.RemoteException;
-import android.util.Log;
 
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
@@ -124,7 +123,7 @@ public class PlacesActivity extends ActionBarActivity {
                 toggleTracking();
                 return true;
             case R.id.action_log_out:
-                //logOut(); TODO
+                GeneralUtils.logUserOut(this);
                 return true;
             case R.id.action_settings:
                 //openSettings(); TODO
@@ -132,7 +131,6 @@ public class PlacesActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     /**
@@ -140,8 +138,8 @@ public class PlacesActivity extends ActionBarActivity {
      * @throws RuntimeException If an exception was thrown during the query
      */
     private void getAllPlaces() {
-        final ProgressDialog progress = ProgressDialog.show(this,
-                Consts.PROGRESS_WAIT,Consts.PROGRESS_BUSINESS_ALL_QUERY);
+//        final ProgressDialog progress = ProgressDialog.show(this,
+//                Consts.PROGRESS_WAIT,Consts.PROGRESS_BUSINESS_ALL_QUERY);
 
         // Query for all businesses
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_PLACE);
@@ -171,7 +169,7 @@ public class PlacesActivity extends ActionBarActivity {
                                 }
                                 // Finally, we can update the list view with this info
                                 updateListView(new ArrayList<>(placesMap.values()));
-                                progress.dismiss();
+                                //progress.dismiss();
                             } else {
                                 mLogger.logError(e);
                             }

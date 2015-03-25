@@ -112,14 +112,20 @@ public class RewardsActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_toggle_tracking:
+                //toggleTracking();
+                return true;
+            case R.id.action_log_out:
+                GeneralUtils.logUserOut(this);
+                return true;
+            case R.id.action_settings:
+                //openSettings(); TODO
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
