@@ -38,8 +38,6 @@
         <activity android:name=".activities.DispatchActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -71,7 +69,6 @@
             android:name=".activities.RedeemActivity"
             android:label="Redeem Reward" >
         </activity>
-
         <activity
             android:name=".activities.VerificationActivity"
             android:label="@string/title_activity_verification" >
@@ -82,6 +79,18 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".activities.SplashScreenActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_splash_screen"
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
