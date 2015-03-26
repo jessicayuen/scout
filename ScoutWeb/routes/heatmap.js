@@ -42,11 +42,13 @@ router.get('/getheatmap', function(req, res, next) {
     var max = 0;
     var width = 1281;
     var height = 778; //TODO: Change based on image size
-    var minLat = -159.75;
-    var maxLat = 62.25;
-    var minLng = -118.25;
-    var maxLng = 278.25;
-    var arrlen = 2;
+
+    var minLng = -80;
+    var maxLng = 80;
+    var minLat = (-97.125/2);
+    var maxLat = (97.125/2);
+
+    var arrlen = 10;
     var len = 20;
     var intervals = [];
 
@@ -68,8 +70,8 @@ router.get('/getheatmap', function(req, res, next) {
                 iso: randomDate
             };
           var point = {
-            coordX: Math.floor(Math.random()*(maxLng-minLng))+minLng,
-            coordY: Math.floor(Math.random()*(maxLat-minLat))+minLat,
+            coordY: Math.floor(Math.random()*(maxLng-minLng))+minLng,
+            coordX: Math.floor(Math.random()*(maxLat-minLat))+minLat,
             timestamp: timestamp
           };
           points.push(point);

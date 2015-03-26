@@ -7,13 +7,41 @@
             body * { font-weight:200;}
             .leaflet-map-pane img { max-width: none; max-height: none;}
             #map {  width:100%; height:100%; display: inline-block; }
+            #dateSlider {
+            position:absolute;
+            height:50px;
+            width:70%;
+            right:0;
+            left:0;
+            bottom:0px;
+            margin: 0 auto;
+            visibility: hidden;
+            }
+            svg text {
+            fill: #fff;
+            }
+            svg line {
+            stroke: #fff;
+            stroke-width: 1px;
+            }
+            svg .domain {
+            stroke: #fff;
+            fill: none;
+            }
+            svg rect {
+            fill: #00AEF7;
+            opacity: .4;
+            stroke: #FFF;
+            }
         </style>
-        </head>
-        <body>
+    </head>
+    <body>
         <% include template/navbar %>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <link rel="stylesheet" href="js/jQRangeSlider-5.7.1/css/iThing.css" type="text/css" />
         <div id = 'map'></div>
-        <div id = 'chartBox'></div>
+<!--         <div id = 'chartBox'></div> -->
+        <div id = "dateSlider"></div>
         </div>
         <% include template/footer %>
     </body>
@@ -69,17 +97,20 @@
     imageLayer.bringToBack();
 
     //add beacons to map
-    var beacon1 = L.marker([1, 1]).addTo(map);
-    beacon1.bindPopup("<b>Beacon 1</b>").openPopup();
-    var beacon2 = L.marker([4, 1]).addTo(map);
-    beacon2.bindPopup("<b>Beacon 2</b>").openPopup();
-    var beacon3 = L.marker([2.5, 4.2]).addTo(map);
-    beacon3.bindPopup("<b>Beacon 3</b>").openPopup();
+    var beacon1 = L.marker([0, 0]).addTo(map);
+    beacon1.bindPopup("<b>Beacon 1</b>");
+    var beacon2 = L.marker([20, -30]).addTo(map);
+    beacon2.bindPopup("<b>Beacon 2</b>");
+    var beacon3 = L.marker([20, 10]).addTo(map);
+    beacon3.bindPopup("<b>Beacon 3</b>");
 
     console.log(map.getBounds());
     console.log(imageBounds);
 // map.fitBounds(imageBounds, {padding: []});
 // map.fitWorld(imageBounds, {padding: []});
+
+    //initiate slider
+    $("#dateSlider").dateRangeSlider();
 
   //get json from Parse
     $.get('/heatmap/retrieveIntervalRecordsJSON')
@@ -94,29 +125,201 @@
                     elem.value = 0;
                     elem.fresh = true;
                     if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
-                        elem.x = parseFloat(elem.coordX * -20);
-                        elem.y = parseFloat(elem.coordY * 20); 
+                        elem.x = parseFloat(elem.coordX * 20);
+                        elem.y = parseFloat(elem.coordY * 20);
                         elem.date = new Date(elem.timestamp.iso);
 
-                        var point = {
-                            x: parseFloat(elem.coordX),
-                            y: parseFloat(elem.coordX)
+                        // var point = {
+                        //     x: parseFloat(elem.coordX),
+                        //     y: parseFloat(elem.coordY)
 
-                            // x: parseFloat((-97.125)/2),
-                            // y: parseFloat(160/2)
-                        };
+                        //     // x: parseFloat((-97.125/2)),
+                        //     // y: parseFloat(160/2)
+                        // };
 
-                        goodData.push(point);
+                        goodData.push(elem);
                     }
             });
         }
 
         var data = {
             data: goodData
+        };
+
+        $("#dateSlider").dateRangeSlider("bounds", new Date(2012, 0, 1), new Date(2012, 11, 31));
+        $("#dateSlider").dateRangeSlider("min", new Date(2012, 1, 1));
+        $("#dateSlider").dateRangeSlider("max", new Date(2012, 2, 1));
+$("#dateSlider").dateRangeSlider("enable");
+$("#dateSlider").hide();
+$("#dateSlider").css("visibility", "visible");
+$("#dateSlider").fadeIn(1000);
+        console.log(goodData);
+        // heatmapLayer.setData(data);
+        var nextDate = new Date(goodData[0].date);
+        console.log("first nextDate: " + nextDate);
+
+        //initilaize variables for the D3 chart
+        var countArray = [],
+          svg,
+          day,
+          x,
+          y,
+          margin,
+          height,
+          width,
+          intervalCounter = 10,
+          index = 0,
+          lastDate,
+          data = {
+            max:15,
+            min:0,
+            data:[]
           };
 
-        console.log(goodData);
-        heatmapLayer.setData(data);
+        // initializeChart();
+
+        //iterate
+        setInterval(function () {
+            //iterates 10 times for each day
+            if (intervalCounter == 10)
+            {
+                intervalCounter = 0;
+                getAnotherDay();
+            }
+            else
+            {
+                intervalCounter++;
+            }
+
+            //create new array for live points, push it to the map
+            var newData = [];
+            for (var j = 0; j < data.data.length; j++) {
+                var point = data.data[j];
+                if (point.value >= 10) {
+                    point.fresh = false;
+                }
+                //fade in fresh points, fade out unfresh points
+                if (point.fresh)
+                {
+                    point.value = point.value + .8;
+                }
+                else
+                {
+                    point.value = point.value - .1;
+                }
+                if(point.value > 0)
+                {
+                    newData.push(data.data[j]);
+                }
+            }
+            data.data = newData;
+            // push new daily data into heatmap layer
+            console.log(data);
+            heatmapLayer.setData(data);
+
+            //update the chart
+            // day = svg.selectAll(".day")
+            // .data(countArray)
+            // .enter()
+            // .append("g")
+            // .attr("class", "day")
+
+            // .attr("transform", function (d) {
+            //     //var yesterday = new Date(d.date);
+            //     //yesterday = yesterday.setDate(yesterday.getDate() - 1)
+            //     return "translate(" + x(d.date) + ",0)";
+            // })
+            // .append("rect")
+            // .attr("width", 28)
+
+            // .attr("y", function (d) {
+            //     return height - y(d.count);
+            // })
+            // .attr("height", function (d) {
+            //     return y(d.count);
+            // })
+            // .attr("class", function (d) {
+            //     return (d.date);
+            // })
+          
+        }, 100);
+
+        function getAnotherDay() {
+          nextDate = new Date(nextDate.setHours(24,0,0,0));
+          var todayCounter = 0;
+
+          //iterate over goodData, push today's events to data.data
+          for (;;index++) {
+
+            var thisDate = goodData[index].date;
+            console.log(thisDate + nextDate);
+            if(thisDate.getTime() < nextDate.getTime()) {
+              data.data.push(goodData[index]);
+              todayCounter++;
+              lastDate = thisDate;
+            }
+            else {
+              //Still need to increment lastDate if there is no data
+              if(todayCounter == 0) {
+                console.log(lastDate);
+                lastDate = lastDate.getDate() - 1;
+              }
+              var todayCount = {
+                date:lastDate,
+                count:todayCounter
+              };
+              countArray.push(todayCount);
+              break;
+            }
+          }
+        }
+
+    //     //sets margins and axes for the D3 chart.  Borrowed from Chris Metcalf's example on dev.socrata.com
+    //     function initializeChart() {
+    //         // Set our margins
+    //         margin = {
+    //             top: 20,
+    //             right: 20,
+    //             bottom: 30,
+    //             left: 60
+    //         },
+    //         width = 800 - margin.left - margin.right,
+    //         height = 100 - margin.top - margin.bottom;
+    //         // Our X scale
+    //         x = d3.time.scale()
+    //           .domain([new Date(goodData[0].date), d3.time.day.offset(new Date(goodData[goodData.length - 1].date), 1)])
+    //           .rangeRound([0, width - margin.left - margin.right])
+    //           //.ticks(d3.time.day, 1);
+    //         // Our Y scale
+    //         y = d3.scale.linear()
+    //           .domain([0,100])
+    //           .rangeRound([height, 0]);
+    //         // Our color bands
+    //         var color = d3.scale.ordinal()
+    //           .range(["#308fef", "#5fa9f3", "#1176db"]);
+    //         // Use our X scale to set a bottom axis
+    //         var xAxis = d3.svg.axis()
+    //           .scale(x)
+    //           .orient("bottom");
+    //         // Same for our left axis
+    //         var yAxis = d3.svg.axis()
+    //           .scale(y)
+    //           .orient("left")
+    //           .tickValues([0,50,100]);
+    //         // Add our chart to the #chart div
+    //         svg = d3.select("#chartBox").append("svg")
+    //           .attr("width", width + margin.left + margin.right)
+    //           .attr("height", height + margin.top + margin.bottom)
+    //           .append("g")
+    //           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //         svg.append("g")
+    //         .attr("class", "x axis")
+    //         .attr("transform", "translate(0," + height + ")")
+    //         .call(xAxis);
+    //         svg.append("g")
+    //         .attr("class", "y axis")
+    //         .call(yAxis);
+    //     };
     });
 
   </script>
