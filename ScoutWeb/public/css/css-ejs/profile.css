@@ -2,3 +2,19 @@
     max-width: 40em;
     max-height: 40em;
 }
+
+#overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #F2F5FA;
+    opacity: 0.5;
+}
+#loading {
+    position: fixed;
+    top: 45%;
+    left: 45%;
+    opacity: 1.0;
+}
