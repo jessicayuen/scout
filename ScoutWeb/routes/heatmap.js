@@ -70,8 +70,8 @@ router.get('/getheatmap', function(req, res, next) {
                 iso: randomDate
             };
           var point = {
-            coordY: Math.floor(Math.random()*(maxLng-minLng))+minLng,
-            coordX: Math.floor(Math.random()*(maxLat-minLat))+minLat,
+            coordX: Math.floor(Math.random()*(maxLng-minLng))+minLng,
+            coordY: Math.floor(Math.random()*(maxLat-minLat))+minLat,
             timestamp: timestamp
           };
           points.push(point);
