@@ -1,5 +1,8 @@
 $(document).ready(function(){
-    $("#login-form").submit(function(event) {
+
+    $("#login-form").submit(login);
+
+    var login = function (event) {
         event.preventDefault();
         var data = 
             {
@@ -11,5 +14,25 @@ $(document).ready(function(){
                 window.location.href = '/dashboard';
             })
             .error(TemplateErrorDisplay);
+    }
+
+    $('#login-btn').on('click', function() {
+        var formBody =
+            '<form id="login-form">'+
+            '<div class="form-group">'+
+            '<label for="editEmail" class="control-label">Email:</label>'+
+            '<input type="text" name="email" id="editEmail" class="form-control" placeholder="Email" required>'+
+            '</div>'+
+            '<div class="form-group">'+
+            '<label for="editPassword" class="control-label">Password:</label>'+
+            '<input type="password" name="password" id="editPassword" class="form-control" placeholder="Password" required>'+
+            '</div></form>';
+
+        $('#modal-title-text').text('Merchant Login');
+        $('#modal-body-div').empty().append(formBody);
+        $('#modal-dismiss-text').text('Close');
+        $('#modal-submit-text').text('Log In');
+        $('#modal').modal('show');
+        $('#modal-form').submit(login);
     });
 });
