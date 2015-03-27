@@ -1,24 +1,24 @@
 var express = require('express');
 var router = express.Router();
 var Parse = require('parse').Parse;
-
+var moment = require('moment'); 
 
 // Mock data
-// Hopefully we get more points data in parse soon!
 var data = {
     new: {
         daily: 'N/A',
         monthly: 'N/A'
     },
-    totcustomers: 'N/A',
+    visitlength: 'N/A',
     points: {
         earned: 'N/A',
-        redeemed: 'N/A'
+        avg: 'N/A'
     }
 };
 
 
-// Please rename this function. I dunno how to describe. I need sleep.
+// Fetch a parse object collection for the current user's business by its string
+// and return its json representation.
 var doStuffToMuhObjectJSON = function(objName, stuff) {
     var businessObj = Parse.Object.extend('Business');
     var businessQuery = new Parse.Query(businessObj);
@@ -50,15 +50,29 @@ router.get('/index', function(req, res, next) {
     doStuffToMuhObjectJSON('Points', function(json) {
         // new daily customers with points
         data.new.daily = json.filter( function(point) {
-            date = new Date(point.createdAt);
+            date = new Date(point.firstVisit);
             return date.setDate(date.getDate() + 1) > new Date();
         }).length;
         // new monthly customers with points
         data.new.monthly = json.filter( function(point) {
-            date = new Date(point.createdAt);
+            date = new Date(point.firstVisit);
             return date.setMonth(date.getMonth() + 1) > new Date();
         }).length;
+        // points earned
+        data.points.earned = json.reduce( function(a, b) {
+            return a + b.points;
+        }, 0);
+        // average points
+        data.points.avg = data.points.earned / json.length;
+    }).then( function() {
+        doStuffToMuhObjectJSON('Interval', function(json)  {
+            // average the durations sum / count
+            var visitlength = json.reduce( function(a, b) {
+                return a + (new Date(b.to.iso) - new Date(b.from.iso));
+            }, 0) / json.length;
+            data.visitlength = moment.duration(visitlength).humanize();
         res.json(data);
+        });
     });
 });
 
@@ -95,29 +109,38 @@ router.get('/customers', function(req, res, next) {
             values : []
         },
     ];
-    doStuffToMuhObjectJSON('NEW_Interval', function(json) {
+    doStuffToMuhObjectJSON('Interval', function(json) {
         // get dates, and unique visits counts binned by said dates.
         var counts =  {};
+        var arr = [];
         json.forEach( function(interval) {
-            var d = new Date(interval.from.iso);
-            d.setHours(0,0,0,0);
+            var d = moment(interval.from.iso);
+            d.startOf('day');
             counts[+d] = 1 + (counts[+d] || 0);
         });
         for (key in counts)
-            customerData[0].values.push({x: parseInt(key), y: counts[key]});
+            arr.push({x: key, y: counts[key]});
+        // sort entries by date.
+        customerData[0].values = arr.sort( function(a, b) {
+            return a.x - b.x;
+        });
 
-    }).then( function() {
-        // bin dates for points data (where unique business-customer
-        // relationships should first be instatiated... eventually)
-        var counts = {};
+    }).then( function() { 
         doStuffToMuhObjectJSON('Points', function(json) {
+            // bin dates for points data (where unique business-customer
+            // relationships should first be instatiated... eventually)
+            var counts = {};
+            var arr = [];
             json.forEach( function(point) {
-                var d = new Date(point.createdAt);
-                d.setHours(0,0,0,0);
+                var d = moment(point.firstVisit.iso);
+                d.startOf('day');
                 counts[+d] = 1 + (counts[+d] || 0);
             });
             for (key in counts)
-                customerData[1].values.push({x: parseInt(key), y: counts[key]});
+                arr.push({x: parseInt(key), y: counts[key]});
+        customerData[1].values = arr.sort( function(a, b) {
+            return a.x - b.x;
+        });
             res.json(customerData);
         });
     });
