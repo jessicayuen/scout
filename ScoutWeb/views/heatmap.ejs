@@ -1,6 +1,10 @@
 <html>
 <head>
     <% include template/header %>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="js/heatmap/build/heatmap.js"></script>
+    <script src='js/heatmap/plugins/leaflet-heatmap-revision.js'></script>
+    <script src="js/ion.rangeSlider-2.0.6/js/ion-rangeSlider/ion.rangeSlider.js"></script>
     <style>
         body, html { margin:0; padding:0; height:100%;}
         body { font-family:sans-serif; }
@@ -20,28 +24,25 @@
         #style { margin-left: auto;margin-right: auto; position: relative; width:80%; padding: 10px;}
         svg text {
           fill: #fff;
-      }
-      svg line {
+        }
+        svg line {
           stroke: #fff;
           stroke-width: 1px;
-      }
-      svg .domain {
+        }
+        svg .domain {
           stroke: #fff;
           fill: none;
-      }
-      svg rect {
+        }
+        svg rect {
           fill: #00AEF7;
           opacity: .4;
           stroke: #FFF;
-      }
-
-
+        }
   </style>
 </head>
 <body>
     <% include template/navbar %>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/normalize.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.skinHTML5.css" type="text/css" />
@@ -123,158 +124,156 @@ var heatmapLayer = new HeatmapOverlay(cfg);
   .success(function (rawData) {
 
     var goodData = [];
-        //console.log(rawData);
-        for (var i in rawData) {
-            rawData[i].forEach(function(elem, index) {
-                //console.log(elem, index);
-                elem.value = 0;
-                elem.fresh = true;
-                if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
-                    elem.x = parseFloat(elem.coordX*normalizeCoef-60);
-                    elem.y = parseFloat(elem.coordY*normalizeCoef-120);
-                    elem.date = moment(elem.timestamp.iso);
+    //console.log(rawData);
+    for (var i in rawData) {
+        rawData[i].forEach(function(elem, index) {
+            //console.log(elem, index);
+            elem.value = 0;
+            elem.fresh = true;
+            if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
+                elem.x = parseFloat(elem.coordX*normalizeCoef-60);
+                elem.y = parseFloat(elem.coordY*normalizeCoef-120);
+                elem.date = moment(elem.timestamp.iso);
 
-                        // var point = {
-                        //     x: parseFloat(elem.coordX),
-                        //     y: parseFloat(elem.coordY)
+                    // var point = {
+                    //     x: parseFloat(elem.coordX),
+                    //     y: parseFloat(elem.coordY)
 
-                        //     // x: parseFloat((-97.125/2)),s
-                        //     // y: parseFloat(160/2)
-                        // };
+                    //     // x: parseFloat((-97.125/2)),s
+                    //     // y: parseFloat(160/2)
+                    // };
 
-                        goodData.push(elem);
-                    }
-                });
+                    goodData.push(elem);
+                }
+            });
+    }
+
+    var data = {
+        data: goodData
+    };
+
+    var today = moment().startOf('day');
+    var prevDate = moment(today);
+    prevDate.subtract(7, "days");
+    console.log(today);
+    console.log(prevDate);
+
+    $("#dateSlider").ionRangeSlider({
+        min: +prevDate.format("X"),
+        max: +today.format("X"),
+        grid: true,
+        prettify_enabled: true,
+        prettify: function (num) {
+            return moment(num, "X").format("LL");
+        }
+    });
+
+    // Save slider instance to var
+    var slider = $("#dateSlider").data("ionRangeSlider");
+    $("#dateSlider").css("visibility", "visible");
+    $("#dateSlider").hide().fadeIn(1000);
+
+    //console.log(goodData);
+    // heatmapLayer.setData(data);
+    var nextDate = prevDate;
+    console.log( nextDate);
+
+    //initilaize variables for the D3 chart
+    var countArray = [],
+    svg,
+    day,
+    x,
+    y,
+    margin,
+    height,
+    width,
+    intervalCounter = 10,
+    index = 0,
+    prevDate,
+    data = {
+        max:15,
+        min:0,
+        data:[]
+    };
+
+    //refresh every 100 milliseconds
+    setInterval(function () {
+        //iterates 10 times for each day
+        if (intervalCounter == 10)
+        {
+            intervalCounter = 0;
+            if (nextDate <= today) {
+                getAnotherDay();
+            }
+        }
+        else
+        {
+            intervalCounter++;
         }
 
-        var data = {
-            data: goodData
-        };
-
-        var today = moment().startOf('day');
-        var prevDate = moment(today);
-        prevDate.subtract(7, "days");
-        console.log(today);
-        console.log(prevDate);
-
-        $("#dateSlider").ionRangeSlider({
-            min: +prevDate.format("X"),
-            max: +today.format("X"),
-            grid: true,
-            force_edges: true,
-            prettify_enabled: true,
-            step: 1,
-            prettify: function (num) {
-                return moment(num, "X").format("LL");
+        //create new array for live points, push it to the map
+        var newData = [];
+        for (var j = 0; j < data.data.length; j++) {
+            var point = data.data[j];
+            if (point.value >= 10) {
+                point.fresh = false;
             }
-        });
-
-// Save slider instance to var
-var slider = $("#dateSlider").data("ionRangeSlider");
-$("#dateSlider").css("visibility", "visible");
-$("#dateSlider").hide().fadeIn(1000);
-
-        //console.log(goodData);
-        // heatmapLayer.setData(data);
-        var nextDate = prevDate;
-        console.log( nextDate);
-
-        //initilaize variables for the D3 chart
-        var countArray = [],
-        svg,
-        day,
-        x,
-        y,
-        margin,
-        height,
-        width,
-        intervalCounter = 10,
-        index = 0,
-        prevDate,
-        data = {
-            max:15,
-            min:0,
-            data:[]
-        };
-
-        //refresh every 100 milliseconds
-        setInterval(function () {
-            //iterates 10 times for each day
-            if (intervalCounter == 10)
+            //fade in fresh points, fade out unfresh points
+            if (point.fresh)
             {
-                intervalCounter = 0;
-                if (nextDate <= today) {
-                    getAnotherDay();
-                }
+                point.value = point.value + .8;
             }
             else
             {
-                intervalCounter++;
+                point.value = point.value - .1;
             }
-
-            //create new array for live points, push it to the map
-            var newData = [];
-            for (var j = 0; j < data.data.length; j++) {
-                var point = data.data[j];
-                if (point.value >= 10) {
-                    point.fresh = false;
-                }
-                //fade in fresh points, fade out unfresh points
-                if (point.fresh)
-                {
-                    point.value = point.value + .8;
-                }
-                else
-                {
-                    point.value = point.value - .1;
-                }
-                if(point.value > 0)
-                {
-                    newData.push(data.data[j]);
-                }
+            if(point.value > 0)
+            {
+                newData.push(data.data[j]);
             }
-            data.data = newData;
-            // push new daily data into heatmap layer
-            //console.log(data);
-            heatmapLayer.setData(data);
+        }
+        data.data = newData;
+        // push new daily data into heatmap layer
+        //console.log(data);
+        heatmapLayer.setData(data);
 
-        }, 100);
+    }, 100);
 
-function getAnotherDay() {
-                      // Call sliders update method with any params
-                      slider.update({
-                        from: +nextDate.format("X")
-                    });
-                      nextDate = moment(nextDate).add(1, "days");
-                      console.log(nextDate);
-                      var todayCounter = 0;
+    function getAnotherDay() {
+        // Call sliders update method with any params
+        slider.update({
+            from: +nextDate.format("X")
+        });
+        nextDate = moment(nextDate).add(1, "days");
+        console.log(nextDate);
+        var todayCounter = 0;
 
-          //iterate over goodData, push today's events to data.data
-          for (;;index++) {
+        //iterate over goodData, push today's events to data.data
+        for (;;index++) {
             var thisDate = goodData[index].date;
             //console.log(thisDate + nextDate);
             // console.log(thisDate);
             // console.log(nextDate);
             if(thisDate < nextDate) {
-              data.data.push(goodData[index]);
-              todayCounter++;
-              prevDate = thisDate;
-          }
-          else {
-              //Still need to increment prevDate if there is no data
-              if(todayCounter == 0) {
-                console.log("prevDate: " + prevDate);
-                prevDate.subtract(1, "days");
+                data.data.push(goodData[index]);
+                todayCounter++;
+                prevDate = thisDate;
             }
-            var todayCount = {
-                date:prevDate,
-                count:todayCounter
-            };
-            countArray.push(todayCount);
-            break;
+            else {
+                //Still need to increment prevDate if there is no data
+                if(todayCounter == 0) {
+                    console.log("prevDate: " + prevDate);
+                    prevDate.subtract(1, "days");
+                }
+                var todayCount = {
+                    date:prevDate,
+                    count:todayCounter
+                };
+                countArray.push(todayCount);
+                break;
+            }
         }
     }
-}
 });
 
 </script>
