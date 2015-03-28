@@ -3,6 +3,17 @@
         <% include template/header %>
     </head>
     <body>
-        <% include modules/login %>
+        <!--% include modules/login %-->
+        <% include modules/modal %>
+        <div class="stack">
+            <div class="layout" id="logo"></div>
+            <div class="layout" id="slogan">Scout For Business</div>
+            <div class="layout" id="sub-slogan">Bring in new customers and increase customer retention.</div>
+            <div class="layout" id="button-nav">
+                <a class="custom-btn green" href="/register">Sign Up</a>
+                <a class="custom-btn blue" id="login-btn">Log In</a>
+            </div>
+        </div>
     </body>
 </html>
+

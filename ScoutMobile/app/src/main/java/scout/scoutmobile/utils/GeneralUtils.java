@@ -10,6 +10,7 @@ import com.parse.SaveCallback;
 import scout.scoutmobile.activities.LoginActivity;
 import scout.scoutmobile.constants.Consts;
 import scout.scoutmobile.model.CustomerSingleton;
+import scout.scoutmobile.services.BluetoothBeaconService;
 
 public class GeneralUtils {
 
@@ -28,6 +29,7 @@ public class GeneralUtils {
             }
         });
 
+        context.stopService(new Intent(context, BluetoothBeaconService.class));
         startMainActivity(context, LoginActivity.class);
     }
 

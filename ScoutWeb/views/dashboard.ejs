@@ -5,6 +5,9 @@
 
         <script src="js/d3.min.js"></script>
         <script src="js/nv.d3.js"></script>
+        <style media="screen" type="text/css">
+            .nvtooltip position:relative
+        </style>
     </head>
     <body>
         <% include template/navbar %>
@@ -33,7 +36,7 @@
                         </ul>
                     </div>
                 </div>
-                <div id="totcustomers" class="col-md-4">
+                <div id="visitlength" class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3>Customer Demographics</h3>
@@ -41,9 +44,7 @@
                         <ul class="list-group">
                             <li id="demographics-duration" class="list-group-item">
                                 Average Visit Duration
-                                <span class="badge">
-                                     minutes
-                                </span>
+                                <span class="badge"></span>
                             </li>
                         </ul>
                     </div>
@@ -55,11 +56,11 @@
                         </div>
                         <ul class="list-group">
                             <a id="points-earned" class="list-group-item">
-                                Points Earned
+                                Total Points Earned
                                 <span class="badge"></span>
                             </a>
-                            <a id="points-redeemed" class="list-group-item">
-                                Points Redeemed
+                            <a id="points-avg" class="list-group-item">
+                                Average Points Earned
                                 <span class="badge"></span>
                             </a>
                         </ul>
@@ -68,7 +69,7 @@
             </div>
 
             <div class="row">
-                <div id="chart" class="col-md-8 col-md-offset-2">
+                <div id="chart" class="col-md-8 col-md-offset-2" style="position:relative">
                     <svg/>
                 </div>
             </div>
@@ -121,7 +122,7 @@ var drawCustomerLine = function() {
     });
 };
 $("#new-daily, #new-montly").click(drawCustomerLine);
-$("#points-earned, #points-redeemed").click(drawPointsScatter);
+$("#points-earned, #points-avg").click(drawPointsScatter);
 drawCustomerLine();
     </script>
 </html>
