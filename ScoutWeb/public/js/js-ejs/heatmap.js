@@ -1,4 +1,8 @@
 $(document).ready(function(){
+    
+    var intervalJsonData;
+    var intervalRecordsJsonData;
+
     // Populates heatmap with points
     var initHeatmap = function (data) {
             // Load floorplan
@@ -26,20 +30,50 @@ $(document).ready(function(){
             });
     }
 
-    // Refreshes heatmap
-    var refreshHeatmap = function (callback) {
-        $.get('/heatmap/getheatmap')
-            .success(function (data) {
-                console.log(data);
-                $('#heatmapContainer').empty();
-                initHeatmap(data);
-            })
+    function getheatmapAjax() {
+        return $.get('/heatmap/getheatmap')
+        .success(function (data) {
+            intervalJsonData = data;
+            console.log(data);
+        })
         .error(function (xhr, textStatus, errorThrown) {
             alert(xhr.responseText);
         });
+    }
 
+    function getIntervalJSONAjax() {
+        return $.get('/heatmap/retrieveIntervalJSON')
+        .success(function (data) {
+            console.log(data);
+        })
+        .error(function (xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+        });
+    }
+
+    function getIntervalRecordsJSONAjax() {
+        return $.get('/heatmap/retrieveIntervalRecordsJSON')
+        .success(function (data) {
+            intervalRecordsJsonData = data
+            console.log(data);
+        })
+        .error(function (xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+        });
+    }
+
+    // Refreshes heatmap
+    var refreshHeatmap = function (callback) {
+        $.when(getheatmapAjax(), getIntervalJSONAjax()).done(function(a1, a2){
+            // the code here will be executed when all four ajax requests resolve.
+            // a1, a2, a3 are lists of length 3 containing the response text,
+            // status, and jqXHR object for each of the 3 ajax calls respectively.
+            $('#heatmapContainer').empty();
+            // initHeatmap(intervalJsonData);
+        });
         if (callback != null) callback();
     }
+
     // Refresh heatmap when page is loaded
     $('#heatmapContainer').ready(refreshHeatmap);
 });

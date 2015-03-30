@@ -1,0 +1,81 @@
+<html>
+<head>
+    <% include template/header %>
+</head>
+<body>
+<% include template/navbar %>
+
+<script>
+    $(document).ready(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
+</script>
+
+<div class="container">
+    <div class="panel panel-default">
+        <!--<div class="panel-heading text-center">Registration</div>-->
+        <div class="panel-body">
+            <div id="updateSuccess" class="alert alert-success">
+                <strong>Success!</strong> Your profile has been updated.
+            </div>
+            <div class="alert alert-danger" role="alert">
+                <strong>Failed!</strong> You have fields missing/invalid.
+            </div>
+            <form id="profile-form" class="form-horizontal" role="form" method="post" action="/profile">
+                <div class="control-group form-group">
+                    <div class="col-md-6 center-block" style="float: none">
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                            <div class="fileinput-new thumbnail previewImg">
+                                <img src="img/preview.png" id="previewImgThumb">
+                            </div>
+                            <div class="fileinput-preview fileinput-exists thumbnail previewImg"></div>
+                            <div>
+                        <span class="btn btn-default btn-file">
+                            <span class="fileinput-new">Select image</span>
+                            <span class="fileinput-exists">Change</span>
+                            <input type="file" name="profileimg">
+                        </span>
+                                <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group form-group">
+                    <label for="password" class="col-sm-3 control-label">Password</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="password" id="password" class="form-control" required>
+                        <p class="help-block"></p>
+                    </div>
+                </div>
+                <div class="control-group form-group">
+                    <label for="confirmpassword" class="col-sm-3 control-label">Confirm Password</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="confirmpassword" id="confirmpassword" class="form-control"
+                               data-validation-match-match="password"
+                               data-validation-match-message="The passwords you entered do not match" required>
+                        <p class="help-block"></p>
+                    </div>
+                </div>
+                <div class="control-group form-group">
+                    <label for="inputBusinessName" class="col-sm-3 control-label">Business Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="businessname" id="inputBusinessName" class="form-control" required>
+                    </div>
+                </div>
+                <div class="control-group form-group">
+                    <label for="points_counter" class="col-sm-3 control-label">Points</label>
+                    <div class="col-sm-9">
+                        <input id="points_counter" type="number" value="0" min="0" name="inputPoints">
+                    </div>
+                </div>
+                <div class="control-group form-group last">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-labeled btn-success">
+                            <span class="btn-label"><i class="glyphicon glyphicon-ok"></i></span>Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<% include template/footer %>
+</body>
+</html>
