@@ -68,8 +68,7 @@ router.post('/', function (req, res) {
         var curLoggedUser = Parse.User.current();
         //checks if current password is the same as the one provided
         //only change the password if current password and a new password is entered
-        if (curPassword != undefined && curPassword.trim().length > 0 &&
-            password != undefined && password.trim().length > 0) {
+        if (password != undefined && password.trim().length > 0) {
             //keep track of current logged in user so that we can
             //log him back if the current password entered in edit profile is invalid
             var curUser = curLoggedUser.getSessionToken();

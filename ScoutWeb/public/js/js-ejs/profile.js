@@ -33,24 +33,15 @@ $(document).ready(function() {
     $("input").not("[type=submit]").jqBootstrapValidation({
         submitSuccess: function ($form, event) {
 
-            var files = $form.find('input[name="profileimg"]').prop('files');
-            var curPassword = $form.find('input[name="curpassword"]').val();
-
             var form = new FormData();
-            form.append( 'image', files[0] );
-            form.append( 'curpassword', curPassword );
+            form.append( 'image', $form.find('input[name="profileimg"]').prop('files')[0] );
+            form.append( 'curpassword', $form.find('input[name="curpassword"]').val() );
             form.append( 'password', $form.find('input[name="password"]').val() );
             form.append( 'businessname', $form.find('input[name="businessname"]').val() );
             form.append( 'points', $form.find('input[name="inputpoints"]').val() );
             form.append( 'rate', $form.find('select[name="rateselection"]').val() );
 
-            if (curPassword != undefined && curPassword.trim().length > 0) {
-                updateProfile(form);
-            } else {
-                form.delete('curpassword');
-                form.delete('password');
-                updateProfile(form);
-            }
+            updateProfile(form);
 
             // will not trigger the default submission in favor of the ajax function
             event.preventDefault();

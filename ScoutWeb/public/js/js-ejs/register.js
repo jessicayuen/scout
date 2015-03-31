@@ -1,4 +1,6 @@
 $(document).ready(function(){
+    $("input").not("[type=submit]").jqBootstrapValidation();
+
     $("#register-form").submit(function(event) {
         event.preventDefault();
         var data = 
