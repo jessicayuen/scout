@@ -11,7 +11,10 @@ $(document).ready(function(){
             .success(function (data) {
                 window.location.href = '/dashboard';
             })
-            .error(TemplateErrorDisplay);
+            .error(function (xhr, textStatus, errorThrown) {
+                $('#modal-error-div').show();
+                TemplateErrorDisplay(xhr, textStatus, errorThrown);
+            });
     }
 
     $('#login-btn').on('click', function() {
@@ -33,4 +36,8 @@ $(document).ready(function(){
         $('#modal').modal('show');
         $('#modal-form').submit(login);
     });
+
+    $('#modal-dismiss-text').on('click', function () {
+        $('#modal-error-div').hide();
+    })
 });
