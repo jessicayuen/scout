@@ -1,5 +1,9 @@
 package scout.scoutmobile.model;
 
+import android.graphics.Bitmap;
+
+import com.parse.ParseFile;
+
 /**
  * Represents a Business location, in the user's perspective. The
  * relevant information to the user is the Business name, the number
@@ -8,23 +12,29 @@ package scout.scoutmobile.model;
 public class Place {
 
     private String mTitle;
-    private String mThumbnailUrl;
+    private ParseFile mImageFile;
+    private byte[] mImageByte;
     private Integer mPoints;
     private String mId;
 
-    public Place(String title, String thumbnailUrl, Integer points, String id) {
+    public Place(String title, ParseFile imageFile, Integer points, String id) {
         this.mTitle = title;
-        this.mThumbnailUrl = thumbnailUrl;
+        this.mImageFile = imageFile;
         this.mPoints = points;
         this.mId = id;
+        this.mImageByte = null;
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public String getThumbnailUrl() {
-        return mThumbnailUrl;
+    public ParseFile getImageFile() {
+        return mImageFile;
+    }
+
+    public byte[] getImageByte() {
+        return mImageByte;
     }
 
     public Integer getPoints() {
@@ -35,8 +45,12 @@ public class Place {
         this.mTitle = title;
     }
 
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.mThumbnailUrl = thumbnailUrl;
+    public void setImageFile(ParseFile imageFile) {
+        this.mImageFile = imageFile;
+    }
+
+    public void setImageByte(byte[] imageByte) {
+        this.mImageByte = imageByte;
     }
 
     public void setPoints(Integer points) {

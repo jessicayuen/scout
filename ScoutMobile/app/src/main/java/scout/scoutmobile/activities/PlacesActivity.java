@@ -2,6 +2,10 @@ package scout.scoutmobile.activities;
 
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
@@ -19,7 +23,9 @@ import android.widget.TextView;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -70,7 +76,7 @@ public class PlacesActivity extends ActionBarActivity {
         public long getItemId(int position) { return 0; }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View view = getLayoutInflater().inflate(
                     R.layout.place_list_item,
                     null
@@ -78,14 +84,31 @@ public class PlacesActivity extends ActionBarActivity {
 
             TextView titleView = (TextView) view.findViewById(R.id.placeTitle);
             TextView pointsView = (TextView) view.findViewById(R.id.placePoints);
-            ImageView imageView = (ImageView) view.findViewById(R.id.placeImage);
 
             Place place = mPlaces.get(position);
+
+            final ViewHolder listItem = new ViewHolder();
+            listItem.position = position;
+            listItem.thumbnail = (ImageView) view.findViewById(R.id.placeImage);
+
+            ParseFile imageFile = place.getImageFile();
+            if (imageFile != null) {
+                imageFile.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] bytes, ParseException e) {
+                        if (e == null) {
+                            if (listItem.position == position) {
+                                Place place = mPlaces.get(listItem.position);
+                                listItem.thumbnail.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                            }
+                        }
+                    }
+                });
+            }
 
             // Set the Place list item values
             titleView.setText(place.getTitle());
             pointsView.setText(place.getPoints().toString() + " points");
-            //image.setImageResource(mPlaces.get(position).getImageURL());
 
             return view;
         }
@@ -206,7 +229,7 @@ public class PlacesActivity extends ActionBarActivity {
                         // While we're here, lets also add in the places for optimization
                         placeMap.put(business.getObjectId(), new Place(
                                         business.getString(Consts.COL_PLACE_NAME),
-                                        business.getString(Consts.COL_PLACE_THUMBNAIL_URL),
+                                        business.getParseFile(Consts.COL_PLACE_THUMBNAIL_URL),
                                         0,
                                         business.getObjectId())
                         );
@@ -252,7 +275,8 @@ public class PlacesActivity extends ActionBarActivity {
                 Place selected = places.get(position);
                 rewardsActivity.putExtra(Consts.PLACE_ID, selected.getId());
                 rewardsActivity.putExtra(Consts.PLACE_NAME, selected.getTitle());
-                rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());
+                rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());;
+                rewardsActivity.putExtra(Consts.BUSINESS_IMAGE, selected.getImageFile().getUrl());
                 startActivity(rewardsActivity);
             }
         });
@@ -275,5 +299,13 @@ public class PlacesActivity extends ActionBarActivity {
         if(beaconManager != null) {
             beaconManager.disconnect();
         }
+    }
+
+    /**
+     * Class for keeping track of listitems in the list view when loading images asychronously
+     */
+    private class ViewHolder {
+        public ImageView thumbnail;
+        public int position;
     }
 }

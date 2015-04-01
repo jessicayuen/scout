@@ -20,9 +20,10 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/image"
-                android:maxHeight="120dp"
-                android:minHeight="120dp"
+                android:maxHeight="150dp"
+                android:minHeight="150dp"
                 android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
                 android:src="@drawable/sample_image" />
 
             <LinearLayout
