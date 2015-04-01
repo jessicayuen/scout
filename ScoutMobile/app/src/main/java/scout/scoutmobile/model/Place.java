@@ -22,7 +22,6 @@ public class Place {
         this.mImageFile = imageFile;
         this.mPoints = points;
         this.mId = id;
-        this.mImageByte = null;
     }
 
     public String getTitle() {
@@ -31,10 +30,6 @@ public class Place {
 
     public ParseFile getImageFile() {
         return mImageFile;
-    }
-
-    public byte[] getImageByte() {
-        return mImageByte;
     }
 
     public Integer getPoints() {
@@ -47,10 +42,6 @@ public class Place {
 
     public void setImageFile(ParseFile imageFile) {
         this.mImageFile = imageFile;
-    }
-
-    public void setImageByte(byte[] imageByte) {
-        this.mImageByte = imageByte;
     }
 
     public void setPoints(Integer points) {
