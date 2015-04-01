@@ -25,7 +25,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -233,9 +232,10 @@ public class RewardsActivity extends ActionBarActivity {
         protected Bitmap doInBackground(String... urls) {
             Bitmap businessImage = null;
             try {
+                //Loads the business image from the url provided in ParseFile()
                 businessImage = BitmapFactory.decodeStream(new URL(urls[0]).openConnection().getInputStream());
             } catch (IOException e) {
-                e.printStackTrace();
+                mLogger.logError(e);
             }
             return businessImage;
         }

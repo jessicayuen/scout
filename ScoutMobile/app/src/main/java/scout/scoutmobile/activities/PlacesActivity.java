@@ -2,10 +2,7 @@ package scout.scoutmobile.activities;
 
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
@@ -275,7 +272,7 @@ public class PlacesActivity extends ActionBarActivity {
                 Place selected = places.get(position);
                 rewardsActivity.putExtra(Consts.PLACE_ID, selected.getId());
                 rewardsActivity.putExtra(Consts.PLACE_NAME, selected.getTitle());
-                rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());;
+                rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());
                 rewardsActivity.putExtra(Consts.BUSINESS_IMAGE, selected.getImageFile().getUrl());
                 startActivity(rewardsActivity);
             }
