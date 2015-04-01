@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var multer  = require('multer')
 var Parse = require('parse').Parse;
 
 var index = require('./routes/index');
@@ -28,6 +29,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(multer({
+    inMemory: true,
+    limits: {
+        fieldNameSize: 256,
+        files: 2,
+        fileSize: 10000000
+    }
+}))
 app.use(express.static(path.join(__dirname, 'public')));
 
 // url routing
@@ -76,5 +85,5 @@ module.exports = app;
 var port = process.env.PORT || 3000;
 
 var server = app.listen(port, function () {
-  console.log('listening on http://localhost:%d', port);
+    console.log('listening on http://localhost:%d', port);
 });

@@ -6,14 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import scout.scoutmobile.R;
-import scout.scoutmobile.activities.util.SystemUiHider;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- *
- * @see SystemUiHider
- */
+
 public class SplashScreenActivity extends Activity {
 
     private static int SPLASH_TIME_OUT = 1500;

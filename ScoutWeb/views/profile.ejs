@@ -5,10 +5,6 @@
 <body>
 <% include template/navbar %>
 
-<script>
-    $(document).ready(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
-</script>
-
 <div class="container">
     <div class="panel panel-default">
         <!--<div class="panel-heading text-center">Registration</div>-->
@@ -16,32 +12,39 @@
             <div id="updateSuccess" class="alert alert-success">
                 <strong>Success!</strong> Your profile has been updated.
             </div>
-            <div class="alert alert-danger" role="alert">
-                <strong>Failed!</strong> You have fields missing/invalid.
+            <div id="updateFailed" class="alert alert-danger" role="alert">
+                You have fields missing/invalid.
             </div>
-            <form id="profile-form" class="form-horizontal" role="form" method="post" action="/profile">
-                <div class="control-group form-group">
+            <form id="profile-form" class="form-horizontal" role="form" method="post" action="/profile" enctype="multipart/form-data">
+                <div class="form-group">
                     <div class="col-md-6 center-block" style="float: none">
                         <div class="fileinput fileinput-new" data-provides="fileinput">
                             <div class="fileinput-new thumbnail previewImg">
-                                <img src="img/preview.png" id="previewImgThumb">
+                                <img src="img/preview.png" name="previewImgThumb">
                             </div>
                             <div class="fileinput-preview fileinput-exists thumbnail previewImg"></div>
                             <div>
-                        <span class="btn btn-default btn-file">
-                            <span class="fileinput-new">Select image</span>
-                            <span class="fileinput-exists">Change</span>
-                            <input type="file" name="profileimg">
-                        </span>
+                            <span class="btn btn-default btn-file">
+                                <span class="fileinput-new">Select image</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" name="profileimg" accept="image/*">
+                            </span>
                                 <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="curpassword" class="col-sm-3 control-label">Current Password</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="curpassword" id="curpassword" class="form-control">
+                        <p class="help-block"></p>
+                    </div>
+                </div>
                 <div class="control-group form-group">
                     <label for="password" class="col-sm-3 control-label">Password</label>
                     <div class="col-sm-9">
-                        <input type="password" name="password" id="password" class="form-control" required>
+                        <input type="password" name="password" id="password" class="form-control">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -50,23 +53,29 @@
                     <div class="col-sm-9">
                         <input type="password" name="confirmpassword" id="confirmpassword" class="form-control"
                                data-validation-match-match="password"
-                               data-validation-match-message="The passwords you entered do not match" required>
+                               data-validation-match-message="The passwords you entered do not match">
                         <p class="help-block"></p>
                     </div>
                 </div>
-                <div class="control-group form-group">
+                <div class="form-group">
                     <label for="inputBusinessName" class="col-sm-3 control-label">Business Name</label>
                     <div class="col-sm-9">
-                        <input type="text" name="businessname" id="inputBusinessName" class="form-control" required>
+                        <input type="text" name="businessname" id="inputBusinessName" class="form-control">
                     </div>
                 </div>
-                <div class="control-group form-group">
+                <div class="form-group">
                     <label for="points_counter" class="col-sm-3 control-label">Points</label>
-                    <div class="col-sm-9">
-                        <input id="points_counter" type="number" value="0" min="0" name="inputPoints">
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input id="points_counter" type="number" value="0" min="0" name="inputpoints" class="form-control">
+                            <select id="rate" class="selectpicker" name="rateselection">
+                                <option value="hourly" selected>Hourly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="control-group form-group last">
+                <div class="form-group last">
                     <div class="col-sm-offset-3 col-sm-9">
                         <button type="submit" class="btn btn-labeled btn-success">
                             <span class="btn-label"><i class="glyphicon glyphicon-ok"></i></span>Update</button>

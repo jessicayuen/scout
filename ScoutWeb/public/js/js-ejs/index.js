@@ -1,7 +1,5 @@
 $(document).ready(function(){
 
-    $("#login-form").submit(login);
-
     var login = function (event) {
         event.preventDefault();
         var data = 
