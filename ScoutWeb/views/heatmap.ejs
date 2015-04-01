@@ -56,34 +56,33 @@
     <% include template/footer %>
 </body>
 <script>
-
     var w = 1280,
     h = 777,
     imageUrl = "/img/floorplan.jpg";
     normalizeCoef = 60;
+
     //heatmap.js config
     var cfg = {
-    // radius should be small ONLY if scaleRadius is true (or small radius is intended)
-    // if scaleRadius is false it will be the constant radius used in pixels
+        // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+        // if scaleRadius is false it will be the constant radius used in pixels
+        maxOpacity: 0.6,
+        radius: 4,
+        blur: .90,
+        // scales the radius based on map zoom
+        "scaleRadius": true, 
+        // if set to false the heatmap uses the global maximum for colorization
+        // if activated: uses the data maximum within the current map boundaries 
+        //   (there will always be a red spot with useLocalExtremas true)
+        "useLocalExtrema": false,
+        // which field name in your data represents the latitude - default "lat"
+        latField: 'y',
+        // which field name in your data represents the longitude - default "lng"
+        lngField: 'x',
+        // which field name in your data represents the data value - default "value"
+        valueField: 'value'
+    };
 
-    maxOpacity: 0.6,
-    radius: 4,
-    blur: .90,
-    // scales the radius based on map zoom
-    "scaleRadius": true, 
-    // if set to false the heatmap uses the global maximum for colorization
-    // if activated: uses the data maximum within the current map boundaries 
-    //   (there will always be a red spot with useLocalExtremas true)
-    "useLocalExtrema": false,
-    // which field name in your data represents the latitude - default "lat"
-    latField: 'y',
-    // which field name in your data represents the longitude - default "lng"
-    lngField: 'x',
-    // which field name in your data represents the data value - default "value"
-    valueField: 'value'
-};
-
-var heatmapLayer = new HeatmapOverlay(cfg);
+    var heatmapLayer = new HeatmapOverlay(cfg);
 
     // map.addLayer(heatmapLayer);
 
@@ -116,165 +115,189 @@ var heatmapLayer = new HeatmapOverlay(cfg);
 
     console.log(map.getBounds());
     console.log(imageBounds);
-// map.fitBounds(imageBounds, {padding: []});
-// map.fitWorld(imageBounds, {padding: []});
+    // map.fitBounds(imageBounds, {padding: []});
+    // map.fitWorld(imageBounds, {padding: []});
 
-  //get json from Parse
-  $.get('/heatmap/retrieveIntervalRecordsJSON')
-  .success(function (rawData) {
+    //get json from Parse
+    $.get('/heatmap/retrieveIntervalRecordsJSON')
+    .success(function (rawData) {
+        var dateHash = {};
+        var refreshIntervalId;
+        var countArray = [],
+        intervalCounter = 10,
+        index = 0,
+        data = {
+            max:15,
+            min:0,
+            data:[]
+        };
 
-    var goodData = [];
-    //console.log(rawData);
-    for (var i in rawData) {
-        rawData[i].forEach(function(elem, index) {
-            //console.log(elem, index);
-            elem.value = 0;
-            elem.fresh = true;
-            if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
-                elem.x = parseFloat(elem.coordX*normalizeCoef-60);
-                elem.y = parseFloat(elem.coordY*normalizeCoef-120);
-                elem.date = moment(elem.timestamp.iso);
+        //console.log(rawData);
+        for (var i in rawData) {
+            rawData[i].forEach(function(elem, elemIndex) {
+                //console.log(elem, elemIndex);
+                elem.value = 0;
+                elem.fresh = true;
+                if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
+                    elem.x = parseFloat(elem.coordX*normalizeCoef-60);
+                    elem.y = parseFloat(elem.coordY*normalizeCoef-120);
+                    elem.date = moment(elem.timestamp.iso);
+                    var dateStr = moment(elem.timestamp.iso).format('MM/DD/YYYY');
+                    // check for preexisting data for a date
+                    if(dateStr in dateHash) {
+                        dateHash[dateStr].push(elem);
+                    }
+                    else {
+                        var goodData = [];
+                        goodData.push(elem);
+                        dateHash[dateStr] = goodData;
+                    }
 
-                    // var point = {
-                    //     x: parseFloat(elem.coordX),
-                    //     y: parseFloat(elem.coordY)
-
-                    //     // x: parseFloat((-97.125/2)),s
-                    //     // y: parseFloat(160/2)
-                    // };
-
-                    goodData.push(elem);
+                    // goodData.push(elem);
                 }
             });
-    }
-
-    var data = {
-        data: goodData
-    };
-
-    var today = moment().startOf('day');
-    var prevDate = moment(today);
-    prevDate.subtract(7, "days");
-    console.log(today);
-    console.log(prevDate);
-
-    $("#dateSlider").ionRangeSlider({
-        min: +prevDate.format("X"),
-        max: +today.format("X"),
-        grid: true,
-        prettify_enabled: true,
-        prettify: function (num) {
-            return moment(num, "X").format("LL");
-        }
-    });
-
-    // Save slider instance to var
-    var slider = $("#dateSlider").data("ionRangeSlider");
-    $("#dateSlider").css("visibility", "visible");
-    $("#dateSlider").hide().fadeIn(1000);
-
-    //console.log(goodData);
-    // heatmapLayer.setData(data);
-    var nextDate = prevDate;
-    console.log( nextDate);
-
-    //initilaize variables for the D3 chart
-    var countArray = [],
-    svg,
-    day,
-    x,
-    y,
-    margin,
-    height,
-    width,
-    intervalCounter = 10,
-    index = 0,
-    prevDate,
-    data = {
-        max:15,
-        min:0,
-        data:[]
-    };
-
-    //refresh every 100 milliseconds
-    setInterval(function () {
-        //iterates 10 times for each day
-        if (intervalCounter == 10)
-        {
-            intervalCounter = 0;
-            if (nextDate <= today) {
-                getAnotherDay();
-            }
-        }
-        else
-        {
-            intervalCounter++;
         }
 
-        //create new array for live points, push it to the map
-        var newData = [];
-        for (var j = 0; j < data.data.length; j++) {
-            var point = data.data[j];
-            if (point.value >= 10) {
-                point.fresh = false;
-            }
-            //fade in fresh points, fade out unfresh points
-            if (point.fresh)
+        var today = moment().startOf('day');
+        var prevDate = moment(today);
+        prevDate.subtract(7, "days");
+
+        console.log(dateHash);
+        console.log("Timeline Min:" + today);
+        console.log("Timeline Max:" + prevDate);
+
+        function animateData() {
+            //iterates n times for each day
+            var pollingRate = 15;
+
+            if (intervalCounter == pollingRate)
             {
-                point.value = point.value + .8;
+                intervalCounter = 0;
+                if (nextDate <= today) {
+                    getAnotherDay();
+                }
             }
             else
             {
-                point.value = point.value - .1;
+                intervalCounter++;
             }
-            if(point.value > 0)
+            //create new array for live points, push it to the map
+            var newData = [];
+            for (var j = 0; j < data.data.length; j++) {
+                var point = data.data[j];
+                if (point.value >= pollingRate) {
+                    point.fresh = false;
+                }
+                //fade in fresh points, fade out unfresh points
+                if (point.fresh)
+                {
+                    point.value = point.value + 2;
+                }
+                else
+                {
+                    point.value = point.value - .8;
+                }
+                if(point.value > 0)
+                {
+                    newData.push(data.data[j]);
+                }
+            }
+            data.data = newData;
+            // push new daily data into heatmap layer
+            //console.log(data);
+            heatmapLayer.setData(data);
+        }
+
+        function showData(newData){
+                            console.log(newData);
+            for (var i = 0; i < newData.length; i++) {
+                var point = newData[i];
+                    point.value = 20;
+                    point.fresh = true;
+            }
+            if (newData.length != 0)
             {
-                newData.push(data.data[j]);
+                data.data = newData
+                console.log(data);
+                heatmapLayer.setData(data);
+            }
+            else
+            {
+                heatmapLayer._heatmap.setData(data);
             }
         }
-        data.data = newData;
-        // push new daily data into heatmap layer
-        //console.log(data);
-        heatmapLayer.setData(data);
 
-    }, 100);
-
-    function getAnotherDay() {
-        // Call sliders update method with any params
-        slider.update({
-            from: +nextDate.format("X")
+        $("#dateSlider").ionRangeSlider({
+            min: +prevDate.format("X"),
+            max: +today.format("X"),
+            grid: true,
+            grid_num: 7,
+            prettify_enabled: true,
+            prettify: function (num) {
+                return moment(num, "X").format("LL");
+            },
+            onChange: function (data) {
+                if (refreshIntervalId != null){
+                    clearInterval(refreshIntervalId);
+                }
+            },
+            onFinish: function (data) {
+                nextDate = moment.unix(data.from).startOf('day');
+                var selectedDateKey = nextDate.format('MM/DD/YYYY');
+                console.log(selectedDateKey)
+                var newData = [];
+                if (selectedDateKey in dateHash) {
+                    newData = dateHash[selectedDateKey];
+                }
+                console.log(newData);
+                showData(newData);
+                // heatmapLayer.setData(data);
+                // console.log(nextDate)
+                // setInterval(animateData, 100);
+            },
         });
-        nextDate = moment(nextDate).add(1, "days");
-        console.log(nextDate);
-        var todayCounter = 0;
 
-        //iterate over goodData, push today's events to data.data
-        for (;;index++) {
-            var thisDate = goodData[index].date;
-            //console.log(thisDate + nextDate);
-            // console.log(thisDate);
-            // console.log(nextDate);
-            if(thisDate < nextDate) {
-                data.data.push(goodData[index]);
-                todayCounter++;
-                prevDate = thisDate;
-            }
-            else {
-                //Still need to increment prevDate if there is no data
-                if(todayCounter == 0) {
-                    console.log("prevDate: " + prevDate);
-                    prevDate.subtract(1, "days");
+        // Save slider instance to var
+        var slider = $("#dateSlider").data("ionRangeSlider");
+        $("#dateSlider").css("visibility", "visible");
+        $("#dateSlider").hide().fadeIn(1000);
+
+        //console.log(goodData);
+        // heatmapLayer.setData(data);
+        var nextDate = prevDate;
+
+        //refresh every 100 milliseconds
+        refreshIntervalId = setInterval(animateData, 100);
+
+        function getAnotherDay() {
+            // Call sliders update method with any params
+            slider.update({
+                from: +nextDate.format("X")
+            });
+            console.log("Current Date" + nextDate);
+            var todayCounter = 0;
+
+            //iterate over goodData, push today's events to data.data
+                // var thisDate = goodData[index].date;
+                var nextDateKey = nextDate.format('MM/DD/YYYY');
+                //console.log(thisDate + nextDate);
+                console.log(nextDateKey);
+                // console.log(nextDate);
+                if(nextDateKey in dateHash) {
+                // if(thisDate < nextDate) {
+                    data.data = data.data.concat(dateHash[nextDateKey]);
+                    todayCounter = dateHash[nextDateKey].length;
+                    prevDate = nextDate;
                 }
                 var todayCount = {
                     date:prevDate,
                     count:todayCounter
                 };
                 countArray.push(todayCount);
-                break;
-            }
+
+                nextDate = moment(nextDate).add(1, "days");
         }
-    }
-});
+    });
 
 </script>
 </html>
