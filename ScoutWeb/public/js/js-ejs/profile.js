@@ -1,7 +1,9 @@
 var fadeAnimationTime = 3000;
 
 $(document).ready(function() {
-    $('.selectpicker').selectpicker();
+    $('.selectpicker').selectpicker({
+        style: 'btn-info'
+    });
 
     $('#updateSuccess').hide();
     $('#updateFailed').hide();

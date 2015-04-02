@@ -26,7 +26,7 @@ public final class Consts {
 
     //Parse business object properties
     public static final String COL_PLACE_NAME = "name";
-    public static final String COL_PLACE_THUMBNAIL_URL = "thumbnailUrl";
+    public static final String COL_PLACE_THUMBNAIL_URL = "image";
     public static final String COL_PLACE_OWNER = "owner";
 
     //Parse points object properties
@@ -95,6 +95,7 @@ public final class Consts {
     public static final String PLACE_POINTS = "place points";
     public static final String CUSTOMER_ID = "customer id";
     public static final String REWARD_ID = "reward id";
+    public static final String BUSINESS_IMAGE = "business image";
 
     //User login related
     public static final String COL_USER_LOGGEDIN = "loggedin";

@@ -1,7 +1,8 @@
 body {
-    background-image: url('./../../img/urban.png');
+    /* http://thewaterrathotel.com.au/content/home/01.jpg */
+    background-image: url('./../../img/register.jpg');
     background-repeat: no-repeat;
-    background-size: auto 100%;
+    background-size: auto auto;
     background-position: center; 
 }
 #register-container {
