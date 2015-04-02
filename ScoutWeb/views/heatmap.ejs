@@ -46,9 +46,7 @@
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/normalize.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.skinHTML5.css" type="text/css" />
-
     <div id = 'map'></div>
-    <!--         <div id = 'chartBox'></div> -->
     <div id = "style">
         <div id = "dateSlider"; position: relative; ></div>
     </div>
@@ -83,8 +81,6 @@
     };
 
     var heatmapLayer = new HeatmapOverlay(cfg);
-
-    // map.addLayer(heatmapLayer);
 
     //setup map
     var map = new L.map('map', {
@@ -152,8 +148,6 @@
                         goodData.push(elem);
                         dateHash[dateStr] = goodData;
                     }
-
-                    // goodData.push(elem);
                 }
             });
         }
@@ -209,7 +203,7 @@
         }
 
         function showData(newData){
-                            console.log(newData);
+            console.log(newData);
             for (var i = 0; i < newData.length; i++) {
                 var point = newData[i];
                     point.value = 20;
@@ -218,12 +212,14 @@
             if (newData.length != 0)
             {
                 data.data = newData
-                console.log(data);
-                heatmapLayer._heatmap.setData(data);
+                heatmapLayer.setData(data);
             }
             else
             {
+                data.data = newData
+                heatmapLayer.setData(data);
                 heatmapLayer._heatmap.setData(data);
+                heatmapLayer._update();
             }
         }
 
@@ -251,9 +247,6 @@
                 }
                 console.log(newData);
                 showData(newData);
-                // heatmapLayer.setData(data);
-                // console.log(nextDate)
-                // setInterval(animateData, 100);
             },
         });
 

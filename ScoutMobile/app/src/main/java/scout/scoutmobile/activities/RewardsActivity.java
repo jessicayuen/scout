@@ -2,6 +2,9 @@ package scout.scoutmobile.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,6 +24,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -83,12 +89,18 @@ public class RewardsActivity extends ActionBarActivity {
         String placeId = getIntent().getStringExtra(Consts.PLACE_ID);
         String placeName = getIntent().getStringExtra(Consts.PLACE_NAME);
         Integer placePoints = getIntent().getIntExtra(Consts.PLACE_POINTS, 0);
+        String imageURL = getIntent().getStringExtra(Consts.BUSINESS_IMAGE);
 
         TextView pointsView = (TextView) findViewById(R.id.points);
         TextView placeView = (TextView) findViewById(R.id.business);
+        ImageView imageView = (ImageView) findViewById(R.id.image);
 
         pointsView.setText(placePoints.toString());
         placeView.setText(placeName);
+        //get the image if the URL is passed over
+        if(imageURL != null) {
+            new ImageFetcherAsync(imageView).execute(imageURL);
+        }
 
         // Set the rewards list items
         this.setRewardsListItems(placeId);
@@ -204,5 +216,34 @@ public class RewardsActivity extends ActionBarActivity {
                 startActivity(redeemActivity);
             }
         });
+    }
+
+    /**
+     * Asynctask class for fetching images from URL since we cant pass big images in bundles
+     */
+    class ImageFetcherAsync extends AsyncTask<String, Void, Bitmap> {
+
+        private ImageView mImageView;
+
+        public ImageFetcherAsync(ImageView view) {
+            this.mImageView = view;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            Bitmap businessImage = null;
+            try {
+                //Loads the business image from the url provided in ParseFile()
+                businessImage = BitmapFactory.decodeStream(new URL(urls[0]).openConnection().getInputStream());
+            } catch (IOException e) {
+                mLogger.logError(e);
+            }
+            return businessImage;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            if(result != null) {
+                mImageView.setImageBitmap(result);
+            }
+        }
     }
 }
