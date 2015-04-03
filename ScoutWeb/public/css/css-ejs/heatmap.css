@@ -1,0 +1,38 @@
+body, html { margin:0; padding:0; height:100%;}
+
+.leaflet-map-pane img { max-width: none; max-height: none;}
+#map {  width:90%; height:75%;   position: relative;  margin-left: auto;
+  margin-right: auto;}
+#dateSlider {
+    position:absolute;
+    height:150px;
+    width:70%;
+    right:0;
+    left:0;
+    bottom:0px;
+    margin: 0 auto;
+    /*            visibility: hidden;*/
+}
+#style {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  width:80%;
+  padding: 20px;
+}
+svg text {
+  fill: #fff;
+}
+svg line {
+  stroke: #fff;
+  stroke-width: 1px;
+}
+svg .domain {
+  stroke: #fff;
+  fill: none;
+}
+svg rect {
+  fill: #00AEF7;
+  opacity: .4;
+  stroke: #FFF;
+}

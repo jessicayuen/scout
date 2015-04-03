@@ -77,12 +77,12 @@
 }
 
 .irs-min, .irs-max {
-    color: #333;
+    color: black;
     font-size: 12px; line-height: 1.333;
     text-shadow: none;
     top: 0;
     padding: 1px 5px;
-    background: rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.8);
     border-radius: 3px;
     -moz-border-radius: 3px;
 }
@@ -109,15 +109,15 @@
 }
 .irs-grid-pol {
     opacity: 0.5;
-    background: #428bca;
+    background:   color: black;
 }
 .irs-grid-pol.small {
-    background: #999;
+    background:   color: black;
 }
 
 .irs-grid-text {
     bottom: 5px;
-    color: #99a4ac;
+    color:   color: black;
 }
 
 .irs-disabled {

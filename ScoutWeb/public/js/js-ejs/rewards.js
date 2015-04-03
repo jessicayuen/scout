@@ -2,38 +2,131 @@ $(document).ready(function(){
     // Populates reward records for rewards table
     var populateRewardsTable = function (data) {
         if (data.length > 0) {
-            var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
-            $('#rewards-table').append(heading);
-
+            // var heading = '<tr><th>Image</th><th>Points</th><th>Description</th><th>Edit/Remove</th></tr>';
+            // $('#rewards-table').append(heading);
+            var tileColors = ["pink", "purple", "cyan", "amber", "blue", "red", "indigo", "deep-orange", "green", "light-blue"];
+            var i = 0;
             data.forEach(function (reward) {
                 var objectid = reward['objectId'];
                 var imageUrl = reward['image'] ? reward['image'] : 'noimage.jpg';
                 var points = reward['points'];
                 var description = reward['description'];
 
+                // var row =
+                //     $('<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
+                //             '<td class="points-col">'+points+'</td>'+
+                //             '<td class="descrip-col">'+description+'</td>'+
+                //             '<td class="edit-remove-col">'+
+                            // '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
+                            // '<button type="submit" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
+                //             '</td></tr>');
+                var color = tileColors[i];
                 var row =
-                    $('<tr><td class="image-col"><a href="#" class="thumbnail"><img src="img/'+imageUrl+'" alt="'+imageUrl+'"></a></td>'+
-                            '<td class="points-col">'+points+'</td>'+
-                            '<td class="descrip-col">'+description+'</td>'+
-                            '<td class="edit-remove-col">'+
-                            '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
+                $('<a class="tile tile-lg tile-sqr tile-'+ color +' ripple-effect" href="#">' +
+                    '<span class="content-wrapper">' +
+                      '<span class="tile-content">' +
+                        '<span class="tile-holder tile-holder-sm" style = "top: 20px">' +
+                        '<span class="title">' + description + '</span>' +
+                        '</span>' +
+                        '<span class="tile-img" style="background-image: url(http://www.radiolaurier.com/wp-content/uploads/2014/10/coffee1.jpeg);"></span>' +
+                        '<span class="tile-holder tile-holder-sm" style = "top: 310px;">' +
+                        '<span class="title"><font color="yellow">Points: ' + points + '</font></span>' +
+                        '</span>' +
+                        '<span class="tile-holder tile-holder-sm">' +
+                                                    '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
                             '<button type="submit" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
-                            '</td></tr>');
-                row.hide();
+                        '</span>' +
+                      '</span>' +
+                    '</span>' +
+                '</a>');
 
-                $('#rewards-table tr:last-child').after(row);
-                row.fadeIn(1000);
+
+                $('#content').append(row);
+                // $('#rewards-table tr:last-child').after(row);
+                i++;
+                if (i >= tileColors.length)
+                {
+                    i = 0;
+                }
             });
+
+            /**
+             * Created by Kupletsky Sergey on 16.09.14.
+             *
+             * Hierarchical timing
+             * Add specific delay for CSS3-animation to elements.
+             */
+
+            (function($) {
+                var speed = 2000;
+                var container =  $('.display-animation');
+                container.each(function() {
+                    var elements = $(this).children();
+                    elements.each(function() {
+                        var elementOffset = $(this).offset();
+                        var offset = elementOffset.left*0.8 + elementOffset.top;
+                        var delay = parseFloat(offset/speed).toFixed(2);
+                        $(this)
+                            .css("-webkit-animation-delay", delay+'s')
+                            .css("-o-animation-delay", delay+'s')
+                            .css("animation-delay", delay+'s')
+                            .addClass('animated');
+                    });
+                });
+            })(jQuery);
+
+            /**
+             * Created by Kupletsky Sergey on 04.09.14.
+             *
+             * Ripple-effect animation
+             * Tested and working in: ?IE9+, Chrome (Mobile + Desktop), ?Safari, ?Opera, ?Firefox.
+             * JQuery plugin add .ink span in element with class .ripple-effect
+             * Animation work on CSS3 by add/remove class .animate to .ink span
+            */
+
+            (function($) {
+                $(".ripple-effect").click(function(e){
+                    var rippler = $(this);
+
+                    // create .ink element if it doesn't exist
+                    if(rippler.find(".ink").length == 0) {
+                        rippler.append("<span class='ink'></span>");
+                    }
+
+                    var ink = rippler.find(".ink");
+
+                    // prevent quick double clicks
+                    ink.removeClass("animate");
+
+                    // set .ink diametr
+                    if(!ink.height() && !ink.width())
+                    {
+                        var d = Math.max(rippler.outerWidth(), rippler.outerHeight());
+                        ink.css({height: d, width: d});
+                    }
+
+                    // get click coordinates
+                    var x = e.pageX - rippler.offset().left - ink.width()/2;
+                    var y = e.pageY - rippler.offset().top - ink.height()/2;
+
+                    // set .ink position and add class .animate
+                    ink.css({
+                        top: y+'px',
+                        left:x+'px'
+                    }).addClass("animate");
+                })
+            })(jQuery);
+
         } else {
-            $("#rewards-table").append('<td><h3>No available rewards.</h3></td>');
+            $("#alert").append('<td style><h3>No available rewards.</h3></td>');
         }
     }
-
     // Refreshes rewards table
     var refreshTable = function (callback) {
         $.get('/rewards/getrewards')
             .success(function (data) {
-                $('#rewards-table').empty();
+                $('#content').empty();
+                $('#alert').empty();
                 populateRewardsTable(data);
             })
         .error(function (xhr, textStatus, errorThrown) {
@@ -44,10 +137,10 @@ $(document).ready(function(){
     }
 
     // Refresh table when page is loaded
-    $('#rewards-table').ready(refreshTable);
+    $('#content').ready(refreshTable);
 
     // Remove reward upon clicking of remove
-    $('#rewards-table').on('click', '.remove', function() {
+    $('#content').on('click', '.remove', function() {
         $.post('/rewards/removereward', { objectid: this.id })
             .done(refreshTable);
     });
@@ -94,7 +187,7 @@ $(document).ready(function(){
         });
     };
     // An reward editting modal is shown to user when edit is clicked
-    $('#rewards-table').on('click', '.edit', function() {
+    $('#content').on('click', '.edit', function() {
         var formBody =
             '<div class="form-group">'+
             '<label for="editDescription" class="control-label">Description:</label>'+

@@ -5,40 +5,6 @@
     <script src="js/heatmap/build/heatmap.js"></script>
     <script src='js/heatmap/plugins/leaflet-heatmap-revision.js'></script>
     <script src="js/ion.rangeSlider-2.0.6/js/ion-rangeSlider/ion.rangeSlider.js"></script>
-    <style>
-        body, html { margin:0; padding:0; height:100%;}
-        body { font-family:sans-serif; }
-        body * { font-weight:200;}
-        .leaflet-map-pane img { max-width: none; max-height: none;}
-        #map {  width:100%; height:75%; display: inline-block; }
-        #dateSlider {
-            position:absolute;
-            height:150px;
-            width:70%;
-            right:0;
-            left:0;
-            bottom:0px;
-            margin: 0 auto;
-            /*            visibility: hidden;*/
-        }
-        #style { margin-left: auto;margin-right: auto; position: relative; width:80%; padding: 10px;}
-        svg text {
-          fill: #fff;
-        }
-        svg line {
-          stroke: #fff;
-          stroke-width: 1px;
-        }
-        svg .domain {
-          stroke: #fff;
-          fill: none;
-        }
-        svg rect {
-          fill: #00AEF7;
-          opacity: .4;
-          stroke: #FFF;
-        }
-  </style>
 </head>
 <body>
     <% include template/navbar %>
@@ -48,7 +14,7 @@
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.skinHTML5.css" type="text/css" />
     <div id = 'map'></div>
     <div id = "style">
-        <div id = "dateSlider"; position: relative; ></div>
+        <div id = "dateSlider";></div>
     </div>
 
     <% include template/footer %>
