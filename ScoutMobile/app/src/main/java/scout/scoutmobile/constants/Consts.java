@@ -1,7 +1,5 @@
 package scout.scoutmobile.constants;
 
-import android.bluetooth.BluetoothAdapter;
-
 public final class Consts {
 
     //Parse table class names

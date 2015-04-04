@@ -8,7 +8,6 @@ package scout.scoutmobile.activities;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -43,9 +42,9 @@ public class DispatchActivity extends CredentialActivity {
         } else {
             invokedActivity = new Intent(this, LoginActivity.class);
         }
+
         invokedActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(invokedActivity);
         finish();
     }
-
 }

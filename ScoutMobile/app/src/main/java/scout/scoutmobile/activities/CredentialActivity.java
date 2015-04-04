@@ -110,7 +110,7 @@ public class CredentialActivity extends Activity {
                 resStr = getString(R.string.exception_invalid_email);
                 break;
             default:
-                return resStr = getString(R.string.exception_general);
+                resStr = getString(R.string.exception_general);
         }
         return resStr;
     }
@@ -125,5 +125,4 @@ public class CredentialActivity extends Activity {
         customerSingleton.setCurCustomer(customer);
         customerSingleton.setCurUser(user);
     }
-
 }
