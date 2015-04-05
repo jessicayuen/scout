@@ -12,7 +12,32 @@
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/normalize.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.css" type="text/css" />
     <link rel="stylesheet" href="js/ion.rangeSlider-2.0.6/css/ion.rangeSlider.skinHTML5.css" type="text/css" />
-    <div id = 'map'></div>
+    <div class="container-fluid" style="height:75%; padding-left:130px; padding-right:130px;">
+        <div class="row">
+            <div class="col-sm-9">
+                <div id = 'map'></div>
+            </div>
+            <div class="col-sm-3">
+                <div id="beacons" ng-app="heatmapApp" ng-controller="BeaconListCtrl">
+                  <input type="text" id="query" ng-model="query"/>
+                  <select ng-model="orderList">
+                    <option value="Name">By name</option>
+                    <option value="-Date">Newest</option>
+                    <option value="Date">Oldest</option>
+                  </select>
+                  <ul id="beacon_ul" class="list">
+                    <li ng-repeat="beacon in beacons | filter:query | orderBy: orderList" class="list">
+                      <strong>Name: </strong><div class="right">{{beacon.Name}}</div><br>
+                      <strong>Date added: </strong><div class="right">{{beacon.Date}}</div><br>
+                      <strong>Coord: </strong><div class="right">{{beacon.Coord}}</div><br><!-- </div> -->
+                    </li>
+                  </ul>
+                  <span>Number of beacons: {{beacons.length}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id = "style">
         <div id = "dateSlider";></div>
     </div>
@@ -20,11 +45,48 @@
     <% include template/footer %>
 </body>
 <script>
+
+    var heatmapModule = angular.module('heatmapApp', []);
+
+    heatmapModule.factory('beaconService', function($http) {
+       return {
+            getBeacons: function() {
+                 //return the promise directly.
+                 return $http.get('/heatmap/retrieveBeaconsJSON')
+                           .then(function(result) {
+                                //resolve the promise as the data
+                                return result.data;
+                            });
+            }
+       }
+    });
+
+    heatmapModule.controller('BeaconListCtrl', function($scope, beaconService) {
+        beaconService.getBeacons().then(function(beaconList) {
+            beacons = [];
+            for (var i in beaconList) {
+                var coordY = beaconList[i].coordY;
+                var coordX = beaconList[i].coordX;
+                var beacon = {
+                    "Name": beaconList[i].name,
+                    "Date": moment(beaconList[i].createdAt).format('YYYY/MM/DD'),
+                    "Coord": [coordX, coordY]
+                };
+                            console.log(beacon)
+                beacons.push(beacon);
+            }
+            $scope.beacons = beacons;
+            $scope.orderList = "name";
+        });
+    });
+
     var w = 1280,
     h = 777,
     imageUrl = "/img/floorplan.jpg";
-    normalizeCoef = 60;
-
+    NORMALIZE_COEF = 4;
+    Y_SCALING = 0;
+    X_SCALING = 0;
+    var beaconList = [];
     //heatmap.js config
     var cfg = {
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
@@ -67,14 +129,21 @@
     map.setMaxBounds(imageBounds);
     imageLayer.bringToBack();
 
-    //add beacons to map
-    var beacon1 = L.marker([0, 0]).addTo(map);
-    beacon1.bindPopup("<b>Beacon 1</b>");
-    var beacon2 = L.marker([20, -30]).addTo(map);
-    beacon2.bindPopup("<b>Beacon 2</b>");
-    var beacon3 = L.marker([20, 10]).addTo(map);
-    beacon3.bindPopup("<b>Beacon 3</b>");
+    function retrieveBeacons(){
+        $.get('/heatmap/retrieveBeaconsJSON')
+        .success(function (rawData) {
+            //add beacons to map
+            console.log(rawData);
+            for (var i in rawData) {
+                var coordY = rawData[i].coordY;
+                var coordX = rawData[i].coordX;
+                var beacon = L.marker([coordY*NORMALIZE_COEF, coordX*NORMALIZE_COEF]).addTo(map);
+                beacon.bindPopup("<b>"+ rawData[i].name +"</b><br>[ " + coordY + ", " + coordX + " ]");
+            }
+        });
+    }
 
+    retrieveBeacons();
     console.log(map.getBounds());
     console.log(imageBounds);
     // map.fitBounds(imageBounds, {padding: []});
@@ -101,8 +170,8 @@
                 elem.value = 0;
                 elem.fresh = true;
                 if(elem.coordX && elem.coordY && elem.timestamp && (elem.timestamp.__type == 'Date')) {
-                    elem.x = parseFloat(elem.coordX*normalizeCoef-60);
-                    elem.y = parseFloat(elem.coordY*normalizeCoef-120);
+                    elem.x = parseFloat((elem.coordX*NORMALIZE_COEF)-X_SCALING);
+                    elem.y = parseFloat((elem.coordY*NORMALIZE_COEF)-Y_SCALING);
                     elem.date = moment(elem.timestamp.iso);
                     var dateStr = moment(elem.timestamp.iso).format('MM/DD/YYYY');
                     // check for preexisting data for a date
@@ -123,8 +192,8 @@
         prevDate.subtract(7, "days");
 
         console.log(dateHash);
-        console.log("Timeline Min:" + today);
-        console.log("Timeline Max:" + prevDate);
+        console.log("Timeline Min: " + today);
+        console.log("Timeline Max: " + prevDate);
 
         function animateData() {
             //iterates n times for each day
@@ -166,6 +235,8 @@
             // push new daily data into heatmap layer
             //console.log(data);
             heatmapLayer.setData(data);
+            heatmapLayer._heatmap.setData(data);
+            heatmapLayer._update();
         }
 
         function showData(newData){
@@ -206,22 +277,18 @@
             onFinish: function (data) {
                 nextDate = moment.unix(data.from).startOf('day');
                 var selectedDateKey = nextDate.format('MM/DD/YYYY');
-                console.log(selectedDateKey)
+                console.log("Selected: " + selectedDateKey);
                 var newData = [];
                 if (selectedDateKey in dateHash) {
                     newData = dateHash[selectedDateKey];
                 }
-                console.log(newData);
                 showData(newData);
             },
         });
 
         // Save slider instance to var
         var slider = $("#dateSlider").data("ionRangeSlider");
-        $("#dateSlider").css("visibility", "visible");
-        $("#dateSlider").hide().fadeIn(1000);
 
-        //console.log(goodData);
         // heatmapLayer.setData(data);
         var nextDate = prevDate;
 
@@ -233,28 +300,25 @@
             slider.update({
                 from: +nextDate.format("X")
             });
-            console.log("Current Date" + nextDate);
+            console.log("Current Date: " + nextDate);
             var todayCounter = 0;
 
             //iterate over goodData, push today's events to data.data
-                // var thisDate = goodData[index].date;
-                var nextDateKey = nextDate.format('MM/DD/YYYY');
-                //console.log(thisDate + nextDate);
-                console.log(nextDateKey);
-                // console.log(nextDate);
-                if(nextDateKey in dateHash) {
-                // if(thisDate < nextDate) {
-                    data.data = data.data.concat(dateHash[nextDateKey]);
-                    todayCounter = dateHash[nextDateKey].length;
-                    prevDate = nextDate;
-                }
-                var todayCount = {
-                    date:prevDate,
-                    count:todayCounter
-                };
-                countArray.push(todayCount);
+            // var thisDate = goodData[index].date;
+            var nextDateKey = nextDate.format('MM/DD/YYYY');
+            console.log(nextDateKey);
+            if(nextDateKey in dateHash) {
+                data.data = data.data.concat(dateHash[nextDateKey]);
+                todayCounter = dateHash[nextDateKey].length;
+                prevDate = nextDate;
+            }
+            var todayCount = {
+                date:prevDate,
+                count:todayCounter
+            };
+            countArray.push(todayCount);
 
-                nextDate = moment(nextDate).add(1, "days");
+            nextDate = moment(nextDate).add(1, "days");
         }
     });
 
