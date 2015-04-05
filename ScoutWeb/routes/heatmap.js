@@ -5,7 +5,7 @@ var parseHandler = require('parse-handler');
 
 router.get('/', function(req, res, next) {
     if (Parse.User.current()) {
-        res.render('heatmap', { title: 'Scout', filename: 'heatmap' } );
+        res.render('heatmap', { title: 'Scout', banner:'Heatmap', filename: 'heatmap' } );
     } else {
         res.redirect('/');
     }

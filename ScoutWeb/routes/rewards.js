@@ -5,7 +5,7 @@ var parseHandler = require('parse-handler');
 
 router.get('/', function(req, res, next) {
   if (Parse.User.current()) {
-    res.render('rewards', { title: 'Scout', jumbotron: 'Rewards', filename: 'rewards' });
+    res.render('rewards', { title: 'Scout', banner: 'Rewards', filename: 'rewards' });
   } else {
     res.redirect('/');
   }

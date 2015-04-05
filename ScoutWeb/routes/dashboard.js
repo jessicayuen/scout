@@ -39,7 +39,7 @@ var doStuffToMuhObjectJSON = function(objName, stuff) {
 router.get('/', function(req, res, next) {
 
     if (Parse.User.current()) {
-        res.render('dashboard', { title: 'Scout', jumbotron: 'Overview', filename: 'dashboard', data: data});
+        res.render('dashboard', { title: 'Scout', banner: 'Overview', filename: 'dashboard', data: data});
     } else {
         res.redirect('/');
     }
