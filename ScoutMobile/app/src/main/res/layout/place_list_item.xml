@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="10dp" >
+    android:layout_height="match_parent">
 
     <ImageView class="scout.scoutmobile.ui.DynamicImageView"
         android:layout_width="fill_parent"
@@ -11,42 +10,52 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:maxHeight="150dp"
-        android:minHeight="150dp"
+        android:maxHeight="180dp"
+        android:minHeight="180dp"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/sample_image"/>
+        android:scaleType="centerCrop"/>
 
     <LinearLayout
-        android:background="#dd020000"
+        android:background="#21020000"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="60dp"
+        android:layout_height="80dp"
         android:layout_alignBottom="@+id/placeImage"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:id="@+id/linearLayout">
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="50dp"
             android:text="Place"
             android:textColor="#ffedebf2"
             android:id="@+id/placeTitle"
-            android:layout_weight="0.80"
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
-            android:textSize="20sp" />
+            android:textStyle="bold"
+            android:textSize="25sp"
+            android:focusable="false"
+            android:layout_above="@+id/placePoints"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="0.12" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="45 Points"
-            android:textColor="#ff4dd2ff"
-            android:id="@+id/placePoints"
-            android:layout_weight="0.20"
-            android:gravity="center_vertical|right"
-            android:paddingRight="10dp"
-            android:textSize="20sp" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:text="45 Points"
+        android:paddingLeft="10dp"
+        android:textColor="#4dd2ff"
+        android:id="@+id/placePoints"
+        android:gravity="center_vertical"
+        android:paddingRight="10dp"
+        android:textSize="20sp"
+        android:layout_alignBottom="@+id/placeImage"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

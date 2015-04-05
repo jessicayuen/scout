@@ -1,18 +1,19 @@
 body {
     /* image from: https://nadiayates.files.wordpress.com/2015/03/img_7429.jpg */
     background-image: linear-gradient(
-      to bottom right,
-      rgba(0, 0, 0, 0.7), 
+      to right,
+      rgba(0, 0, 0, .9),
       rgba(0, 0, 0, 0)
     ),url('./../../img/login.jpg');
     background-repeat: no-repeat;
     background-size: auto auto;
-    background-position: 60% 50%; 
+    background-position: 60% 50%;
 }
 
 .stack {
     position:relative;
     width: auto;
+    height: 100%;
 }
 .layout {
     margin-left: 5%;

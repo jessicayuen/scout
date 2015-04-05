@@ -95,7 +95,7 @@ public class RewardsActivity extends ActionBarActivity {
         TextView placeView = (TextView) findViewById(R.id.business);
         ImageView imageView = (ImageView) findViewById(R.id.image);
 
-        pointsView.setText(placePoints.toString());
+        pointsView.setText(placePoints.toString() + " Points");
         placeView.setText(placeName);
         //get the image if the URL is passed over
         if(imageURL != null) {
@@ -126,14 +126,8 @@ public class RewardsActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.action_toggle_tracking:
-                //toggleTracking();
-                return true;
             case R.id.action_log_out:
                 GeneralUtils.logUserOut(this);
-                return true;
-            case R.id.action_settings:
-                //openSettings(); TODO
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -235,7 +229,8 @@ public class RewardsActivity extends ActionBarActivity {
                 //Loads the business image from the url provided in ParseFile()
                 businessImage = BitmapFactory.decodeStream(new URL(urls[0]).openConnection().getInputStream());
             } catch (IOException e) {
-                mLogger.logError(e);
+                // Image likely just doesn't exist, we shouldn't worry about it, continue on.
+                //mLogger.logError(e);
             }
             return businessImage;
         }

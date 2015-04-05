@@ -10,7 +10,7 @@ import scout.scoutmobile.R;
 
 public class SplashScreenActivity extends Activity {
 
-    private static int SPLASH_TIME_OUT = 1500;
+    private static int SPLASH_TIME_OUT = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,12 +1,11 @@
 package scout.scoutmobile.activities;
 
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -139,14 +138,8 @@ public class PlacesActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.action_toggle_tracking:
-                toggleTracking();
-                return true;
             case R.id.action_log_out:
                 GeneralUtils.logUserOut(this);
-                return true;
-            case R.id.action_settings:
-                //openSettings(); TODO
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -158,8 +151,8 @@ public class PlacesActivity extends ActionBarActivity {
      * @throws RuntimeException If an exception was thrown during the query
      */
     private void getAllPlaces() {
-//        final ProgressDialog progress = ProgressDialog.show(this,
-//                Consts.PROGRESS_WAIT,Consts.PROGRESS_BUSINESS_ALL_QUERY);
+        final ProgressDialog progress = ProgressDialog.show(this,
+                Consts.PROGRESS_WAIT,Consts.PROGRESS_BUSINESS_ALL_QUERY);
 
         // Query for all businesses
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_PLACE);
@@ -189,7 +182,11 @@ public class PlacesActivity extends ActionBarActivity {
                                 }
                                 // Finally, we can update the list view with this info
                                 updateListView(new ArrayList<>(placesMap.values()));
-                                //progress.dismiss();
+                                try {
+                                    progress.dismiss();
+                                } catch (Exception e2) {
+                                    // Going to let this one pass..
+                                }
                             } else {
                                 mLogger.logError(e);
                             }
@@ -273,29 +270,14 @@ public class PlacesActivity extends ActionBarActivity {
                 rewardsActivity.putExtra(Consts.PLACE_ID, selected.getId());
                 rewardsActivity.putExtra(Consts.PLACE_NAME, selected.getTitle());
                 rewardsActivity.putExtra(Consts.PLACE_POINTS, selected.getPoints());
-                rewardsActivity.putExtra(Consts.BUSINESS_IMAGE, selected.getImageFile().getUrl());
+                try {
+                    rewardsActivity.putExtra(Consts.BUSINESS_IMAGE, selected.getImageFile().getUrl());
+                } catch (NullPointerException e) {
+                    rewardsActivity.putExtra(Consts.BUSINESS_IMAGE, "");
+                }
                 startActivity(rewardsActivity);
             }
         });
-    }
-
-    protected void toggleTracking() {
-        scoutApp = (ScoutAndroidApplication) getApplicationContext();
-        beaconManager = scoutApp.getBeaconManager();
-        notificationManager = scoutApp.getNotificationManager();
-
-        try {
-            beaconManager.stopRanging(ALL_ESTIMOTE_BEACONS_REGION);
-        } catch (RemoteException e) {
-            Log.d(TAG, "Error while stopping ranging", e);
-        }
-
-        if(notificationManager != null) {
-            notificationManager.cancel(scoutApp.getNotificationId());
-        }
-        if(beaconManager != null) {
-            beaconManager.disconnect();
-        }
     }
 
     /**
