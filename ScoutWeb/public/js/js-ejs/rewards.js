@@ -148,6 +148,7 @@ $(document).ready(function(){
     // Add a reward
     var addReward = function(event) {
         event.preventDefault();
+        event.stopImmediatePropagation();
         var data =
         {
             description: $(this).find('input[name="description"]').val(),
@@ -166,6 +167,7 @@ $(document).ready(function(){
     // Edit a reward
     var editReward = function(event) {
         event.preventDefault();
+        event.stopImmediatePropagation();
         var data =
         {
             objectId: $(this).find('input[name="objectId"]').val(),
@@ -177,7 +179,7 @@ $(document).ready(function(){
             url: '/rewards/editreward',
             type: 'PUT',
             data: data,
-            success: refresh(function() {
+            success: refreshTable(function() {
                 $('#modal').modal('hide');
                 $('#modal-body-div').empty();
             }),
