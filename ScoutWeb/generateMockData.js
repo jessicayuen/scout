@@ -1,4 +1,5 @@
 var Parse = require('parse').Parse;
+var moment = require('moment');
 
 var APP_ID = 'DiEded8eK6muPcH8cdHGj8iqYUny65Mva143CpQ3';
 var MASTER_KEY = 'haRBk6ltEVIbnNmwsBkMYneYefjS9JSLOWyjxbjb';
@@ -8,11 +9,6 @@ var NUM_MIN_ARGS = 1;
 
 var getBusinessQuery = function (businessName) {
     var businessObj = Parse.Object.extend(BUSINESS_TABLE);
-
-    if (businessName == null) {
-        console.log('getBusinessQuery: business name is null')
-        process.exit(1);
-    }
 
     var query = new Parse.Query(businessObj);
     query.equalTo(businessName);
@@ -26,9 +22,21 @@ var getAllCustomerQuery = function () {
     return new Parse.Query(customerObj);
 };
 
-var insertIntervals = function (business, customersList) {
+var insertIntervalRecords = function (intervalObj, currentDate) {
+    var durationMin = 20; // need to generate random minute range
 
-}
+    
+};
+
+var insertIntervals = function (business, customersList) {
+    var previousWeekDate = moment().subtract(7,'days').utc();
+    var currentDate = moment().utc();
+
+    for (var date=previousWeekDate; date<currentDate; date.add(5, 'minutes')) {
+        // need to figure out how to generate random intervals
+        //console.log(date.format("MM-DD-YYYY HH:mm:ss"));
+    }
+};
 
 var generateData = function (businessName) {
     var business = null;
@@ -41,8 +49,7 @@ var generateData = function (businessName) {
 
     getBusinessQuery(businessName).first().then(function (businessObj) {
         // get business
-
-        business = businessObj; // no need to fetch?
+        business = businessObj;
 
         return getAllCustomerQuery().find();
     })
@@ -68,17 +75,17 @@ var generateData = function (businessName) {
     });
 };
 
-var main = function () {
-    if (process.argv.length-2 < NUM_MIN_ARGS) {
-        console.log('USAGE: node index.js [business name] [customer]');
+var main = function (argc, argv) {
+    if (argc-2 < NUM_MIN_ARGS) {
+        console.log('USAGE: node index.js [business name]');
         process.exit(1);
     }
 
     Parse.initialize(APP_ID, MASTER_KEY);
 
-    var businessName = process.argv[2];
+    var businessName = argv[2];
 
     generateData(businessName);
 };
 
-main();
+main(process.argv.length, process.argv);
