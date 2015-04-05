@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="10dp">
+    android:layout_height="match_parent" >
 
     <LinearLayout
         android:orientation="horizontal"
@@ -13,13 +12,13 @@
         android:weightSum="1">
 
         <TextView
-            android:background="#fff27b25"
+            android:background="#4dd2ff"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:minWidth="80dp"
             android:text="45"
             android:id="@+id/rewardsPoint"
-            android:layout_weight="0.20"
+            android:maxWidth="100dp"
+            android:minWidth="100dp"
             android:gravity="center_vertical|center_horizontal"
             android:paddingRight="10dp"
             android:textColor="#fffffffb"
@@ -27,15 +26,14 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="Reward"
             android:id="@+id/rewardsDescription"
-            android:layout_weight="0.80"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textColor="#dd020000" />
 
     </LinearLayout>

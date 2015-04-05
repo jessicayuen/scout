@@ -95,7 +95,7 @@ public class RewardsActivity extends ActionBarActivity {
         TextView placeView = (TextView) findViewById(R.id.business);
         ImageView imageView = (ImageView) findViewById(R.id.image);
 
-        pointsView.setText(placePoints.toString());
+        pointsView.setText(placePoints.toString() + " Points");
         placeView.setText(placeName);
         //get the image if the URL is passed over
         if(imageURL != null) {

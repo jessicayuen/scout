@@ -59,7 +59,7 @@
         </activity>
         <activity
             android:name=".activities.RewardsActivity"
-            android:label="Rewards"
+            android:label=""
             android:screenOrientation="portrait">
         </activity>
 

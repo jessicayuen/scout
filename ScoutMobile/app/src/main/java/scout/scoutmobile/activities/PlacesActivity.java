@@ -182,7 +182,11 @@ public class PlacesActivity extends ActionBarActivity {
                                 }
                                 // Finally, we can update the list view with this info
                                 updateListView(new ArrayList<>(placesMap.values()));
-                                progress.dismiss();
+                                try {
+                                    progress.dismiss();
+                                } catch (Exception e2) {
+                                    // Going to let this one pass..
+                                }
                             } else {
                                 mLogger.logError(e);
                             }
