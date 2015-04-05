@@ -13,6 +13,7 @@ body {
 .stack {
     position:relative;
     width: auto;
+    height: 100%;
 }
 .layout {
     margin-left: 5%;
