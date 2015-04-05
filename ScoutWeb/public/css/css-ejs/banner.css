@@ -18,19 +18,19 @@
 }
 .bottom{
   z-index: 1;
-  background-image: url(/img/banner_reward.jpg);
+  background-image: url(/img/login.jpg);
 }
 .middle{
   z-index: 2;
-  background-image: url(/img/banner_reward.jpg);
-  -webkit-animation: fadeMiddle 20s infinite;
-  animation: fadeMiddle 20s infinite;
+  background-image: url(/img/urban.png);
+  -webkit-animation: fadeMiddle 15s infinite;
+  animation: fadeMiddle 15s infinite;
 }
 .top{
   z-index: 3;
-  background-image: url(/img/banner_reward.jpg);
-  -webkit-animation: fadeTop 20s infinite;
-  animation: fadeTop 20s infinite;
+  background-image: url(/img/register.jpg);
+  -webkit-animation: fadeTop 15s infinite;
+  animation: fadeTop 15s infinite;
 }
 #bannerDescription{
   position: absolute;
