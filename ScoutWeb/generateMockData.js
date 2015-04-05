@@ -5,36 +5,66 @@ var APP_ID = 'DiEded8eK6muPcH8cdHGj8iqYUny65Mva143CpQ3';
 var MASTER_KEY = 'haRBk6ltEVIbnNmwsBkMYneYefjS9JSLOWyjxbjb';
 var BUSINESS_TABLE = 'Business';
 var CUSTOMER_TABLE = 'Customer';
+var INTERVAL_TABLE = 'Interval';
+var INTERVAL_REC_TABLE = 'IntervalRecord';
+
 var NUM_MIN_ARGS = 1;
+
+var CUST_MIN_DUR = 5;
+var CUST_MAX_DUR = 25;
+
+var CHANCE_CUST_IN_STORE = 0.1;
+
 
 var getBusinessQuery = function (businessName) {
     var businessObj = Parse.Object.extend(BUSINESS_TABLE);
 
     var query = new Parse.Query(businessObj);
-    query.equalTo(businessName);
+    query.equalTo('name', businessName);
 
-    return query;
+    return query.first();
 };
 
 var getAllCustomerQuery = function () {
-    var customerObj = Parse.Object.extend(BUSINESS_TABLE);
+    var customerObj = Parse.Object.extend(CUSTOMER_TABLE);
 
-    return new Parse.Query(customerObj);
+    var query = new Parse.Query(customerObj);
+
+    return query.find();
+};
+
+var saveInterval = function () {
+    var intervalObj = Parse.Object.extend(INTERVAL_TABLE);
+    
+}
+
+var saveIntervalRecord = function () {
+    var intervalRecObj = Parse.Object.extend(INTERVAL_REC_TABLE);
+
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+var getRandomInt = function (min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
 };
 
 var insertIntervalRecords = function (intervalObj, currentDate) {
-    var durationMin = 20; // need to generate random minute range
+    var durationMin = getRandomInt(CUST_MIN_DUR, CUST_MAX_DUR);
 
-    
+
 };
 
 var insertIntervals = function (business, customersList) {
+    var custInStoreQueue = [];
     var previousWeekDate = moment().subtract(7,'days').utc();
     var currentDate = moment().utc();
 
     for (var date=previousWeekDate; date<currentDate; date.add(5, 'minutes')) {
-        // need to figure out how to generate random intervals
-        //console.log(date.format("MM-DD-YYYY HH:mm:ss"));
+        if (Math.random() < CHANCE_CUST_IN_STORE && customersList.length) {
+            var customer = custNotInStoreQueue.shift();
+
+            // save
+        }
     }
 };
 
@@ -47,11 +77,11 @@ var generateData = function (businessName) {
         process.exit(1);
     }
 
-    getBusinessQuery(businessName).first().then(function (businessObj) {
+    getBusinessQuery(businessName).then(function (businessObj) {
         // get business
         business = businessObj;
 
-        return getAllCustomerQuery().find();
+        return getAllCustomerQuery();
     })
     .then(function (customersObj) {
         // get customers
