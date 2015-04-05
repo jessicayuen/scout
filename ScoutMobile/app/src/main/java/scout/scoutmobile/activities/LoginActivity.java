@@ -225,7 +225,6 @@ public class LoginActivity extends CredentialActivity implements LoaderCallbacks
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
 
