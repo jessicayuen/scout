@@ -33,8 +33,10 @@ $(document).ready(function(){
                         '<span class="title"><font color="yellow">Points: ' + points + '</font></span>' +
                         '</span>' +
                         '<span class="tile-holder tile-holder-sm">' +
-                                                    '<button type="submit" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
-                            '<button type="submit" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
+                            '<div>'+
+                                '<button type="submit" style="width:110px;" class="btn btn-primary edit" id="'+objectid+'">Edit</button>'+
+                                '<button type="submit" style="width:110px;margin-left:5px;" class="btn btn-danger remove" id="'+objectid+'">Remove</button>'+
+                            '</div>'+
                         '</span>' +
                       '</span>' +
                     '</span>' +
