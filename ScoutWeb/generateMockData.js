@@ -6,6 +6,7 @@ var MASTER_KEY = 'haRBk6ltEVIbnNmwsBkMYneYefjS9JSLOWyjxbjb';
 
 var BUSINESS_TABLE = 'Business';
 var CUSTOMER_TABLE = 'Customer';
+var POINTS_TABLE = 'Points';
 var INTERVAL_TABLE = 'Interval';
 var INTERVAL_REC_TABLE = 'IntervalRecord';
 
@@ -15,6 +16,16 @@ var CUST_MIN_DUR = 5;
 var CUST_MAX_DUR = 25;
 var CHANCE_CUST_IN_STORE = 0.1;
 var HOURS_OF_DATA = 3;
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+var getRandomInt = function (min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+};
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+var getRandomArbitrary = function (min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 var getBusinessQuery = function (businessName) {
     var businessObj = Parse.Object.extend(BUSINESS_TABLE);
@@ -40,7 +51,7 @@ var saveInterval = function (business, customer, from, to) {
 
     interval.set('business', business);
     interval.set('customer', customer);
-    interval.set('from', from.toDate());
+    interval.set('from', from.toDate()); // dates are incorrectly inserted for some reason
     interval.set('to', to.toDate());
 
     return interval.save(null, {error: function (obj, error) {console.log('saveInterval: '+ error.message )}});
@@ -63,14 +74,18 @@ var saveIntervalRecords = function (intervalObj, from, to) {
     return;
 };
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-var getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-};
+var savePoints = function (business, customer, pointCount) {
+    var pointsObj = Parse.Object.extend(POINTS_TABLE);
+    var points = new pointsObj();
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-var getRandomArbitrary = function (min, max) {
-  return Math.random() * (max - min) + min;
+    points.set('business', business);
+    points.set('customer', customer);
+    points.set('firstVisit', moment().utc().toDate());
+    points.set('points', pointCount);
+
+    points.save(null, { error: function (obj, error) {console.log('savePoints: '+ error.message );} });
+
+    return;
 }
 
 var insertIntervals = function (business, customer) {
@@ -80,15 +95,20 @@ var insertIntervals = function (business, customer) {
     for (var date=previousWeekDate; date<currentDate; date.add(5, 'minutes')) {
         if (Math.random() < CHANCE_CUST_IN_STORE) {
             var durationMin = getRandomInt(CUST_MIN_DUR, CUST_MAX_DUR);
+            var points = getRandomInt(1,4);
 
-            var fromDate = date;
+            var fromDate = date.clone();
             var toDate = date.clone().add(durationMin, 'minutes');
 
             saveInterval(business, customer, fromDate, toDate).then(function(intervalObj) {
                 toDate = date.clone().add(durationMin, 'minutes'); // unsure why this is needed
 
                 return saveIntervalRecords(intervalObj, fromDate, toDate);
-            }).then(function () {
+            })
+            .then(function () {
+                return savePoints(business, customer, points);
+            })
+            .then(function () {
                 date.add(durationMin, 'minutes');
 
                 return;
@@ -102,11 +122,11 @@ var generateData = function (businessName, username) {
     var customer = null;
 
     if (businessName == null) {
-        console.log('generateData: business name is null');
+        console.log('generateIntervalData: business name is null');
         process.exit(1);
     }
     if (username == null) {
-        console.log('generateData: business name is null');
+        console.log('generateIntervalData: business name is null');
         process.exit(1);
     }
 
@@ -133,34 +153,116 @@ var generateData = function (businessName, username) {
     .then(function() {
         // insert intervals
         if (business == null) {
-            console.log('generateData: unable to query business');
+            console.log('generateIntervalData: unable to query business');
             process.exit(1);
         }
         if (customer == null) {
-            console.log('generateData: unable to query customers');
+            console.log('generateIntervalData: unable to query customers');
             process.exit(1);
         }
 
-        console.log('generateData: found '+ businessName);
-        console.log('generateData: queried '+ customer.get('user').get('username'));
+        console.log('generateIntervalData: found '+ businessName);
+        console.log('generateIntervalData: queried '+ customer.get('user').get('username'));
 
         insertIntervals(business, customer);
     });
 };
 
+var generateRewardData = function (businessName, username) {
+    var business = null;
+    var customer = null;
+
+    if (businessName == null) {
+        console.log('generateRewardData: business name is null');
+        process.exit(1);
+    }
+    if (username == null) {
+        console.log('generateRewardData: business name is null');
+        process.exit(1);
+    }
+
+    getBusinessQuery(businessName).then(function (businessObj) {
+        // get business
+        business = businessObj;
+
+        return getAllCustomerQuery();
+    })
+    .then(function (customersObj) {
+        // get customers
+        customersObj.some(function (obj) {
+            var objUsername = obj.get('user').get('username');
+
+            if (username == objUsername) {
+                customer = obj;
+            }
+
+            return customer;
+        });
+
+        return;
+    })
+    .then(function () {
+        if (business == null) {
+            console.log('generateRewardData: unable to query business');
+            process.exit(1);
+        }
+        if (customer == null) {
+            console.log('generateRewardData: unable to query customers');
+            process.exit(1);
+        }
+
+        console.log('generateRewardData: found '+ businessName);
+        console.log('generateRewardData: queried '+ customer.get('user').get('username'));
+
+    });
+};
+
+var getArgs = function (argc, argv) {
+    var args = argv;
+    var argsObj = {};
+
+    args.splice(0,2);
+
+    while(args.length > 0) {
+        var temp = null;
+
+        switch (args[0]) {
+            case '-b':
+                temp = args.splice(0,2);
+                argsObj.business = temp[1];
+                break;
+            case '-c':
+                temp = args.splice(0,2);
+                argsObj.username = temp[1];
+                break;
+            case '-h':
+                temp = args.splice(0,2);
+                argsObj.hours = temp[1];
+                break;
+            default:
+                console.log('invalid input');
+                process.exit(1);
+        }
+    }
+
+    return argsObj;
+};
+
 var main = function (argc, argv) {
     if (argc-2 < NUM_MIN_ARGS) {
-        console.log('USAGE: node index.js [business name] [customer.user username] [OPTIONAL: hours of data (default=3)]');
+        console.log('USAGE: node index.js [-b business] [-c customer username] [OPTIONAL: -h hours]');
         process.exit(1);
     }
 
     Parse.initialize(APP_ID, MASTER_KEY);
 
-    var businessName = argv[2];
-    var username = argv[3];
+    var argsObj = getArgs(argc, argv);
 
-    if (argv[4] != null && typeof argv[4] === 'number') {
-        HOURS_OF_DATA = argv[4]
+    var businessName = argsObj.business;
+    var username = argsObj.username;
+
+    if (argsObj.hours) {
+        HOURS_OF_DATA = argsObj.hours;
     }
 
     generateData(businessName, username);
