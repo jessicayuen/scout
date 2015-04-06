@@ -29,12 +29,20 @@
                   </select>
                   <ul id="beacon_ul" class="list">
                     <li ng-repeat="beacon in beacons | filter:query | orderBy: orderList" class="list">
-                      <strong>Name: </strong><div class="right">{{beacon.Name}}</div><br>
-                      <strong>Date added: </strong><div class="right">{{beacon.Date}}</div><br>
-                      <strong>Coord: </strong><div class="right">{{beacon.Coord}}</div><br><!-- </div> -->
+                        <strong>Name: </strong><div class="right">{{beacon.Name}}</div><br>
+                        <strong>Date added: </strong><div class="right">{{beacon.Date}}</div><br>
+                        <div style = 'margin-bottom: 5px';><strong>Coord: </strong><div class="right">{{beacon.Coord}}</div><br></div><!-- </div> -->
+                        <button type="submit" class="btn btn-primary edit btn-sm" id="{{beacon.objectId}}">Edit</button>
+                        <button type="submit" class="btn btn-danger remove btn-sm" id="{{beacon.objectId}}">Remove</button>
                     </li>
                   </ul>
-                  <span>Number of beacons: {{beacons.length}}</span>
+                        <span>Number of beacons: {{beacons.length}}
+                            <div style=" float: right;">
+                                <div class="form-group" style=" height:100%; margin:0px; padding:0px;">
+                                    <button class="btn btn btn-success" id="addbutton">Add a beacon</button>
+                                </div>
+                            </div>
+                        </span>
                 </div>
             </div>
         </div>
@@ -43,52 +51,19 @@
     <div id = "style">
         <div id = "dateSlider";></div>
     </div>
-
+    <% include modules/modal %>
     <% include template/footer %>
 </body>
 <script>
 
-    var heatmapModule = angular.module('heatmapApp', []);
-
-    heatmapModule.factory('beaconService', function($http) {
-       return {
-            getBeacons: function() {
-                 //return the promise directly.
-                 return $http.get('/heatmap/retrieveBeaconsJSON')
-                           .then(function(result) {
-                                //resolve the promise as the data
-                                return result.data;
-                            });
-            }
-       }
-    });
-
-    heatmapModule.controller('BeaconListCtrl', function($scope, beaconService) {
-        beaconService.getBeacons().then(function(beaconList) {
-            beacons = [];
-            for (var i in beaconList) {
-                var coordY = beaconList[i].coordY;
-                var coordX = beaconList[i].coordX;
-                var beacon = {
-                    "Name": beaconList[i].name,
-                    "Date": moment(beaconList[i].createdAt).format('YYYY/MM/DD'),
-                    "Coord": [coordX, coordY]
-                };
-                            console.log(beacon)
-                beacons.push(beacon);
-            }
-            $scope.beacons = beacons;
-            $scope.orderList = "name";
-        });
-    });
-
     var w = 1280,
-    h = 777,
-    imageUrl = "/img/floorplan.jpg";
-    NORMALIZE_COEF = 4;
-    Y_SCALING = 0;
-    X_SCALING = 0;
+        h = 777;
+    var imageUrl = "/img/floorplan.jpg";
+    var NORMALIZE_COEF = 4;
+    var Y_SCALING = 0;
+    var X_SCALING = 0;
     var beaconList = [];
+    var beaconLayer;
     //heatmap.js config
     var cfg = {
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
@@ -136,12 +111,20 @@
         .success(function (rawData) {
             //add beacons to map
             console.log(rawData);
+            var beaconMarkers = [];
+            if (beaconLayer)
+            {
+                map.removeLayer(beaconLayer);
+            }
             for (var i in rawData) {
                 var coordY = rawData[i].coordY;
                 var coordX = rawData[i].coordX;
-                var beacon = L.marker([coordY*NORMALIZE_COEF, coordX*NORMALIZE_COEF]).addTo(map);
+                var beacon = L.marker([coordY*NORMALIZE_COEF, coordX*NORMALIZE_COEF]);
                 beacon.bindPopup("<b>"+ rawData[i].name +"</b><br>[ " + coordY + ", " + coordX + " ]");
+                beaconMarkers.push(beacon);
             }
+            beaconLayer = L.layerGroup(beaconMarkers);
+            beaconLayer.addTo(map)
         });
     }
 
@@ -323,6 +306,166 @@
             nextDate = moment(nextDate).add(1, "days");
         }
     });
+
+    var heatmapModule = angular.module('heatmapApp', []);
+
+    heatmapModule.factory('beaconService', function($http) {
+       return {
+            getBeacons: function() {
+                 //return the promise directly.
+                 return $http.get('/heatmap/retrieveBeaconsJSON')
+                           .then(function(result) {
+                                //resolve the promise as the data
+                                return result.data;
+                            });
+            }
+       }
+    });
+
+    heatmapModule.controller('BeaconListCtrl', function($scope, beaconService) {
+
+        function formBeaconList(beaconListJSON) {
+            beacons = [];
+            for (var i in beaconListJSON) {
+                var coordY = beaconListJSON[i].coordY;
+                var coordX = beaconListJSON[i].coordX;
+                var beacon = {
+                    "objectId": beaconListJSON[i].objectId,
+                    "Name": beaconListJSON[i].name,
+                    "Date": moment(beaconListJSON[i].createdAt).format('YYYY/MM/DD'),
+                    "Coord": [coordX, coordY]
+                };
+                console.log(beacon)
+                beacons.push(beacon);
+            }
+            return beacons;
+        }
+
+        function refreshTable() {
+            $scope.$apply(function() {
+                setCtrlBeacons();
+            });
+        }
+
+        function setCtrlBeacons() {
+            beaconService.getBeacons().then(function(beaconListJSON) {
+                $scope.beacons = formBeaconList(beaconListJSON);
+                $scope.orderList = "name";
+            });
+        }
+
+        // Edit a beacon
+        var editBeacon = function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            var data =
+            {
+                objectId: $(this).find('input[name="objectId"]').val(),
+                name: $(this).find('input[name="name"]').val(),
+                coordX: $(this).find('input[name="coordX"]').val(),
+                coordY: $(this).find('input[name="coordY"]').val()
+            };
+            console.log(data)
+            $.ajax({
+                url: '/heatmap/editBeacon',
+                type: 'PUT',
+                data: data,
+                success: function() {
+                    refreshTable();
+                    retrieveBeacons();
+                    $('#modal-form').unbind('submit');
+                    $('#modal').modal('hide');
+                    $('#modal-body-div').empty();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+            });
+        };
+
+        // Add a beacon
+        var addBeacon = function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            var data =
+            {
+                name: $(this).find('input[name="name"]').val(),
+                coordX: $(this).find('input[name="coordX"]').val(),
+                coordY: $(this).find('input[name="coordY"]').val()
+            };
+
+            $.post('/heatmap/addBeacon', data)
+                .success(function() {
+                    refreshTable();
+                    retrieveBeacons();
+                    $('#modal-form').unbind('submit');
+                    $('#modal').modal('hide');
+                    $('#modal-body-div').empty();
+                })
+            .error(function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText);
+            });
+        };
+
+        setCtrlBeacons();
+
+        $('#beacons').on('click', '.remove', function() {
+            $.post('/heatmap/removeBeacon', { objectid: this.id })
+                .success(function (data) {
+                    refreshTable();
+                    retrieveBeacons();
+                })
+                .error(function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                });
+        });
+
+        // An beacon editting modal is shown to user when edit is clicked
+        $('#beacons').on('click', '.edit', function() {
+            var formBody =
+                '<div class="form-group">'+
+                '<label for="editName" class="control-label">Name:</label>'+
+                '<input type="text" name="name" id="editName" class="form-control" placeholder="Name" required>'+
+                '</div>'+
+                '<div class="form-group">'+
+                '<label for="editCoordX" class="control-label">CoordX:</label>'+
+                '<input type="number" name="coordX" id="editCoordX" class="form-control" placeholder="CoordX" required>'+
+                '</div>'+
+                '<div class="form-group">'+
+                '<label for="editCoordY" class="control-label">CoordY:</label>'+
+                '<input type="number" name="coordY" id="editCoordY" class="form-control" placeholder="CoordY" required>'+
+                '</div>'+
+                '<input type="hidden" name="objectId" value="'+this.id+'">';
+
+            $('#modal-title-text').text('Edit Beacon');
+            $('#modal-body-div').empty().append(formBody);
+            $('#modal-dismiss-text').text('Close');
+            $('#modal-submit-text').text('Save Changes');
+            $('#modal').modal('show');
+            $('#modal-form').submit(editBeacon);
+        });
+
+        // When the add beacon button is pressed, a form will be shown
+        $('#addbutton').on('click', function() {
+            var formBody =
+                '<div class="form-group">'+
+                '<label for="name" class="control-label">Name:</label>'+
+                '<input type="text" name="name" class="form-control" placeholder="Name" required></div>' +
+                '<div class="form-group">'+
+                '<label for="coordX" class="control-label">Coordinate X:</label>'+
+                '<input type="number" name="coordX" class="form-control" placeholder="Coordinate X" required></div>' +
+                '<label for="coordY" class="control-label">Coordinate Y:</label>'+
+                '<input type="number" name="coordY" class="form-control" placeholder="Coordinate Y" required></div>';
+
+            $('#modal-title-text').text('Add Beacon');
+            $('#modal-body-div').empty().append(formBody);
+            $('#modal-dismiss-text').text('Close');
+            $('#modal-submit-text').text('Add Beacon');
+            $('#modal').modal('show');
+            $('#modal-form').submit(addBeacon);
+        });
+    });
+
 
 </script>
 </html>
