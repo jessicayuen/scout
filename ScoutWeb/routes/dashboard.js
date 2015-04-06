@@ -119,7 +119,7 @@ router.get('/customers', function(req, res, next) {
             counts[+d] = 1 + (counts[+d] || 0);
         });
         for (key in counts)
-            arr.push({x: key, y: counts[key]});
+            arr.push({x: parseInt(key), y: counts[key]});
         // sort entries by date.
         customerData[0].values = arr.sort( function(a, b) {
             return a.x - b.x;
