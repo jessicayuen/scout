@@ -1,14 +1,17 @@
 package scout.scoutmobile.test;
 
-import scout.scoutmobile.activities.SplashScreenActivity;
-import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.robotium.solo.Solo;
+import com.robotium.solo.Timeout;
 
-public class register extends ActivityInstrumentationTestCase2<SplashScreenActivity> {
+import scout.scoutmobile.activities.SplashScreenActivity;
+
+
+public class Register extends ActivityInstrumentationTestCase2<SplashScreenActivity> {
   	private Solo solo;
   	
-  	public register() {
+  	public Register() {
 		super(SplashScreenActivity.class);
   	}
 

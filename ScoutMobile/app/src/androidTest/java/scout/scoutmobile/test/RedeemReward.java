@@ -1,14 +1,17 @@
 package scout.scoutmobile.test;
 
-import scout.scoutmobile.activities.SplashScreenActivity;
-import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.robotium.solo.Solo;
+import com.robotium.solo.Timeout;
 
-public class logout extends ActivityInstrumentationTestCase2<SplashScreenActivity> {
+import scout.scoutmobile.activities.SplashScreenActivity;
+
+
+public class RedeemReward extends ActivityInstrumentationTestCase2<SplashScreenActivity> {
   	private Solo solo;
   	
-  	public logout() {
+  	public RedeemReward() {
 		super(SplashScreenActivity.class);
   	}
 
@@ -25,17 +28,10 @@ public class logout extends ActivityInstrumentationTestCase2<SplashScreenActivit
   	}
   
 	public void testRun() {
-        //Take screenshot
-        solo.takeScreenshot();
         //Wait for activity: 'scout.scoutmobile.activities.SplashScreenActivity'
 		solo.waitForActivity(scout.scoutmobile.activities.SplashScreenActivity.class, 2000);
-        //Wait for activity: 'scout.scoutmobile.activities.LoginActivity'
-		assertTrue("scout.scoutmobile.activities.LoginActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.LoginActivity.class));
-        //Enter the text: 'test2'
-		solo.clearEditText((android.widget.EditText) solo.getView(scout.scoutmobile.R.id.email));
-		solo.enterText((android.widget.EditText) solo.getView(scout.scoutmobile.R.id.email), "test2");
-        //Wait for dialog
-		solo.waitForDialogToOpen(5000);
+        //Wait for activity: 'scout.scoutmobile.activities.PlacesActivity'
+		assertTrue("scout.scoutmobile.activities.PlacesActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.PlacesActivity.class));
         //Enter the text: 'test@test.com'
 		solo.clearEditText((android.widget.EditText) solo.getView(scout.scoutmobile.R.id.email));
 		solo.enterText((android.widget.EditText) solo.getView(scout.scoutmobile.R.id.email), "test@test.com");
@@ -48,17 +44,20 @@ public class logout extends ActivityInstrumentationTestCase2<SplashScreenActivit
 		solo.clickOnView(solo.getView(scout.scoutmobile.R.id.email_sign_in_button));
         //Wait for activity: 'scout.scoutmobile.activities.PlacesActivity'
 		assertTrue("scout.scoutmobile.activities.PlacesActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.PlacesActivity.class));
-        //Set default small timeout to 55040 milliseconds
-		Timeout.setSmallTimeout(55040);
-        //Click on One Size Fits All 0 points
-		solo.clickInList(1, 0);
+        //Set default small timeout to 25447 milliseconds
+		Timeout.setSmallTimeout(25447);
+        //Scroll to Ellantos 119 points
+		android.widget.ListView listView0 = (android.widget.ListView) solo.getView(android.widget.ListView.class, 0);
+		solo.scrollListToLine(listView0, 1);
+        //Click on Ellantos 119 points
+		solo.clickOnView(solo.getView(scout.scoutmobile.R.id.placeImage, 2));
         //Wait for activity: 'scout.scoutmobile.activities.RewardsActivity'
 		assertTrue("scout.scoutmobile.activities.RewardsActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.RewardsActivity.class));
-        //Click on ImageView
-		solo.clickOnView(solo.getView(android.widget.ImageView.class, 1));
-        //Click on Log Out
-		solo.clickInList(1, 0);
-        //Wait for activity: 'scout.scoutmobile.activities.LoginActivity'
-		assertTrue("scout.scoutmobile.activities.LoginActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.LoginActivity.class));
+        //Click on 30 Appetizer
+		solo.clickInList(3, 0);
+        //Wait for activity: 'scout.scoutmobile.activities.RedeemActivity'
+		assertTrue("scout.scoutmobile.activities.RedeemActivity is not found!", solo.waitForActivity(scout.scoutmobile.activities.RedeemActivity.class));
+        //Press menu back key
+		solo.goBack();
 	}
 }
