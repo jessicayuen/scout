@@ -93,6 +93,7 @@
     <orderEntry type="library" exported="" name="bolts-android-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="android-beacon-library-2.1.4" level="project" />
     <orderEntry type="library" exported="" name="Parse-1.8.2" level="project" />
+    <orderEntry type="library" exported="" name="robotium-solo-5.3.2-SNAPSHOT" level="project" />
   </component>
 </module>
 

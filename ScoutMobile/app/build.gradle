@@ -30,3 +30,7 @@ dependencies {
     compile 'org.altbeacon:android-beacon-library:2.+@aar'
     compile 'com.android.support:support-v4:21.0.3'
 }
+
+dependencies{
+    androidTestCompile fileTree(dir: 'libs', include: ['robotium-solo-5.3.2-SNAPSHOT.jar'])
+}

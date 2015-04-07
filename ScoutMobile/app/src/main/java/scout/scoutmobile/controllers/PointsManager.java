@@ -52,7 +52,7 @@ public class PointsManager implements BeaconPingObserver {
                 if (!beaconResults.isEmpty() && e == null) {
                     ParseObject business = beaconResults.get(0).getParseObject(Consts.COL_BEACON_BUSINESS);
                     // Update the points every 300 seconds (1 min).
-                    long updateTime = 60 / seconds;
+                    long updateTime = 1;
 
                     updatePoints(business, updateTime);
                 } else {
@@ -72,7 +72,7 @@ public class PointsManager implements BeaconPingObserver {
             mSeconds.put(id, 1l);
         }
 
-        if (mSeconds.get(id) > updateTime) {
+        if (mSeconds.get(id) >= updateTime) {
             mSeconds.put(id, 0l);
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Consts.TABLE_POINTS)
