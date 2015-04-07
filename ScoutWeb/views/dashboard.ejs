@@ -53,7 +53,9 @@
                 <div id="points" class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
+<span>
                             <h3>Points</h3>
+</span>
                         </div>
                         <ul class="list-group">
                             <a id="points-earned" class="list-group-item">
@@ -70,8 +72,10 @@
             </div>
 
             <div class="row">
-                <div id="chart" class="col-md-8 col-md-offset-2" style="position:relative">
-                    <svg/>
+                <div id="chart" class="col-md-12">
+                    <div class="panel panel-default">
+                        <svg/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -85,18 +89,28 @@ var drawPointsScatter = function() {
     d3.selectAll("svg > *").remove();
     d3.json('/dashboard/points', function(data) {
         nv.addGraph( function() {
-            var width = 600, height = 400;
+            var width = $('svg').width() - 40;
+            var height = $('svg').height();
             var chart = nv.models.scatterChart()
-            chart.xAxis
-                .tickFormat(function(d) {
-                    return d3.time.format('%x')(new Date(d));
-                });
+            chart.xAxis.tickFormat(function(d) {
+                return d3.time.format('%x')(new Date(d));
+            });
+            chart.tooltipContent(function(key) {
+                return key;
+            });
             chart.forceY(0);
+            chart.width(width).height(height);
+
             d3.select('#chart svg')
                 .datum(data)
                 .call(chart);
 
-            nv.utils.windowResize(chart.update);
+            nv.utils.windowResize( function() {
+                var width = $('svg').width() - 40;
+                var height = $('svg').height();
+                chart.width(width).height(height);
+                chart.update();
+            });
             return chart;
         });
     });
@@ -106,18 +120,25 @@ var drawCustomerLine = function() {
     d3.selectAll("svg > *").remove();
     d3.json('/dashboard/customers', function(data) {
         nv.addGraph( function() {
-            var width = 600, height = 400;
+            var width = $('svg').width() - 40;
+            var height = $('svg').height();
             var chart = nv.models.lineChart()
             chart.xAxis.tickFormat(function(d) {
                     return d3.time.format('%x')(new Date(d));
                 });
             chart.forceY(0);
+            chart.width(width).height(height);
 
             d3.select('#chart svg')
                 .datum(data)
                 .call(chart);
 
-            nv.utils.windowResize(chart.update);
+            nv.utils.windowResize( function() {
+                var width = $('svg').width() - 40;
+                var height = $('svg').height();
+                chart.width(width).height(height);
+                chart.update();
+            });
             return chart;
         });
     });

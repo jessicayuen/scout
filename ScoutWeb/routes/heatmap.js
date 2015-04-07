@@ -47,6 +47,103 @@ router.get('/retrieveBeaconsJSON', function(req, res, next) {
     parseHandler.retrieveBeaconsJSON(successCb, errorCb, {'user': Parse.User.current()});
 });
 
+router.post('/addBeacon', function (req, res) {
+  var BeaconObj = Parse.Object.extend('Beacon');
+  var BusinessObj = Parse.Object.extend('Business');
+
+  var name = req.body['name'];
+  var coordX = req.body['coordX'];
+  var coordY = req.body['coordY'];
+
+  console.log('name: '+ name + ', coordX: '+ coordX + ', coordY: '+ coordY);
+
+  var businessQuery = new Parse.Query(BusinessObj);
+  businessQuery.equalTo('owner', Parse.User.current());
+  businessQuery.first().then( function(business) {
+  
+    var beacon = new BeaconObj();
+    beacon.set("name", name);
+    beacon.set("coordX", parseFloat(coordX));
+    beacon.set("coordY", parseFloat(coordY));
+
+    beacon.save(null, {
+      success: function(beacon) {
+        console.log('Beacon has been successfully saved.');
+
+        res.status(200).send();
+      },
+      error: function(beacon, error) {
+        console.log('ERROR: Unable to save beacon.');
+        console.log(error.message);
+
+        res.status(400).send('Beacon could not be successfully saved.');
+      }
+    });
+  }, function(error) {
+    console.log('ERROR: Could not query business');
+    console.log(error.message);
+    
+    res.status(400).send('Unable to find the current business.');
+  });
+});
+
+router.put('/editBeacon', function (req, res) {
+  var beaconId = req.body['objectId'];
+  var name = req.body['name'];
+  var coordX = req.body['coordX'];
+  var coordY = req.body['coordY'];
+
+  var BeaconObj = Parse.Object.extend('Beacon');
+  var query = new Parse.Query(BeaconObj);
+
+  query.get(beaconId, {
+    success: function (beacon) {
+      beacon.set('name', name);
+      beacon.set('coordX', parseFloat(coordX));
+      beacon.set('coordY', parseFloat(coordY));
+
+      beacon.save(null , {
+        success: function (beacon) {
+          console.log('Beacon '+ beaconId + 'has been successfully updated.');
+          
+          res.status(200).send();
+        },
+        error: function(beacon, error) {
+          console.log('ERROR: Cannot update beacon '+ beaconId);
+          console.log(error.message);
+
+          res.status(400).send('Unable to update beacon'+ beaconId + '.')
+        }
+      });
+    },
+    error: function (error) {
+      console.log('ERROR: Cannot query beacon '+ beaconId);
+
+      res.status(400).send('Unable to find the beacon '+ beaconId + '.');
+    }
+  });
+});
+
+router.post('/removeBeacon', function (req, res) {
+  var beaconObjectId = req.body['objectid'];
+  var BeaconObj = Parse.Object.extend('Beacon');
+  var query = new Parse.Query(BeaconObj);
+
+  query.get(beaconObjectId, {
+    success: function (beacon) {
+      beacon.destroy();
+      console.log('Beacon ' + beaconObjectId + ' has been successfully deleted.');
+
+      res.status(200).send();
+    },
+    error: function (error) {
+      console.log('ERROR: Cannot delete beacon ' + beaconObjectId + ' or is already deleted.');
+
+      res.status(400).send('Unable to delete beacon ' + beaconObjectId + '.');
+    }
+  });
+});
+
 // routing for testing data
 router.get('/getTestHeatmap', function(req, res, next) {
 
