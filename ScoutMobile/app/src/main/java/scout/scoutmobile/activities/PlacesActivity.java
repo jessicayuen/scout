@@ -3,6 +3,7 @@ package scout.scoutmobile.activities;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -18,7 +19,9 @@ import android.widget.TextView;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -84,20 +87,20 @@ public class PlacesActivity extends ActionBarActivity {
             listItem.position = position;
             listItem.thumbnail = (ImageView) view.findViewById(R.id.placeImage);
 
-//            ParseFile imageFile = place.getImageFile();
-//            if (imageFile != null) {
-//                imageFile.getDataInBackground(new GetDataCallback() {
-//                    @Override
-//                    public void done(byte[] bytes, ParseException e) {
-//                        if (e == null) {
-//                            if (listItem.position == position) {
-//                                Place place = mPlaces.get(listItem.position);
-//                                listItem.thumbnail.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-//                            }
-//                        }
-//                    }
-//                });
-//            }
+            ParseFile imageFile = place.getImageFile();
+            if (imageFile != null) {
+                imageFile.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] bytes, ParseException e) {
+                        if (e == null) {
+                            if (listItem.position == position) {
+                                Place place = mPlaces.get(listItem.position);
+                                listItem.thumbnail.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                            }
+                        }
+                    }
+                });
+            }
 
             // Set the Place list item values
             titleView.setText(place.getTitle());
