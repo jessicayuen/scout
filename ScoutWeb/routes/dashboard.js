@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Parse = require('parse').Parse;
-var moment = require('moment'); 
+var moment = require('moment');
 
 // Mock data
 var data = {
@@ -125,14 +125,14 @@ router.get('/customers', function(req, res, next) {
             return a.x - b.x;
         });
 
-    }).then( function() { 
+    }).then( function() {
         doStuffToMuhObjectJSON('Points', function(json) {
             // bin dates for points data (where unique business-customer
             // relationships should first be instatiated... eventually)
             var counts = {};
             var arr = [];
             json.forEach( function(point) {
-                var d = moment(point.firstVisit.iso);
+                var d = point.firstVisit ? moment(point.firstVisit.iso) : moment(point.createdAt.iso);
                 d.startOf('day');
                 counts[+d] = 1 + (counts[+d] || 0);
             });
