@@ -14,7 +14,9 @@ var NUM_MIN_ARGS = 3;
 
 var CUST_MIN_DUR = 5;
 var CUST_MAX_DUR = 25;
+var POINTS_PER_5_MIN = 1;
 var CHANCE_CUST_IN_STORE = 0.1;
+var REWARDS_ON = false;
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 var getRandomInt = function (min, max) {
@@ -44,7 +46,19 @@ var getAllCustomerQuery = function () {
     return query.find();
 };
 
-var saveIntervalRecData = function (intervalObj, startDate, endDate) {
+var saveRewardData = function (date, duration, business, customer) {
+    var pointsObj = Parse.Object.extend(POINTS_TABLE);
+    var points = new pointsObj();
+
+    points.set('business', business);
+    points.set('customer', customer);
+    points.set('firstVisit', date.toDate());
+    points.set('points', Math.floor(duration/5)*POINTS_PER_5_MIN);
+
+    points.save(null, {error: function (obj, error) {console.log('saveRewardData: '+ error.message);}});
+};
+
+var saveIntervalRecData = function (intervalObj, startDate, endDate, business, customer) {
     for (var i=startDate.clone(); i<endDate; i.add(5,'minutes')) {
         var intervalRecObj = Parse.Object.extend(INTERVAL_REC_TABLE);
         var intervalRec = new intervalRecObj();
@@ -54,18 +68,15 @@ var saveIntervalRecData = function (intervalObj, startDate, endDate) {
         intervalRec.set('coordX', getRandomArbitrary(1,10));
         intervalRec.set('coordY', getRandomArbitrary(1,10));
 
-        intervalRec.save(null, { error: function (obj, error) {console.log('saveIntervalRecords: '+ error.message );} });
+        intervalRec.save(null, {error: function (obj, error) {console.log('saveIntervalRecData: '+ error.message );}});
     }
 };
 
 var saveIntervalData = function(business, customer, startDate) {
-    var durationMin = getRandomInt(CUST_MIN_DUR, CUST_MAX_DUR);
-    var endDate = startDate.clone();
-
-    endDate.add(durationMin, 'minutes');
-
     var intervalObj = Parse.Object.extend(INTERVAL_TABLE);
     var interval = new intervalObj();
+    var durationMin = getRandomInt(CUST_MIN_DUR, CUST_MAX_DUR);
+    var endDate = startDate.clone().add(durationMin, 'minutes');
 
     interval.set('business', business);
     interval.set('customer', customer);
@@ -74,7 +85,10 @@ var saveIntervalData = function(business, customer, startDate) {
 
     interval.save(null, {
         success: function (obj) {
-            saveIntervalRecData(obj, startDate.clone(), endDate.clone());
+            saveIntervalRecData(obj, startDate.clone(), endDate.clone(), business, customer);
+            if (REWARDS_ON) {
+                saveRewardData(startDate.clone(), durationMin, business, customer);
+            }
         },
         error: function (obj, error) {
             console.log('saveIntervalData: '+ error.message);
@@ -178,6 +192,10 @@ var getArgs = function (argc, argv) {
                 temp = args.splice(0,2);
                 argsObj.pchance = temp[1];
                 break;
+            case '-r': // rewards flag
+                temp = args.splice(0,1);
+                REWARDS_ON = true;
+                break;
             default:
                 console.log('invalid input');
                 process.exit(1);
@@ -189,7 +207,7 @@ var getArgs = function (argc, argv) {
 
 var main = function (argc, argv) {
     if (argc-2 < NUM_MIN_ARGS) {
-        console.log('USAGE: node index.js [-b business] [-c customer username] [-d date (YYYY-MM-DD) [OPTIONAL: -p percent chance (0.0-1.0)]]');
+        console.log('USAGE: node index.js [-b business] [-c customer username] [-d date (YYYY-MM-DD) [OPTIONAL: -p percent chance (0.0-1.0)]] [-r add rewards]');
         process.exit(1);
     }
 
