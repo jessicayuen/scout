@@ -141,6 +141,9 @@ public class PlacesActivity extends ActionBarActivity {
             case R.id.action_log_out:
                 GeneralUtils.logUserOut(this);
                 return true;
+            case R.id.action_refresh:
+                finish();
+                startActivity(getIntent());
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -21,4 +21,4 @@ start the local server on localhost port 3000 .
 License
 -------
 
-Copyright (c) 2015 Jessica Yuen, Justin Hoy, Jim Wen, Shen Wei Liao, Thomas Fung
+Licensed under GNU GPL v3.
