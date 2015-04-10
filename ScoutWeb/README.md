@@ -13,4 +13,4 @@ To run the application, go to the Scout Webapp root directory and run: `node app
 
 Generating mock data
 -----------------------
-To generate mock data run: `USAGE: node index.js [-b business] [-c customer username] [OPTIONAL: -h hours]`
+To generate mock data run: `USAGE: node index.js [-b business] [-c customer username] [-d date (YYYY-MM-DD) [OPTIONAL: -p percent chance (0.0-1.0)]] [-r add rewards]`
