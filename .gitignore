@@ -1,5 +1,5 @@
 # Built application files
-ScoutMobile/*.apk
+ScoutMobile/app/*.apk
 ScoutMobile/*.ap_
 
 # Files for the Dalvik VM
